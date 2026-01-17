@@ -1,0 +1,942 @@
+/**
+ * DataService.js
+ * Query layer over DataStore
+ * Provides bidirectional relationship queries
+ * Supports time range filtering for temporal data
+ */
+
+import { dataStore } from './DataStore.js';
+
+export const DataService = {
+  // ============================================
+  // Time Range Filtering Utilities
+  // ============================================
+
+  /**
+   * Check if a date falls within a time range
+   * @param {string|Date} date - The date to check
+   * @param {Object|null} timeRange - { start: Date, end: Date } or null for no filter
+   * @returns {boolean}
+   */
+  isDateInRange: (date, timeRange) => {
+    if (!timeRange || !timeRange.start || !timeRange.end) return true;
+    const d = new Date(date);
+    return d >= timeRange.start && d <= timeRange.end;
+  },
+
+  /**
+   * Filter volumeOverTime array by time range
+   * @param {Array} volumeOverTime - Array of { date, factionVolumes, sourceVolumes }
+   * @param {Object|null} timeRange - { start: Date, end: Date } or null
+   * @returns {Array} Filtered array
+   */
+  filterVolumeByTimeRange: (volumeOverTime, timeRange) => {
+    if (!volumeOverTime || !timeRange) return volumeOverTime || [];
+    return volumeOverTime.filter(entry => DataService.isDateInRange(entry.date, timeRange));
+  },
+
+  /**
+   * Check if a narrative has activity within a time range
+   * @param {Object} narrative - Narrative object with volumeOverTime
+   * @param {Object|null} timeRange - { start: Date, end: Date } or null
+   * @returns {boolean}
+   */
+  narrativeHasActivityInRange: (narrative, timeRange) => {
+    if (!timeRange) return true;
+    if (!narrative.volumeOverTime || !narrative.volumeOverTime.length) {
+      // Check createdAt as fallback
+      return DataService.isDateInRange(narrative.createdAt, timeRange);
+    }
+    return narrative.volumeOverTime.some(entry => DataService.isDateInRange(entry.date, timeRange));
+  },
+
+  // ============================================
+  // Direct Getters
+  // ============================================
+
+  // Missions
+  getMissions: () => dataStore.data.missions,
+  getMission: (id) => dataStore.data.missions.find(m => m.id === id),
+
+  // Narratives - now supports time range filtering
+  getNarratives: (missionId = null, timeRange = null) => {
+    let narratives = dataStore.data.narratives;
+    
+    // Filter by mission
+    if (missionId && missionId !== 'all') {
+      narratives = narratives.filter(n => n.missionId === missionId);
+    }
+    
+    // Filter by time range
+    if (timeRange) {
+      narratives = narratives.filter(n => DataService.narrativeHasActivityInRange(n, timeRange));
+    }
+    
+    return narratives;
+  },
+  getNarrative: (id) => dataStore.data.narratives.find(n => n.id === id),
+  
+  // Get narratives by status (with optional time range)
+  getNarrativesByStatus: (status, timeRange = null) => {
+    let narratives = dataStore.data.narratives.filter(n => (n.status || 'new') === status);
+    if (timeRange) {
+      narratives = narratives.filter(n => DataService.narrativeHasActivityInRange(n, timeRange));
+    }
+    return narratives;
+  },
+  
+  // Get status counts (with optional time range)
+  getNarrativeStatusCounts: (timeRange = null) => {
+    const counts = { new: 0, in_progress: 0, under_investigation: 0, resolved: 0 };
+    let narratives = dataStore.data.narratives;
+    
+    if (timeRange) {
+      narratives = narratives.filter(n => DataService.narrativeHasActivityInRange(n, timeRange));
+    }
+    
+    narratives.forEach(n => {
+      const status = n.status || 'new';
+      counts[status] = (counts[status] || 0) + 1;
+    });
+    return counts;
+  },
+
+  // Sub-Narratives
+  getSubNarratives: () => dataStore.data.subNarratives,
+  getSubNarrative: (id) => dataStore.data.subNarratives.find(s => s.id === id),
+
+  // Factions
+  getFactions: () => dataStore.data.factions,
+  getFaction: (id) => dataStore.data.factions.find(f => f.id === id),
+  getFactionOverlaps: () => dataStore.data.factionOverlaps,
+
+  // Locations
+  getLocations: () => dataStore.data.locations,
+  getLocation: (id) => dataStore.data.locations.find(l => l.id === id),
+
+  // Events
+  getEvents: () => dataStore.data.events,
+  getEvent: (id) => dataStore.data.events.find(e => e.id === id),
+
+  // Persons
+  getPersons: () => dataStore.data.persons,
+  getPerson: (id) => dataStore.data.persons.find(p => p.id === id),
+
+  // Organizations
+  getOrganizations: () => dataStore.data.organizations,
+  getOrganization: (id) => dataStore.data.organizations.find(o => o.id === id),
+
+  // Documents
+  getDocuments: () => dataStore.data.documents || [],
+  getDocument: (id) => (dataStore.data.documents || []).find(d => d.id === id),
+
+  // Sources
+  getSources: () => dataStore.data.sources || [],
+  getSource: (id) => (dataStore.data.sources || []).find(s => s.id === id),
+  getSourceCategories: () => dataStore.data.sourceCategories || [],
+  
+  getSourcesByType: (type) => {
+    return (dataStore.data.sources || []).filter(s => s.type === type);
+  },
+  
+  getSocialSources: () => {
+    return (dataStore.data.sources || []).filter(s => s.type === 'social');
+  },
+  
+  getNewsSources: () => {
+    return (dataStore.data.sources || []).filter(s => 
+      s.type === 'national_news' || s.type === 'international_news'
+    );
+  },
+  
+  getNationalNewsSources: () => {
+    return (dataStore.data.sources || []).filter(s => s.type === 'national_news');
+  },
+  
+  getInternationalNewsSources: () => {
+    return (dataStore.data.sources || []).filter(s => s.type === 'international_news');
+  },
+
+  // ============================================
+  // Narrative Relationships
+  // ============================================
+
+  getSubNarrativesForNarrative: (narrativeId) =>
+    dataStore.data.subNarratives.filter(s => s.parentNarrativeId === narrativeId),
+
+  getFactionsForNarrative: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative || !narrative.factionMentions) return [];
+    return Object.entries(narrative.factionMentions).map(([factionId, data]) => ({
+      faction: dataStore.data.factions.find(f => f.id === factionId),
+      ...data
+    })).filter(f => f.faction);
+  },
+
+  getPersonsForNarrative: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative) return [];
+    return (narrative.personIds || [])
+      .map(pid => dataStore.data.persons.find(p => p.id === pid))
+      .filter(Boolean);
+  },
+
+  getOrganizationsForNarrative: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative) return [];
+    return (narrative.organizationIds || [])
+      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
+      .filter(Boolean);
+  },
+
+  getLocationsForNarrative: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative) return [];
+    return (narrative.locationIds || [])
+      .map(lid => dataStore.data.locations.find(l => l.id === lid))
+      .filter(Boolean);
+  },
+
+  getEventsForNarrative: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative) return [];
+    return (narrative.eventIds || [])
+      .map(eid => dataStore.data.events.find(e => e.id === eid))
+      .filter(Boolean);
+  },
+
+  // ============================================
+  // SubNarrative Relationships (same as Narrative)
+  // ============================================
+
+  getFactionsForSubNarrative: (subNarrativeId) => {
+    const sub = dataStore.data.subNarratives.find(s => s.id === subNarrativeId);
+    if (!sub || !sub.factionMentions) return [];
+    return Object.entries(sub.factionMentions).map(([factionId, data]) => ({
+      faction: dataStore.data.factions.find(f => f.id === factionId),
+      ...data
+    })).filter(f => f.faction);
+  },
+
+  getParentNarrative: (subNarrativeId) => {
+    const sub = dataStore.data.subNarratives.find(s => s.id === subNarrativeId);
+    if (!sub) return null;
+    return dataStore.data.narratives.find(n => n.id === sub.parentNarrativeId);
+  },
+
+  // ============================================
+  // Faction Relationships
+  // ============================================
+
+  getNarrativesForFaction: (factionId) => {
+    return dataStore.data.narratives.filter(n =>
+      n.factionMentions && n.factionMentions[factionId]
+    );
+  },
+
+  getSubNarrativesForFaction: (factionId) => {
+    return dataStore.data.subNarratives.filter(s =>
+      s.factionMentions && s.factionMentions[factionId]
+    );
+  },
+
+  getRelatedFactions: (factionId) => {
+    const faction = dataStore.data.factions.find(f => f.id === factionId);
+    if (!faction) return [];
+    return (faction.relatedFactionIds || [])
+      .map(fid => dataStore.data.factions.find(f => f.id === fid))
+      .filter(Boolean);
+  },
+
+  getFactionOverlapsFor: (factionId) => {
+    return dataStore.data.factionOverlaps.filter(o =>
+      o.factionIds.includes(factionId)
+    );
+  },
+
+  getAffiliatedPersonsForFaction: (factionId) => {
+    const faction = dataStore.data.factions.find(f => f.id === factionId);
+    if (!faction) return [];
+    return (faction.affiliatedPersonIds || [])
+      .map(pid => dataStore.data.persons.find(p => p.id === pid))
+      .filter(Boolean);
+  },
+
+  getAffiliatedOrganizationsForFaction: (factionId) => {
+    const faction = dataStore.data.factions.find(f => f.id === factionId);
+    if (!faction) return [];
+    return (faction.affiliatedOrganizationIds || [])
+      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
+      .filter(Boolean);
+  },
+
+  // ============================================
+  // Location Relationships
+  // ============================================
+
+  getNarrativesForLocation: (locationId) => {
+    return dataStore.data.narratives.filter(n =>
+      (n.locationIds || []).includes(locationId)
+    );
+  },
+
+  getSubNarrativesForLocation: (locationId) => {
+    return dataStore.data.subNarratives.filter(s =>
+      (s.locationIds || []).includes(locationId)
+    );
+  },
+
+  getEventsForLocation: (locationId) => {
+    return dataStore.data.events.filter(e => e.locationId === locationId);
+  },
+
+  getPersonsForLocation: (locationId) => {
+    return dataStore.data.persons.filter(p =>
+      (p.relatedLocationIds || []).includes(locationId)
+    );
+  },
+
+  getOrganizationsForLocation: (locationId) => {
+    return dataStore.data.organizations.filter(o =>
+      (o.relatedLocationIds || []).includes(locationId)
+    );
+  },
+
+  // ============================================
+  // Event Relationships
+  // ============================================
+
+  getSubEventsForEvent: (eventId) => {
+    const event = dataStore.data.events.find(e => e.id === eventId);
+    if (!event) return [];
+    return (event.subEventIds || [])
+      .map(eid => dataStore.data.events.find(e => e.id === eid))
+      .filter(Boolean);
+  },
+
+  getParentEvent: (eventId) => {
+    const event = dataStore.data.events.find(e => e.id === eventId);
+    if (!event || !event.parentEventId) return null;
+    return dataStore.data.events.find(e => e.id === event.parentEventId);
+  },
+
+  getLocationForEvent: (eventId) => {
+    const event = dataStore.data.events.find(e => e.id === eventId);
+    if (!event || !event.locationId) return null;
+    return dataStore.data.locations.find(l => l.id === event.locationId);
+  },
+
+  getPersonsForEvent: (eventId) => {
+    const event = dataStore.data.events.find(e => e.id === eventId);
+    if (!event) return [];
+    return (event.personIds || [])
+      .map(pid => dataStore.data.persons.find(p => p.id === pid))
+      .filter(Boolean);
+  },
+
+  getOrganizationsForEvent: (eventId) => {
+    const event = dataStore.data.events.find(e => e.id === eventId);
+    if (!event) return [];
+    return (event.organizationIds || [])
+      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
+      .filter(Boolean);
+  },
+
+  getNarrativesForEvent: (eventId) => {
+    return dataStore.data.narratives.filter(n =>
+      (n.eventIds || []).includes(eventId)
+    );
+  },
+
+  getSubNarrativesForEvent: (eventId) => {
+    return dataStore.data.subNarratives.filter(s =>
+      (s.eventIds || []).includes(eventId)
+    );
+  },
+
+  // ============================================
+  // Person Relationships
+  // ============================================
+
+  getNarrativesForPerson: (personId) => {
+    return dataStore.data.narratives.filter(n =>
+      (n.personIds || []).includes(personId)
+    );
+  },
+
+  getSubNarrativesForPerson: (personId) => {
+    return dataStore.data.subNarratives.filter(s =>
+      (s.personIds || []).includes(personId)
+    );
+  },
+
+  /**
+   * Get related persons by finding other people who appear in the same narratives.
+   * Two people are related if they are mentioned together in at least one narrative.
+   */
+  getRelatedPersons: (personId) => {
+    const narratives = dataStore.data.narratives.filter(n =>
+      (n.personIds || []).includes(personId)
+    );
+    
+    // Collect all other person IDs from these narratives
+    const relatedIds = new Set();
+    narratives.forEach(n => {
+      (n.personIds || []).forEach(pId => {
+        if (pId !== personId) relatedIds.add(pId);
+      });
+    });
+    
+    return [...relatedIds]
+      .map(pid => dataStore.data.persons.find(p => p.id === pid))
+      .filter(Boolean);
+  },
+
+  /**
+   * Get related organizations by finding orgs that appear in the same narratives as this person.
+   */
+  getRelatedOrganizationsForPerson: (personId) => {
+    const narratives = dataStore.data.narratives.filter(n =>
+      (n.personIds || []).includes(personId)
+    );
+    
+    // Collect all organization IDs from these narratives
+    const relatedIds = new Set();
+    narratives.forEach(n => {
+      (n.organizationIds || []).forEach(oId => relatedIds.add(oId));
+    });
+    
+    return [...relatedIds]
+      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
+      .filter(Boolean);
+  },
+
+  getAffiliatedFactionsForPerson: (personId) => {
+    const person = dataStore.data.persons.find(p => p.id === personId);
+    if (!person) return [];
+    return (person.affiliatedFactionIds || [])
+      .map(fid => dataStore.data.factions.find(f => f.id === fid))
+      .filter(Boolean);
+  },
+
+  getLocationsForPerson: (personId) => {
+    const person = dataStore.data.persons.find(p => p.id === personId);
+    if (!person) return [];
+    return (person.relatedLocationIds || [])
+      .map(lid => dataStore.data.locations.find(l => l.id === lid))
+      .filter(Boolean);
+  },
+
+  getEventsForPerson: (personId) => {
+    const person = dataStore.data.persons.find(p => p.id === personId);
+    if (!person) return [];
+    return (person.relatedEventIds || [])
+      .map(eid => dataStore.data.events.find(e => e.id === eid))
+      .filter(Boolean);
+  },
+
+  // ============================================
+  // Organization Relationships
+  // ============================================
+
+  getNarrativesForOrganization: (orgId) => {
+    return dataStore.data.narratives.filter(n =>
+      (n.organizationIds || []).includes(orgId)
+    );
+  },
+
+  getSubNarrativesForOrganization: (orgId) => {
+    return dataStore.data.subNarratives.filter(s =>
+      (s.organizationIds || []).includes(orgId)
+    );
+  },
+
+  /**
+   * Get related persons by finding people who appear in the same narratives as this org.
+   */
+  getRelatedPersonsForOrganization: (orgId) => {
+    const narratives = dataStore.data.narratives.filter(n =>
+      (n.organizationIds || []).includes(orgId)
+    );
+    
+    // Collect all person IDs from these narratives
+    const relatedIds = new Set();
+    narratives.forEach(n => {
+      (n.personIds || []).forEach(pId => relatedIds.add(pId));
+    });
+    
+    return [...relatedIds]
+      .map(pid => dataStore.data.persons.find(p => p.id === pid))
+      .filter(Boolean);
+  },
+
+  /**
+   * Get related organizations by finding other orgs that appear in the same narratives.
+   */
+  getRelatedOrganizations: (orgId) => {
+    const narratives = dataStore.data.narratives.filter(n =>
+      (n.organizationIds || []).includes(orgId)
+    );
+    
+    // Collect all other organization IDs from these narratives
+    const relatedIds = new Set();
+    narratives.forEach(n => {
+      (n.organizationIds || []).forEach(oId => {
+        if (oId !== orgId) relatedIds.add(oId);
+      });
+    });
+    
+    return [...relatedIds]
+      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
+      .filter(Boolean);
+  },
+
+  getAffiliatedFactionsForOrganization: (orgId) => {
+    const org = dataStore.data.organizations.find(o => o.id === orgId);
+    if (!org) return [];
+    return (org.affiliatedFactionIds || [])
+      .map(fid => dataStore.data.factions.find(f => f.id === fid))
+      .filter(Boolean);
+  },
+
+  getLocationsForOrganization: (orgId) => {
+    const org = dataStore.data.organizations.find(o => o.id === orgId);
+    if (!org) return [];
+    return (org.relatedLocationIds || [])
+      .map(lid => dataStore.data.locations.find(l => l.id === lid))
+      .filter(Boolean);
+  },
+
+  // ============================================
+  // Network Graph Builder
+  // ============================================
+
+  /**
+   * Build network graph by deriving relationships from shared narratives.
+   * Two entities are connected if they appear together in at least one narrative.
+   * Each link includes the narratives that connect the entities.
+   */
+  buildNetworkGraph: (personIds, orgIds) => {
+    const nodes = [];
+    const links = [];
+    const narratives = dataStore.data.narratives;
+
+    // Build index: entityId -> Set of narrative IDs
+    const entityToNarratives = new Map();
+    narratives.forEach(n => {
+      (n.personIds || []).forEach(pId => {
+        if (!entityToNarratives.has(pId)) entityToNarratives.set(pId, new Set());
+        entityToNarratives.get(pId).add(n.id);
+      });
+      (n.organizationIds || []).forEach(oId => {
+        if (!entityToNarratives.has(oId)) entityToNarratives.set(oId, new Set());
+        entityToNarratives.get(oId).add(n.id);
+      });
+    });
+
+    // Helper to find shared narratives between two entities
+    const getSharedNarratives = (id1, id2) => {
+      const set1 = entityToNarratives.get(id1) || new Set();
+      const set2 = entityToNarratives.get(id2) || new Set();
+      const sharedIds = [...set1].filter(nId => set2.has(nId));
+      return sharedIds.map(nId => narratives.find(n => n.id === nId)).filter(Boolean);
+    };
+
+    // Add person nodes
+    personIds.forEach(pId => {
+      const person = dataStore.data.persons.find(p => p.id === pId);
+      if (person) {
+        nodes.push({ id: pId, label: person.name, type: 'person', data: person });
+      }
+    });
+
+    // Add organization nodes
+    orgIds.forEach(oId => {
+      const org = dataStore.data.organizations.find(o => o.id === oId);
+      if (org) {
+        nodes.push({ id: oId, label: org.name, type: 'organization', data: org });
+      }
+    });
+
+    const nodeIds = new Set(nodes.map(n => n.id));
+    const addedLinks = new Set(); // Track links to avoid duplicates
+
+    // Compute person-person links from shared narratives
+    for (let i = 0; i < personIds.length; i++) {
+      for (let j = i + 1; j < personIds.length; j++) {
+        const p1 = personIds[i];
+        const p2 = personIds[j];
+        const sharedNarratives = getSharedNarratives(p1, p2);
+        
+        if (sharedNarratives.length > 0) {
+          const linkKey = [p1, p2].sort().join('-');
+          if (!addedLinks.has(linkKey)) {
+            links.push({
+              source: p1,
+              target: p2,
+              type: 'person-person',
+              narratives: sharedNarratives,
+              strength: sharedNarratives.length
+            });
+            addedLinks.add(linkKey);
+          }
+        }
+      }
+    }
+
+    // Compute org-org links from shared narratives
+    for (let i = 0; i < orgIds.length; i++) {
+      for (let j = i + 1; j < orgIds.length; j++) {
+        const o1 = orgIds[i];
+        const o2 = orgIds[j];
+        const sharedNarratives = getSharedNarratives(o1, o2);
+        
+        if (sharedNarratives.length > 0) {
+          const linkKey = [o1, o2].sort().join('-');
+          if (!addedLinks.has(linkKey)) {
+            links.push({
+              source: o1,
+              target: o2,
+              type: 'org-org',
+              narratives: sharedNarratives,
+              strength: sharedNarratives.length
+            });
+            addedLinks.add(linkKey);
+          }
+        }
+      }
+    }
+
+    // Compute person-org links from shared narratives
+    personIds.forEach(pId => {
+      orgIds.forEach(oId => {
+        const sharedNarratives = getSharedNarratives(pId, oId);
+        
+        if (sharedNarratives.length > 0) {
+          const linkKey = [pId, oId].sort().join('-');
+          if (!addedLinks.has(linkKey)) {
+            links.push({
+              source: pId,
+              target: oId,
+              type: 'person-org',
+              narratives: sharedNarratives,
+              strength: sharedNarratives.length
+            });
+            addedLinks.add(linkKey);
+          }
+        }
+      });
+    });
+
+    return { nodes, links };
+  },
+
+  // ============================================
+  // Dashboard Aggregations (with time range support)
+  // ============================================
+
+  getDashboardStats: (missionId = null, timeRange = null) => {
+    const narratives = DataService.getNarratives(missionId, timeRange);
+    const subNarratives = dataStore.data.subNarratives.filter(s =>
+      narratives.some(n => n.id === s.parentNarrativeId)
+    );
+
+    // Calculate total volume for each narrative (filtered by time range)
+    const narrativesWithVolume = narratives.map(n => {
+      const filteredVolume = DataService.filterVolumeByTimeRange(n.volumeOverTime, timeRange);
+      const totalVolume = timeRange && filteredVolume.length > 0
+        ? filteredVolume.reduce((sum, entry) => {
+            return sum + Object.values(entry.factionVolumes || {}).reduce((s, v) => s + v, 0);
+          }, 0)
+        : Object.values(n.factionMentions || {}).reduce((sum, f) => sum + (f.volume || 0), 0);
+      
+      return { ...n, totalVolume };
+    });
+
+    // Sort by volume
+    narrativesWithVolume.sort((a, b) => b.totalVolume - a.totalVolume);
+
+    // Filter events by time range
+    let events = dataStore.data.events;
+    if (timeRange) {
+      events = events.filter(e => DataService.isDateInRange(e.date, timeRange));
+    }
+
+    return {
+      totalNarratives: narratives.length,
+      totalSubNarratives: subNarratives.length,
+      totalFactions: dataStore.data.factions.length,
+      totalLocations: dataStore.data.locations.length,
+      totalEvents: events.length,
+      totalPersons: dataStore.data.persons.length,
+      totalOrganizations: dataStore.data.organizations.length,
+      topNarratives: narrativesWithVolume.slice(0, 10),
+      recentNarratives: [...narratives]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
+    };
+  },
+
+  // Aggregate volume over time across multiple narratives (with time range support)
+  getAggregateVolumeOverTime: (missionId = null, timeRange = null) => {
+    const narratives = DataService.getNarratives(missionId);
+    const factions = dataStore.data.factions;
+    const dateMap = new Map();
+
+    narratives.forEach(n => {
+      const volumeData = DataService.filterVolumeByTimeRange(n.volumeOverTime, timeRange);
+      volumeData.forEach(entry => {
+        if (!dateMap.has(entry.date)) {
+          dateMap.set(entry.date, {});
+        }
+        const dayData = dateMap.get(entry.date);
+        Object.entries(entry.factionVolumes || {}).forEach(([fId, vol]) => {
+          dayData[fId] = (dayData[fId] || 0) + vol;
+        });
+      });
+    });
+
+    const dates = [...dateMap.keys()].sort();
+    const series = factions.map(f =>
+      dates.map(date => (dateMap.get(date) || {})[f.id] || 0)
+    );
+
+    return { dates, series, factions };
+  },
+
+  // Get all locations with related narrative/event counts (with time range support)
+  getAllLocationsWithCounts: (timeRange = null) => {
+    const narratives = timeRange 
+      ? dataStore.data.narratives.filter(n => DataService.narrativeHasActivityInRange(n, timeRange))
+      : dataStore.data.narratives;
+    
+    const events = timeRange
+      ? dataStore.data.events.filter(e => DataService.isDateInRange(e.date, timeRange))
+      : dataStore.data.events;
+
+    return dataStore.data.locations.map(loc => ({
+      ...loc,
+      narrativeCount: narratives.filter(n =>
+        (n.locationIds || []).includes(loc.id)
+      ).length,
+      eventCount: events.filter(e =>
+        e.locationId === loc.id
+      ).length
+    }));
+  },
+
+  // Get recent events (with time range support)
+  getRecentEvents: (limit = 10, timeRange = null) => {
+    let events = [...dataStore.data.events];
+    
+    if (timeRange) {
+      events = events.filter(e => DataService.isDateInRange(e.date, timeRange));
+    }
+    
+    return events
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, limit);
+  },
+
+  // Calculate total volume for a narrative
+  getNarrativeTotalVolume: (narrative) => {
+    return Object.values(narrative.factionMentions || {})
+      .reduce((sum, f) => sum + (f.volume || 0), 0);
+  },
+
+  // ============================================
+  // Source Relationships
+  // ============================================
+
+  getSourcesForNarrative: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative || !narrative.sourceVolumes) return [];
+    
+    const sources = dataStore.data.sources || [];
+    return Object.entries(narrative.sourceVolumes).map(([sourceId, data]) => {
+      const source = sources.find(s => s.id === sourceId);
+      return source ? { source, ...data } : null;
+    }).filter(Boolean);
+  },
+
+  getFactionSourcesForNarrative: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative || !narrative.factionSources) return [];
+    
+    const factions = dataStore.data.factions;
+    const sources = dataStore.data.sources || [];
+    
+    return Object.entries(narrative.factionSources).map(([factionId, sourceCounts]) => {
+      const faction = factions.find(f => f.id === factionId);
+      if (!faction) return null;
+      
+      const sourceData = Object.entries(sourceCounts).map(([sourceId, volume]) => {
+        const source = sources.find(s => s.id === sourceId);
+        return source ? { source, volume } : null;
+      }).filter(Boolean);
+      
+      return { faction, sources: sourceData };
+    }).filter(Boolean);
+  },
+
+  getSourceVolumeOverTime: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative || !narrative.volumeOverTime) return { dates: [], series: [], sources: [] };
+    
+    const sources = dataStore.data.sources || [];
+    const allSourceIds = new Set();
+    
+    // Collect all source IDs present in the time series
+    narrative.volumeOverTime.forEach(entry => {
+      Object.keys(entry.sourceVolumes || {}).forEach(id => allSourceIds.add(id));
+    });
+    
+    const sourceIds = [...allSourceIds];
+    const relevantSources = sourceIds.map(id => sources.find(s => s.id === id)).filter(Boolean);
+    
+    const dates = narrative.volumeOverTime.map(e => e.date);
+    const series = relevantSources.map(source => 
+      narrative.volumeOverTime.map(entry => (entry.sourceVolumes || {})[source.id] || 0)
+    );
+    
+    return { dates, series, sources: relevantSources };
+  },
+
+  // Aggregate source volumes across multiple narratives (with time range support)
+  getAggregateSourceVolumes: (missionId = null, timeRange = null) => {
+    const narratives = DataService.getNarratives(missionId, timeRange);
+    const sources = dataStore.data.sources || [];
+    const sourceTotals = {};
+    
+    narratives.forEach(n => {
+      // If time range specified, calculate from volumeOverTime
+      if (timeRange && n.volumeOverTime) {
+        const filteredVolume = DataService.filterVolumeByTimeRange(n.volumeOverTime, timeRange);
+        filteredVolume.forEach(entry => {
+          Object.entries(entry.sourceVolumes || {}).forEach(([sourceId, vol]) => {
+            if (!sourceTotals[sourceId]) {
+              sourceTotals[sourceId] = { volume: 0, sentimentCounts: { positive: 0, neutral: 0, negative: 0 } };
+            }
+            sourceTotals[sourceId].volume += vol;
+          });
+        });
+      } else {
+        // Use aggregate sourceVolumes
+        Object.entries(n.sourceVolumes || {}).forEach(([sourceId, data]) => {
+          if (!sourceTotals[sourceId]) {
+            sourceTotals[sourceId] = { volume: 0, sentimentCounts: { positive: 0, neutral: 0, negative: 0 } };
+          }
+          sourceTotals[sourceId].volume += data.volume || 0;
+          if (data.sentiment) {
+            sourceTotals[sourceId].sentimentCounts[data.sentiment]++;
+          }
+        });
+      }
+    });
+    
+    return Object.entries(sourceTotals).map(([sourceId, totals]) => {
+      const source = sources.find(s => s.id === sourceId);
+      return source ? { source, ...totals } : null;
+    }).filter(Boolean).sort((a, b) => b.volume - a.volume);
+  },
+
+  // Aggregate source volumes over time (with time range support)
+  getAggregateSourceVolumeOverTime: (missionId = null, timeRange = null) => {
+    const narratives = DataService.getNarratives(missionId);
+    const sources = dataStore.data.sources || [];
+    const dateMap = new Map();
+
+    narratives.forEach(n => {
+      const volumeData = DataService.filterVolumeByTimeRange(n.volumeOverTime, timeRange);
+      volumeData.forEach(entry => {
+        if (!dateMap.has(entry.date)) {
+          dateMap.set(entry.date, {});
+        }
+        const dayData = dateMap.get(entry.date);
+        Object.entries(entry.sourceVolumes || {}).forEach(([sId, vol]) => {
+          dayData[sId] = (dayData[sId] || 0) + vol;
+        });
+      });
+    });
+
+    const dates = [...dateMap.keys()].sort();
+    const allSourceIds = new Set();
+    dateMap.forEach(dayData => {
+      Object.keys(dayData).forEach(id => allSourceIds.add(id));
+    });
+    
+    const relevantSources = [...allSourceIds].map(id => sources.find(s => s.id === id)).filter(Boolean);
+    const series = relevantSources.map(source =>
+      dates.map(date => (dateMap.get(date) || {})[source.id] || 0)
+    );
+
+    return { dates, series, sources: relevantSources };
+  },
+
+  // Get top sources by total volume (with time range support)
+  getTopSources: (missionId = null, limit = 5, timeRange = null) => {
+    const aggregated = DataService.getAggregateSourceVolumes(missionId, timeRange);
+    return aggregated.slice(0, limit);
+  },
+
+  // Get source category totals (with time range support)
+  getSourceCategoryTotals: (missionId = null, timeRange = null) => {
+    const aggregated = DataService.getAggregateSourceVolumes(missionId, timeRange);
+    const categories = dataStore.data.sourceCategories || [];
+    const categoryTotals = {};
+    
+    categories.forEach(cat => {
+      categoryTotals[cat.id] = { category: cat, volume: 0, sources: [] };
+    });
+    
+    aggregated.forEach(item => {
+      const type = item.source.type;
+      if (categoryTotals[type]) {
+        categoryTotals[type].volume += item.volume;
+        categoryTotals[type].sources.push(item);
+      }
+    });
+    
+    return Object.values(categoryTotals).sort((a, b) => b.volume - a.volume);
+  },
+
+  // Search across all entities
+  search: (query) => {
+    const lowerQuery = query.toLowerCase();
+    const results = {
+      narratives: [],
+      subNarratives: [],
+      factions: [],
+      locations: [],
+      events: [],
+      persons: [],
+      organizations: []
+    };
+
+    results.narratives = dataStore.data.narratives.filter(n =>
+      n.text.toLowerCase().includes(lowerQuery)
+    );
+    results.subNarratives = dataStore.data.subNarratives.filter(s =>
+      s.text.toLowerCase().includes(lowerQuery)
+    );
+    results.factions = dataStore.data.factions.filter(f =>
+      f.name.toLowerCase().includes(lowerQuery)
+    );
+    results.locations = dataStore.data.locations.filter(l =>
+      l.name.toLowerCase().includes(lowerQuery)
+    );
+    results.events = dataStore.data.events.filter(e =>
+      e.text.toLowerCase().includes(lowerQuery)
+    );
+    results.persons = dataStore.data.persons.filter(p =>
+      p.name.toLowerCase().includes(lowerQuery)
+    );
+    results.organizations = dataStore.data.organizations.filter(o =>
+      o.name.toLowerCase().includes(lowerQuery)
+    );
+
+    return results;
+  }
+};
+
+export default DataService;

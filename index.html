@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Primer - Intelligence Dashboard</title>
+  
+  <!-- External Libraries -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/venn.js@0.2.20/build/venn.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- App Styles -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+        <line x1="12" y1="22" x2="12" y2="15.5"/>
+        <polyline points="22 8.5 12 15.5 2 8.5"/>
+        <polyline points="2 15.5 12 8.5 22 15.5"/>
+        <line x1="12" y1="2" x2="12" y2="8.5"/>
+      </svg>
+      <span class="logo-text">Primer</span>
+    </div>
+    
+    <div class="nav-section">
+      <span class="nav-section-title">Analysis</span>
+      <ul class="nav-links">
+        <li><a href="#/dashboard" class="nav-link" data-view="dashboard">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <rect x="1" y="1" width="6" height="6" rx="1"/>
+            <rect x="9" y="1" width="6" height="6" rx="1"/>
+            <rect x="1" y="9" width="6" height="6" rx="1"/>
+            <rect x="9" y="9" width="6" height="6" rx="1"/>
+          </svg> Dashboard
+        </a></li>
+        <li><a href="#/monitors" class="nav-link" data-view="monitors">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <rect x="1" y="2" width="14" height="10" rx="1"/>
+            <path d="M5 14h6M8 12v2"/>
+            <path d="M4 6h2M4 8h3M10 5l2 2-2 2"/>
+          </svg> Monitors
+        </a></li>
+        <li><a href="#/workspaces" class="nav-link" data-view="workspaces">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <rect x="1" y="1" width="14" height="14" rx="1"/>
+            <path d="M1 5h14"/>
+            <path d="M5 5v10"/>
+          </svg> Workspaces
+        </a></li>
+        <li><a href="#/ai-briefing" class="nav-link" data-view="ai-briefing">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <circle cx="8" cy="8" r="6"/>
+            <path d="M8 5v3l2 1"/>
+            <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+            <path d="M3 3l1.5 1.5M13 3l-1.5 1.5M3 13l1.5-1.5M13 13l-1.5-1.5"/>
+          </svg> AI Briefing
+        </a></li>
+      </ul>
+    </div>
+    
+    <div class="nav-section">
+      <span class="nav-section-title">Data</span>
+      <ul class="nav-links">
+        <li><a href="#/narratives" class="nav-link" data-view="narratives">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <path d="M2 2h12v12H2z" rx="1"/>
+            <path d="M4 5h8M4 8h8M4 11h5"/>
+          </svg> Narratives
+        </a></li>
+        <li><a href="#/factions" class="nav-link" data-view="factions">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <circle cx="8" cy="5" r="2.5"/>
+            <circle cx="4" cy="11" r="2"/>
+            <circle cx="12" cy="11" r="2"/>
+            <path d="M6 6.5L4.5 9M10 6.5l1.5 2.5"/>
+          </svg> Factions
+        </a></li>
+        <li><a href="#/locations" class="nav-link" data-view="locations">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/>
+            <circle cx="8" cy="6" r="2"/>
+          </svg> Locations
+        </a></li>
+        <li><a href="#/events" class="nav-link" data-view="events">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <rect x="2" y="3" width="12" height="11" rx="1"/>
+            <path d="M2 6h12M5 1v3M11 1v3"/>
+          </svg> Events
+        </a></li>
+        <li><a href="#/entities" class="nav-link" data-view="entities">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <circle cx="8" cy="4" r="2.5"/>
+            <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
+          </svg> People & Orgs
+        </a></li>
+      </ul>
+    </div>
+    
+    <div class="nav-section">
+      <span class="nav-section-title">Status</span>
+      <ul class="nav-links">
+        <li><a href="#/status/new" class="nav-link" data-view="status-new">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor" stroke="none">
+            <circle cx="8" cy="8" r="4"/>
+          </svg> New
+        </a></li>
+        <li><a href="#/status/in_progress" class="nav-link" data-view="status-in_progress">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <circle cx="8" cy="8" r="5"/>
+            <path d="M8 5v3l2 2"/>
+          </svg> In Progress
+        </a></li>
+        <li><a href="#/status/under_investigation" class="nav-link" data-view="status-under_investigation">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <circle cx="7" cy="7" r="4"/>
+            <path d="M10 10l4 4"/>
+          </svg> Investigating
+        </a></li>
+        <li><a href="#/status/resolved" class="nav-link" data-view="status-resolved">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <circle cx="8" cy="8" r="5"/>
+            <path d="M5 8l2 2 4-4"/>
+          </svg> Resolved
+        </a></li>
+      </ul>
+    </div>
+    
+    <div class="nav-section">
+      <span class="nav-section-title">Tools</span>
+      <ul class="nav-links">
+        <li><a href="#/editor" class="nav-link" data-view="editor">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <path d="M11 2l3 3-9 9H2v-3l9-9z"/>
+          </svg> Data Editor
+        </a></li>
+        <li><a href="data-model.html" class="nav-link">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4"/>
+            <path d="M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </svg> Data Model
+        </a></li>
+        <li><a href="component-demos.html" class="nav-link">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <rect x="1" y="1" width="5" height="5" rx="1"/>
+            <rect x="10" y="1" width="5" height="5" rx="1"/>
+            <rect x="1" y="10" width="5" height="5" rx="1"/>
+            <rect x="10" y="10" width="5" height="5" rx="1"/>
+          </svg> Component Demos
+        </a></li>
+      </ul>
+    </div>
+    
+  </nav>
+
+  <div class="content-wrapper">
+    <!-- Global Filter Bar -->
+    <div class="global-filter-bar">
+      <div class="filter-group mission-filter-group">
+        <label for="mission-filter">Mission</label>
+        <select id="mission-filter">
+          <option value="all">All Missions</option>
+        </select>
+      </div>
+      
+      <div class="filter-group time-filter-group">
+        <label>Time Range</label>
+        <div class="time-filter-wrapper">
+          <div id="time-range-filter"></div>
+          <span id="time-range-label" class="time-range-label">All Time</span>
+          <button id="clear-time-filter" class="clear-filter-btn" title="Clear time filter">
+            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4l8 8M12 4l-8 8"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="filter-group chat-toggle-group">
+        <button id="chat-toggle" class="chat-toggle-btn" title="Toggle AI Assistant">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+          </svg>
+          <span class="chat-toggle-label">AI Assistant</span>
+        </button>
+      </div>
+    </div>
+
+    <main id="app" class="main-content">
+    <div class="loading-state">
+      <div class="loader"></div>
+      <p>Initializing dashboard...</p>
+    </div>
+  </main>
+  
+  <!-- Modal Container -->
+  <div id="modal-container" class="modal-container hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  </div><!-- /content-wrapper -->
+
+  <!-- Chat Panel -->
+  <aside id="chat-panel" class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-title">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+        <span>AI Assistant</span>
+      </div>
+      <button id="chat-close" class="chat-close-btn" title="Close chat">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4l8 8M12 4l-8 8"/>
+        </svg>
+      </button>
+    </div>
+    <div id="chat-messages" class="chat-messages">
+      <div class="chat-message assistant">
+        <div class="chat-message-content">
+          Hello! I'm your AI assistant for Primer. How can I help you analyze narratives, factions, or events today?
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-wrapper">
+      <textarea id="chat-input" class="chat-input" placeholder="Ask a question..." rows="1"></textarea>
+      <button id="chat-send" class="chat-send-btn" title="Send message">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

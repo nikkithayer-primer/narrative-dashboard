@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Primer - Data Model Reference</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #1a1a1e;
+      --bg-secondary: #222226;
+      --bg-tertiary: #2a2a2f;
+      --bg-hover: #32323a;
+      --border-color: #3a3a42;
+      --border-subtle: #2e2e34;
+      --text-primary: #e0e0e4;
+      --text-secondary: #9090a0;
+      --text-muted: #606070;
+      --accent-primary: #6b8acd;
+      --accent-secondary: #5a7ab8;
+      --accent-muted: #4a6090;
+      
+      /* Entity colors */
+      --color-mission: #8b5cf6;
+      --color-narrative: #ef4444;
+      --color-faction: #f59e0b;
+      --color-location: #10b981;
+      --color-event: #3b82f6;
+      --color-entity: #ec4899;
+      --color-source: #06b6d4;
+      
+      --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--accent-primary);
+    }
+
+    .logo-text {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .back-link {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Main Content */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .page-intro {
+      margin-bottom: 40px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .page-description {
+      color: var(--text-secondary);
+      font-size: 15px;
+      max-width: 800px;
+    }
+
+    /* Navigation */
+    .model-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-pill:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    .nav-pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Entity Relationship Diagram */
+    .erd-section {
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: var(--accent-primary);
+      border-radius: 2px;
+    }
+
+    .erd-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 32px;
+      overflow-x: auto;
+    }
+
+    .erd-diagram {
+      min-width: 1100px;
+      height: 650px;
+    }
+
+    /* Entity Cards */
+    .entities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 24px;
+    }
+
+    .entity-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .entity-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .entity-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .entity-info h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .entity-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .entity-body {
+      padding: 16px 20px;
+    }
+
+    .field-list {
+      list-style: none;
+    }
+
+    .field-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .field-item:last-child {
+      border-bottom: none;
+    }
+
+    .field-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent-primary);
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+
+    .field-meta {
+      flex: 1;
+    }
+
+    .field-type {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .field-type.required::after {
+      content: '*';
+      color: var(--color-narrative);
+      margin-left: 4px;
+    }
+
+    .field-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .field-enum {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .field-enum code {
+      font-family: var(--font-mono);
+      background: var(--bg-tertiary);
+      padding: 1px 4px;
+      border-radius: 2px;
+      margin-right: 4px;
+    }
+
+    /* Relationships Section */
+    .relationships-section {
+      margin-top: 48px;
+    }
+
+    .relationship-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .relationship-table th,
+    .relationship-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .relationship-table th {
+      background: var(--bg-tertiary);
+      font-weight: 500;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .relationship-table td {
+      background: var(--bg-secondary);
+    }
+
+    .relationship-table tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .entity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .entity-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .relationship-type {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* JSON Schema Section */
+    .schema-section {
+      margin-top: 48px;
+    }
+
+    .schema-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .schema-tab {
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s;
+    }
+
+    .schema-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .schema-tab.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+    }
+
+    .schema-content {
+      display: none;
+    }
+
+    .schema-content.active {
+      display: block;
+    }
+
+    .code-block {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .code-block .key {
+      color: var(--accent-primary);
+    }
+
+    .code-block .string {
+      color: #a5d6a7;
+    }
+
+    .code-block .number {
+      color: #ffcc80;
+    }
+
+    .code-block .boolean {
+      color: #ce93d8;
+    }
+
+    .code-block .comment {
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 64px;
+      padding: 24px 32px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main {
+        padding: 20px;
+      }
+
+      .entities-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+          <line x1="12" y1="22" x2="12" y2="15.5"/>
+          <polyline points="22 8.5 12 15.5 2 8.5"/>
+          <polyline points="2 15.5 12 8.5 22 15.5"/>
+          <line x1="12" y1="2" x2="12" y2="8.5"/>
+        </svg>
+        <span class="logo-text">Primer</span>
+      </div>
+      <span class="header-title">Data Model Reference</span>
+      <a href="index.html" class="back-link">
+        <span>←</span> Back to Dashboard
+      </a>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="page-intro">
+      <h1 class="page-title">Data Model Documentation</h1>
+      <p class="page-description">
+        This reference documents the complete data model for the Primer Intelligence Dashboard. 
+        The model supports tracking of disinformation narratives and sub-narratives, factions, events, 
+        locations, people, and organizations across intelligence missions.
+      </p>
+    </section>
+
+    <nav class="model-nav">
+      <a href="#mission" class="nav-pill">
+        <span class="dot" style="background: var(--color-mission)"></span>
+        Mission
+      </a>
+      <a href="#narrative" class="nav-pill">
+        <span class="dot" style="background: var(--color-narrative)"></span>
+        Narrative
+      </a>
+      <a href="#subnarrative" class="nav-pill">
+        <span class="dot" style="background: #f87171"></span>
+        SubNarrative
+      </a>
+      <a href="#faction" class="nav-pill">
+        <span class="dot" style="background: var(--color-faction)"></span>
+        Faction
+      </a>
+      <a href="#person" class="nav-pill">
+        <span class="dot" style="background: var(--color-entity)"></span>
+        Person
+      </a>
+      <a href="#organization" class="nav-pill">
+        <span class="dot" style="background: #a855f7"></span>
+        Organization
+      </a>
+      <a href="#location" class="nav-pill">
+        <span class="dot" style="background: var(--color-location)"></span>
+        Location
+      </a>
+      <a href="#event" class="nav-pill">
+        <span class="dot" style="background: var(--color-event)"></span>
+        Event
+      </a>
+      <a href="#subevent" class="nav-pill">
+        <span class="dot" style="background: #60a5fa"></span>
+        SubEvent
+      </a>
+    </nav>
+
+    <!-- Entity Relationship Diagram -->
+    <section class="erd-section">
+      <h2 class="section-title">Entity Relationship Diagram</h2>
+      <div class="erd-container">
+        <svg class="erd-diagram" viewBox="0 0 1100 650">
+          <!-- Definitions -->
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#606070"/>
+            </marker>
+            <marker id="diamond" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+              <polygon points="6 0, 12 6, 6 12, 0 6" fill="#606070"/>
+            </marker>
+            <marker id="crowfoot" markerWidth="12" markerHeight="12" refX="0" refY="6" orient="auto">
+              <path d="M 12 6 L 0 0 M 12 6 L 0 6 M 12 6 L 0 12" stroke="#606070" stroke-width="1.5" fill="none"/>
+            </marker>
+          </defs>
+
+          <!-- Connection Lines -->
+          <!-- Mission to Narrative (1:N) -->
+          <path d="M 200 85 L 200 135" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="210" y="115" fill="#9090a0" font-size="9">contains</text>
+          
+          <!-- Narrative to SubNarrative (1:N) -->
+          <path d="M 200 185 L 200 235" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="210" y="215" fill="#9090a0" font-size="9">has</text>
+          
+          <!-- Narrative to Faction (N:M) -->
+          <path d="M 280 160 L 380 160" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="310" y="152" fill="#9090a0" font-size="9">mentions</text>
+          
+          <!-- Narrative to Person (N:M) -->
+          <path d="M 280 170 L 460 280" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- Narrative to Organization (N:M) -->
+          <path d="M 280 175 L 620 280" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- Narrative to Location (N:M) -->
+          <path d="M 200 185 L 280 380" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="215" y="290" fill="#9090a0" font-size="9">references</text>
+          
+          <!-- Narrative to Event (N:M) -->
+          <path d="M 200 185 L 460 380" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- SubNarrative connections (similar to Narrative) -->
+          <path d="M 280 260 L 380 180" stroke="#505058" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
+          <path d="M 280 270 L 460 300" stroke="#505058" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
+          <path d="M 280 275 L 620 300" stroke="#505058" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
+          <path d="M 230 285 L 280 400" stroke="#505058" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
+          <path d="M 240 285 L 460 400" stroke="#505058" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
+          
+          <!-- Event to SubEvent (1:N) -->
+          <path d="M 540 420 L 540 485" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="550" y="455" fill="#9090a0" font-size="9">contains</text>
+          
+          <!-- Event to Location (N:1) -->
+          <path d="M 460 410 L 360 410" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="390" y="402" fill="#9090a0" font-size="9">occurs_at</text>
+          
+          <!-- Event to Person (N:M) -->
+          <path d="M 500 380 L 500 335" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="508" y="358" fill="#9090a0" font-size="9">involves</text>
+          
+          <!-- Event to Organization (N:M) -->
+          <path d="M 580 380 L 660 335" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- Person to Location (N:M) -->
+          <path d="M 460 310 L 360 390" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- Person to Person (N:M self) -->
+          <path d="M 460 300 C 420 280, 420 320, 460 320" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="408" y="305" fill="#9090a0" font-size="8">related_to</text>
+          
+          <!-- Person to Organization (N:M) -->
+          <path d="M 580 310 L 660 310" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="600" y="302" fill="#9090a0" font-size="9">affiliated</text>
+          
+          <!-- Person to Faction (N:M) -->
+          <path d="M 500 285 L 500 185" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- Organization to Location (N:M) -->
+          <path d="M 660 325 L 360 400" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- Organization to Organization (N:M self) -->
+          <path d="M 780 300 C 820 280, 820 320, 780 320" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="825" y="305" fill="#9090a0" font-size="8">related_to</text>
+          
+          <!-- Organization to Faction (N:M) -->
+          <path d="M 660 290 L 580 180" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- Faction to Faction (N:M self) -->
+          <path d="M 580 160 C 620 140, 620 180, 580 180" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="625" y="165" fill="#9090a0" font-size="8">overlaps</text>
+
+          <!-- Entity Boxes -->
+          <!-- Mission -->
+          <g transform="translate(120, 35)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#8b5cf6" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#8b5cf6"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Mission</text>
+          </g>
+
+          <!-- Narrative -->
+          <g transform="translate(120, 135)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#ef4444" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#ef4444"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Narrative</text>
+          </g>
+
+          <!-- SubNarrative -->
+          <g transform="translate(120, 235)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#f87171" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#f87171"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">SubNarrative</text>
+          </g>
+
+          <!-- Faction -->
+          <g transform="translate(420, 135)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#f59e0b" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#f59e0b"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Faction</text>
+          </g>
+
+          <!-- Person -->
+          <g transform="translate(420, 285)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#ec4899" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#ec4899"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Person</text>
+          </g>
+
+          <!-- Organization -->
+          <g transform="translate(660, 285)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#a855f7" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#a855f7"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Organization</text>
+          </g>
+
+          <!-- Location -->
+          <g transform="translate(200, 380)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#10b981" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#10b981"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Location</text>
+          </g>
+
+          <!-- Event -->
+          <g transform="translate(460, 380)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#3b82f6" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#3b82f6"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Event</text>
+          </g>
+
+          <!-- SubEvent -->
+          <g transform="translate(460, 485)">
+            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#60a5fa" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#60a5fa"/>
+            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">SubEvent</text>
+          </g>
+
+          <!-- Legend -->
+          <g transform="translate(880, 50)">
+            <text x="0" y="0" fill="#9090a0" font-size="11" font-weight="500">LEGEND</text>
+            <line x1="0" y1="25" x2="40" y2="25" stroke="#606070" stroke-width="1.5"/>
+            <text x="50" y="29" fill="#606070" font-size="10">One-to-Many</text>
+            <line x1="0" y1="50" x2="40" y2="50" stroke="#606070" stroke-width="1.5" stroke-dasharray="4,4"/>
+            <text x="50" y="54" fill="#606070" font-size="10">Many-to-Many</text>
+            <line x1="0" y1="75" x2="40" y2="75" stroke="#505058" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="50" y="79" fill="#606070" font-size="10">SubNarrative links</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Entity Definitions -->
+    <section class="entities-section">
+      <h2 class="section-title">Entity Definitions</h2>
+      
+      <div class="entities-grid">
+        <!-- Mission -->
+        <article id="mission" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(139, 92, 246, 0.2); color: var(--color-mission);">◉</div>
+            <div class="entity-info">
+              <h3>Mission</h3>
+              <p>Top-level container for intelligence operations</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier for the mission</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">name</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Mission name/code name</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Detailed mission description and objectives</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">status</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Current operational status</p>
+                  <p class="field-enum">
+                    <code>active</code>
+                    <code>completed</code>
+                    <code>archived</code>
+                    <code>planned</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">startDate</span>
+                <div class="field-meta">
+                  <span class="field-type">date</span>
+                  <p class="field-desc">Mission start date (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">endDate</span>
+                <div class="field-meta">
+                  <span class="field-type">date</span>
+                  <p class="field-desc">Mission end date (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">createdAt</span>
+                <div class="field-meta">
+                  <span class="field-type">datetime</span>
+                  <p class="field-desc">Record creation timestamp</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">updatedAt</span>
+                <div class="field-meta">
+                  <span class="field-type">datetime</span>
+                  <p class="field-desc">Last modification timestamp</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Narrative -->
+        <article id="narrative" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--color-narrative);">◈</div>
+            <div class="entity-info">
+              <h3>Narrative</h3>
+              <p>Disinformation or propaganda narrative being tracked</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">missionId</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Foreign key to parent Mission</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">title</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Short title identifying the narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Detailed description of the narrative theme and messaging</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">status</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Current tracking status</p>
+                  <p class="field-enum">
+                    <code>emerging</code>
+                    <code>active</code>
+                    <code>declining</code>
+                    <code>dormant</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">threatLevel</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Assessed threat/impact level</p>
+                  <p class="field-enum">
+                    <code>critical</code>
+                    <code>high</code>
+                    <code>medium</code>
+                    <code>low</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">firstSeen</span>
+                <div class="field-meta">
+                  <span class="field-type">date</span>
+                  <p class="field-desc">Date narrative was first observed</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">lastSeen</span>
+                <div class="field-meta">
+                  <span class="field-type">date</span>
+                  <p class="field-desc">Date of most recent observation</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">tags</span>
+                <div class="field-meta">
+                  <span class="field-type">string[]</span>
+                  <p class="field-desc">Classification tags for categorization</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">factionIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Factions mentioned in this narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">personIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">People mentioned in this narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">organizationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Organizations mentioned in this narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">locationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Locations referenced in this narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">eventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Events referenced in this narrative</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Faction -->
+        <article id="faction" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--color-faction);">◇</div>
+            <div class="entity-info">
+              <h3>Faction</h3>
+              <p>Groups or organizations involved in narrative operations</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">name</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Faction name</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">aliases</span>
+                <div class="field-meta">
+                  <span class="field-type">string[]</span>
+                  <p class="field-desc">Alternative names or designations</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">type</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Faction classification</p>
+                  <p class="field-enum">
+                    <code>state</code>
+                    <code>non-state</code>
+                    <code>proxy</code>
+                    <code>commercial</code>
+                    <code>unknown</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Background and operational profile</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">countryOfOrigin</span>
+                <div class="field-meta">
+                  <span class="field-type">string (ISO 3166)</span>
+                  <p class="field-desc">Country code of faction origin</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">capabilities</span>
+                <div class="field-meta">
+                  <span class="field-type">string[]</span>
+                  <p class="field-desc">Known operational capabilities</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">overlappingFactionIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Other factions this faction overlaps with</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">color</span>
+                <div class="field-meta">
+                  <span class="field-type">string (hex)</span>
+                  <p class="field-desc">Display color for visualizations</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Location -->
+        <article id="location" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--color-location);">◎</div>
+            <div class="entity-info">
+              <h3>Location</h3>
+              <p>Geographic locations relevant to operations</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">name</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Location name</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">type</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Location classification</p>
+                  <p class="field-enum">
+                    <code>country</code>
+                    <code>region</code>
+                    <code>city</code>
+                    <code>facility</code>
+                    <code>virtual</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">coordinates</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Geographic coordinates { lat: number, lng: number }</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">countryCode</span>
+                <div class="field-meta">
+                  <span class="field-type">string (ISO 3166)</span>
+                  <p class="field-desc">ISO country code</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Location details and significance</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">parentId</span>
+                <div class="field-meta">
+                  <span class="field-type">string (UUID)</span>
+                  <p class="field-desc">Parent location for hierarchical nesting</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Event -->
+        <article id="event" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--color-event);">◆</div>
+            <div class="entity-info">
+              <h3>Event</h3>
+              <p>Significant events referenced by narratives</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">title</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Event title</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Detailed event description</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">type</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Event classification</p>
+                  <p class="field-enum">
+                    <code>publication</code>
+                    <code>broadcast</code>
+                    <code>social_media</code>
+                    <code>physical</code>
+                    <code>cyber</code>
+                    <code>other</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">date</span>
+                <div class="field-meta">
+                  <span class="field-type required">datetime</span>
+                  <p class="field-desc">Event timestamp (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">locationId</span>
+                <div class="field-meta">
+                  <span class="field-type">string (UUID)</span>
+                  <p class="field-desc">Foreign key to Location (occurs_at)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">personIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">People involved in this event</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">organizationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Organizations involved in this event</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">impact</span>
+                <div class="field-meta">
+                  <span class="field-type">enum</span>
+                  <p class="field-desc">Assessed impact level</p>
+                  <p class="field-enum">
+                    <code>high</code>
+                    <code>medium</code>
+                    <code>low</code>
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Person -->
+        <article id="person" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--color-entity);">◐</div>
+            <div class="entity-info">
+              <h3>Person</h3>
+              <p>Individuals involved in or mentioned by narratives</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">name</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Person's name</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">aliases</span>
+                <div class="field-meta">
+                  <span class="field-type">string[]</span>
+                  <p class="field-desc">Known aliases or alternate identities</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">role</span>
+                <div class="field-meta">
+                  <span class="field-type">enum</span>
+                  <p class="field-desc">Role in operations</p>
+                  <p class="field-enum">
+                    <code>operator</code>
+                    <code>amplifier</code>
+                    <code>target</code>
+                    <code>influencer</code>
+                    <code>unknown</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Background information and profile</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">socialHandles</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Social media handles { platform: handle }</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">relatedPersonIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Related people (related_to relationship)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">organizationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Affiliated organizations</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">factionIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Affiliated factions</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">locationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Locations mentioned alongside this person</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">eventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Events this person is involved in</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Organization -->
+        <article id="organization" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">⬡</div>
+            <div class="entity-info">
+              <h3>Organization</h3>
+              <p>Organizations mentioned in or related to narratives</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">name</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Organization name</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">type</span>
+                <div class="field-meta">
+                  <span class="field-type">enum</span>
+                  <p class="field-desc">Organization classification</p>
+                  <p class="field-enum">
+                    <code>government</code>
+                    <code>corporate</code>
+                    <code>non_profit</code>
+                    <code>media_outlet</code>
+                    <code>other</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">aliases</span>
+                <div class="field-meta">
+                  <span class="field-type">string[]</span>
+                  <p class="field-desc">Known aliases or alternate names</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Background information and profile</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">countryCode</span>
+                <div class="field-meta">
+                  <span class="field-type">string (ISO 3166)</span>
+                  <p class="field-desc">Country of origin/headquarters</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">relatedOrganizationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Related organizations</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">factionIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Affiliated factions</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">locationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Locations mentioned alongside this organization</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- SubNarrative -->
+        <article id="subnarrative" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(248, 113, 113, 0.2); color: #f87171;">◈</div>
+            <div class="entity-info">
+              <h3>SubNarrative</h3>
+              <p>Sub-components or variations of a parent narrative</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">narrativeId</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Foreign key to parent Narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">title</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Short title identifying the sub-narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Detailed description of the sub-narrative theme</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">factionIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Factions mentioned in this sub-narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">personIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">People mentioned in this sub-narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">organizationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Organizations mentioned in this sub-narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">locationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Locations referenced in this sub-narrative</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">eventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Events referenced in this sub-narrative</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- SubEvent -->
+        <article id="subevent" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(96, 165, 250, 0.2); color: #60a5fa;">◆</div>
+            <div class="entity-info">
+              <h3>SubEvent</h3>
+              <p>Sub-components or related occurrences within an event</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">eventId</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Foreign key to parent Event</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">title</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Sub-event title</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Detailed sub-event description</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">date</span>
+                <div class="field-meta">
+                  <span class="field-type">datetime</span>
+                  <p class="field-desc">Sub-event timestamp (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">sequence</span>
+                <div class="field-meta">
+                  <span class="field-type">number</span>
+                  <p class="field-desc">Order within parent event</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Relationships -->
+    <section class="relationships-section">
+      <h2 class="section-title">Relationships</h2>
+      <div class="erd-container">
+        <table class="relationship-table">
+          <thead>
+            <tr>
+              <th>From Entity</th>
+              <th>Relationship</th>
+              <th>To Entity</th>
+              <th>Cardinality</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(139, 92, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-mission)"></span>
+                  Mission
+                </span>
+              </td>
+              <td class="relationship-type">contains</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td>1:N</td>
+              <td>A mission contains multiple narratives being tracked</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td class="relationship-type">has</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
+                  <span class="dot" style="background: #f87171"></span>
+                  SubNarrative
+                </span>
+              </td>
+              <td>1:N</td>
+              <td>A narrative can have multiple sub-narratives</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td class="relationship-type">mentions</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(245, 158, 11, 0.15);">
+                  <span class="dot" style="background: var(--color-faction)"></span>
+                  Faction
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Narratives can mention multiple factions</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td class="relationship-type">mentions</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Narratives can mention multiple people</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td class="relationship-type">mentions</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Narratives can mention multiple organizations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(16, 185, 129, 0.15);">
+                  <span class="dot" style="background: var(--color-location)"></span>
+                  Location
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Narratives can reference multiple locations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Narratives can reference multiple events</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
+                  <span class="dot" style="background: #f87171"></span>
+                  SubNarrative
+                </span>
+              </td>
+              <td class="relationship-type">mentions</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(245, 158, 11, 0.15);">
+                  <span class="dot" style="background: var(--color-faction)"></span>
+                  Faction
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>SubNarratives can mention multiple factions</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
+                  <span class="dot" style="background: #f87171"></span>
+                  SubNarrative
+                </span>
+              </td>
+              <td class="relationship-type">mentions</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>SubNarratives can mention multiple people</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
+                  <span class="dot" style="background: #f87171"></span>
+                  SubNarrative
+                </span>
+              </td>
+              <td class="relationship-type">mentions</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>SubNarratives can mention multiple organizations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
+                  <span class="dot" style="background: #f87171"></span>
+                  SubNarrative
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(16, 185, 129, 0.15);">
+                  <span class="dot" style="background: var(--color-location)"></span>
+                  Location
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>SubNarratives can reference multiple locations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
+                  <span class="dot" style="background: #f87171"></span>
+                  SubNarrative
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>SubNarratives can reference multiple events</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td class="relationship-type">contains</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(96, 165, 250, 0.15);">
+                  <span class="dot" style="background: #60a5fa"></span>
+                  SubEvent
+                </span>
+              </td>
+              <td>1:N</td>
+              <td>An event can contain multiple sub-events</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td class="relationship-type">occurs_at</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(16, 185, 129, 0.15);">
+                  <span class="dot" style="background: var(--color-location)"></span>
+                  Location
+                </span>
+              </td>
+              <td>N:1</td>
+              <td>Events occur at a specific location</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td class="relationship-type">involves</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Events can involve multiple people</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td class="relationship-type">involves</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Events can involve multiple organizations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td class="relationship-type">mentioned_alongside</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(16, 185, 129, 0.15);">
+                  <span class="dot" style="background: var(--color-location)"></span>
+                  Location
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>People can be mentioned alongside locations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td class="relationship-type">related_to</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>People can be related to other people</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td class="relationship-type">affiliated_with</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>People can be affiliated with organizations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td class="relationship-type">affiliated_with</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(245, 158, 11, 0.15);">
+                  <span class="dot" style="background: var(--color-faction)"></span>
+                  Faction
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>People can be affiliated with factions</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td class="relationship-type">involved_in</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>People can be involved in events</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td class="relationship-type">mentioned_alongside</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(16, 185, 129, 0.15);">
+                  <span class="dot" style="background: var(--color-location)"></span>
+                  Location
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Organizations can be mentioned alongside locations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td class="relationship-type">related_to</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Organizations can be related to other organizations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td class="relationship-type">affiliated_with</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(245, 158, 11, 0.15);">
+                  <span class="dot" style="background: var(--color-faction)"></span>
+                  Faction
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Organizations can be affiliated with factions</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(245, 158, 11, 0.15);">
+                  <span class="dot" style="background: var(--color-faction)"></span>
+                  Faction
+                </span>
+              </td>
+              <td class="relationship-type">overlaps</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(245, 158, 11, 0.15);">
+                  <span class="dot" style="background: var(--color-faction)"></span>
+                  Faction
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Factions can overlap with other factions</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- JSON Schema Examples -->
+    <section class="schema-section">
+      <h2 class="section-title">JSON Schema Examples</h2>
+      
+      <div class="schema-tabs">
+        <button class="schema-tab active" data-tab="mission-schema">Mission</button>
+        <button class="schema-tab" data-tab="narrative-schema">Narrative</button>
+        <button class="schema-tab" data-tab="event-schema">Event</button>
+        <button class="schema-tab" data-tab="full-schema">Full Export</button>
+      </div>
+
+      <div id="mission-schema" class="schema-content active">
+        <div class="code-block">
+          <pre><span class="comment">// Mission entity example</span>
+{
+  <span class="key">"id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+  <span class="key">"name"</span>: <span class="string">"Operation Clarity"</span>,
+  <span class="key">"description"</span>: <span class="string">"Track and analyze disinformation campaigns targeting democratic processes in Eastern Europe"</span>,
+  <span class="key">"status"</span>: <span class="string">"active"</span>,
+  <span class="key">"startDate"</span>: <span class="string">"2025-01-15"</span>,
+  <span class="key">"endDate"</span>: <span class="boolean">null</span>,
+  <span class="key">"createdAt"</span>: <span class="string">"2025-01-15T08:30:00Z"</span>,
+  <span class="key">"updatedAt"</span>: <span class="string">"2026-01-10T14:22:00Z"</span>
+}</pre>
+        </div>
+      </div>
+
+      <div id="narrative-schema" class="schema-content">
+        <div class="code-block">
+          <pre><span class="comment">// Narrative entity example</span>
+{
+  <span class="key">"id"</span>: <span class="string">"660e8400-e29b-41d4-a716-446655440001"</span>,
+  <span class="key">"missionId"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+  <span class="key">"title"</span>: <span class="string">"Election Infrastructure Vulnerability Claims"</span>,
+  <span class="key">"description"</span>: <span class="string">"Coordinated messaging claiming widespread vulnerabilities in electronic voting systems"</span>,
+  <span class="key">"status"</span>: <span class="string">"active"</span>,
+  <span class="key">"threatLevel"</span>: <span class="string">"high"</span>,
+  <span class="key">"firstSeen"</span>: <span class="string">"2025-03-10"</span>,
+  <span class="key">"lastSeen"</span>: <span class="string">"2026-01-14"</span>,
+  <span class="key">"tags"</span>: [<span class="string">"election"</span>, <span class="string">"infrastructure"</span>, <span class="string">"cyber"</span>],
+  <span class="key">"factionIds"</span>: [
+    <span class="string">"770e8400-e29b-41d4-a716-446655440002"</span>
+  ],
+  <span class="key">"personIds"</span>: [
+    <span class="string">"880e8400-e29b-41d4-a716-446655440010"</span>
+  ],
+  <span class="key">"organizationIds"</span>: [
+    <span class="string">"990e8400-e29b-41d4-a716-446655440020"</span>
+  ],
+  <span class="key">"locationIds"</span>: [
+    <span class="string">"aa0e8400-e29b-41d4-a716-446655440030"</span>
+  ],
+  <span class="key">"eventIds"</span>: [
+    <span class="string">"bb0e8400-e29b-41d4-a716-446655440040"</span>
+  ]
+}</pre>
+        </div>
+      </div>
+
+      <div id="event-schema" class="schema-content">
+        <div class="code-block">
+          <pre><span class="comment">// Event entity example</span>
+{
+  <span class="key">"id"</span>: <span class="string">"bb0e8400-e29b-41d4-a716-446655440040"</span>,
+  <span class="key">"title"</span>: <span class="string">"Viral Social Media Campaign Launch"</span>,
+  <span class="key">"description"</span>: <span class="string">"Coordinated posting across multiple platforms with identical messaging and hashtags"</span>,
+  <span class="key">"type"</span>: <span class="string">"social_media"</span>,
+  <span class="key">"date"</span>: <span class="string">"2025-11-02T14:30:00Z"</span>,
+  <span class="key">"locationId"</span>: <span class="string">"aa0e8400-e29b-41d4-a716-446655440030"</span>,
+  <span class="key">"personIds"</span>: [
+    <span class="string">"880e8400-e29b-41d4-a716-446655440010"</span>,
+    <span class="string">"880e8400-e29b-41d4-a716-446655440011"</span>
+  ],
+  <span class="key">"organizationIds"</span>: [
+    <span class="string">"990e8400-e29b-41d4-a716-446655440020"</span>
+  ],
+  <span class="key">"impact"</span>: <span class="string">"high"</span>
+}</pre>
+        </div>
+      </div>
+
+      <div id="full-schema" class="schema-content">
+        <div class="code-block">
+          <pre><span class="comment">// Complete data export structure</span>
+{
+  <span class="key">"version"</span>: <span class="string">"1.0"</span>,
+  <span class="key">"exportedAt"</span>: <span class="string">"2026-01-16T10:00:00Z"</span>,
+  <span class="key">"missions"</span>: [
+    { <span class="comment">/* Mission objects */</span> }
+  ],
+  <span class="key">"narratives"</span>: [
+    { <span class="comment">/* Narrative objects */</span> }
+  ],
+  <span class="key">"subNarratives"</span>: [
+    { <span class="comment">/* SubNarrative objects */</span> }
+  ],
+  <span class="key">"factions"</span>: [
+    { <span class="comment">/* Faction objects */</span> }
+  ],
+  <span class="key">"persons"</span>: [
+    { <span class="comment">/* Person objects */</span> }
+  ],
+  <span class="key">"organizations"</span>: [
+    { <span class="comment">/* Organization objects */</span> }
+  ],
+  <span class="key">"locations"</span>: [
+    { <span class="comment">/* Location objects */</span> }
+  ],
+  <span class="key">"events"</span>: [
+    { <span class="comment">/* Event objects */</span> }
+  ],
+  <span class="key">"subEvents"</span>: [
+    { <span class="comment">/* SubEvent objects */</span> }
+  ]
+}</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Primer Data Model Reference v1.0 • Generated January 2026</p>
+  </footer>
+
+  <script>
+    // Tab switching functionality
+    document.querySelectorAll('.schema-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.schema-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.schema-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Smooth scroll for navigation
+    document.querySelectorAll('.nav-pill').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(pill.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

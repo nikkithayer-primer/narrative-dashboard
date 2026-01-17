@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Primer - Component Demos</title>
+  
+  <!-- External Libraries -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/venn.js@0.2.20/build/venn.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- App Styles (shared with main app) -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/editor.css">
+  
+  <!-- Demo Page Specific Styles -->
+  <style>
+    /* Use sidebar layout like main dashboard */
+    body {
+      display: flex;
+    }
+
+    /* Demo Sidebar */
+    .demo-sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+    }
+
+    .demo-sidebar .logo {
+      border-bottom: none;
+    }
+
+    .sidebar-back-top {
+      padding: var(--space-sm) var(--space-lg);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .sidebar-back-top a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-size: var(--text-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .sidebar-back-top a:hover {
+      text-decoration: underline;
+    }
+
+    .demo-sidebar .nav-section {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .demo-sidebar .nav-link.active {
+      background: var(--bg-tertiary);
+      color: var(--accent-primary);
+    }
+
+    /* Main Content */
+    .demo-main {
+      flex: 1;
+      padding: var(--space-2xl);
+      overflow-y: auto;
+      max-width: 1200px;
+    }
+
+    .page-intro {
+      margin-bottom: var(--space-2xl);
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+
+    .page-description {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      max-width: 700px;
+    }
+
+    /* Component Section */
+    .component-section {
+      margin-bottom: var(--space-2xl);
+    }
+
+    .section-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .section-title::before {
+      content: '';
+      width: 3px;
+      height: 18px;
+      background: var(--accent-primary);
+      border-radius: 2px;
+    }
+
+    .section-description {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .demo-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: var(--space-lg);
+      overflow: hidden;
+    }
+
+    .demo-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    /* Sparkline Demo */
+    .sparkline-demo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+    }
+
+    .sparkline-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .sparkline-label {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: var(--space-lg);
+      overflow-x: auto;
+      margin-top: var(--space-lg);
+    }
+
+    .code-block pre {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .code-block .key {
+      color: var(--accent-primary);
+    }
+
+    .code-block .string {
+      color: #a5d6a7;
+    }
+
+    .code-block .number {
+      color: #ffcc80;
+    }
+
+    .code-block .comment {
+      color: #6a737d;
+      font-style: italic;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .demo-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .demo-main {
+        padding: var(--space-lg);
+      }
+
+      .demo-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="demo-sidebar">
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+        <line x1="12" y1="22" x2="12" y2="15.5"/>
+        <polyline points="22 8.5 12 15.5 2 8.5"/>
+        <polyline points="2 15.5 12 8.5 22 15.5"/>
+        <line x1="12" y1="2" x2="12" y2="8.5"/>
+      </svg>
+      <span class="logo-text">Primer</span>
+    </div>
+
+    <div class="sidebar-back-top">
+      <a href="index.html">← Back to Dashboard</a>
+    </div>
+
+    <div class="nav-section">
+      <span class="nav-section-title">Charts</span>
+      <ul class="nav-links">
+        <li><a href="#sparkline" class="nav-link" data-target="sparkline">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <polyline points="1 12 4 8 7 10 11 4 15 6"/>
+          </svg> Sparkline
+        </a></li>
+        <li><a href="#stacked-area" class="nav-link" data-target="stacked-area">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <path d="M1 14V6l4-2 4 3 6-4v11H1z"/>
+            <path d="M1 14V9l4-1 4 2 6-3v7H1z" opacity="0.5"/>
+          </svg> Stacked Area
+        </a></li>
+        <li><a href="#sentiment" class="nav-link" data-target="sentiment">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <rect x="1" y="3" width="8" height="2" rx="0.5"/>
+            <rect x="1" y="7" width="12" height="2" rx="0.5"/>
+            <rect x="1" y="11" width="5" height="2" rx="0.5"/>
+          </svg> Sentiment
+        </a></li>
+        <li><a href="#venn" class="nav-link" data-target="venn">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <circle cx="6" cy="8" r="4"/>
+            <circle cx="10" cy="8" r="4"/>
+          </svg> Venn Diagram
+        </a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <span class="nav-section-title">Timeline</span>
+      <ul class="nav-links">
+        <li><a href="#timeline" class="nav-link" data-target="timeline">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <line x1="1" y1="8" x2="15" y2="8"/>
+            <circle cx="4" cy="8" r="2"/>
+            <circle cx="9" cy="8" r="2"/>
+            <circle cx="13" cy="8" r="1.5"/>
+          </svg> Timeline
+        </a></li>
+        <li><a href="#timeline-volume-composite" class="nav-link" data-target="timeline-volume-composite">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <path d="M1 10V4l4 2 4-3 6 4v6H1z"/>
+            <line x1="1" y1="13" x2="15" y2="13"/>
+            <circle cx="5" cy="13" r="1"/>
+            <circle cx="11" cy="13" r="1"/>
+          </svg> Timeline + Volume
+        </a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <span class="nav-section-title">Spatial</span>
+      <ul class="nav-links">
+        <li><a href="#network" class="nav-link" data-target="network">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <circle cx="8" cy="4" r="2"/>
+            <circle cx="4" cy="12" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <line x1="8" y1="6" x2="5" y2="10"/>
+            <line x1="8" y1="6" x2="11" y2="10"/>
+            <line x1="6" y1="12" x2="10" y2="12"/>
+          </svg> Network Graph
+        </a></li>
+        <li><a href="#map" class="nav-link" data-target="map">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/>
+            <circle cx="8" cy="6" r="2"/>
+          </svg> Map View
+        </a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <span class="nav-section-title">Lists</span>
+      <ul class="nav-links">
+        <li><a href="#faction-cards" class="nav-link" data-target="faction-cards">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <rect x="1" y="2" width="6" height="5" rx="1"/>
+            <rect x="9" y="2" width="6" height="5" rx="1"/>
+            <rect x="1" y="9" width="6" height="5" rx="1"/>
+            <rect x="9" y="9" width="6" height="5" rx="1"/>
+          </svg> Faction Cards
+        </a></li>
+        <li><a href="#narrative-list" class="nav-link" data-target="narrative-list">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+            <rect x="1" y="2" width="14" height="3" rx="0.5"/>
+            <rect x="1" y="6.5" width="14" height="3" rx="0.5"/>
+            <rect x="1" y="11" width="14" height="3" rx="0.5"/>
+          </svg> Narrative List
+        </a></li>
+      </ul>
+    </div>
+
+  </nav>
+
+  <main class="demo-main">
+    <section class="page-intro">
+      <h1 class="page-title">Component Library</h1>
+      <p class="page-description">
+        Interactive demos of all visualization components. Click a component in the sidebar to jump to its demo.
+      </p>
+    </section>
+
+    <!-- Sparkline -->
+    <section id="sparkline" class="component-section">
+      <h2 class="section-title">Sparkline</h2>
+      <p class="section-description">Mini trend visualization for inline display. Shows data trends in a compact format.</p>
+      <div class="demo-container">
+        <div class="sparkline-demo">
+          <div class="sparkline-item">
+            <span class="sparkline-label">Upward trend</span>
+            <div id="sparkline-up"></div>
+          </div>
+          <div class="sparkline-item">
+            <span class="sparkline-label">Downward trend</span>
+            <div id="sparkline-down"></div>
+          </div>
+          <div class="sparkline-item">
+            <span class="sparkline-label">Volatile</span>
+            <div id="sparkline-volatile"></div>
+          </div>
+          <div class="sparkline-item">
+            <span class="sparkline-label">With area fill</span>
+            <div id="sparkline-area"></div>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><span class="key">const</span> sparkline = <span class="key">new</span> Sparkline(<span class="string">'container'</span>, {
+  width: <span class="number">100</span>,
+  height: <span class="number">30</span>,
+  color: <span class="string">'var(--accent-primary)'</span>,
+  showDot: <span class="number">true</span>,
+  showArea: <span class="number">false</span>
+});
+sparkline.update([<span class="number">10</span>, <span class="number">15</span>, <span class="number">12</span>, <span class="number">18</span>, <span class="number">25</span>, <span class="number">22</span>, <span class="number">30</span>]);</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Network Graph -->
+    <section id="network" class="component-section">
+      <h2 class="section-title">Network Graph</h2>
+      <p class="section-description">Force-directed network visualization for people and organizations. Drag nodes to rearrange.</p>
+      <div class="demo-container">
+        <div id="network-graph" style="height: 400px;"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> network = <span class="key">new</span> NetworkGraph(<span class="string">'container'</span>, {
+  height: <span class="number">400</span>,
+  nodeRadius: <span class="number">20</span>,
+  linkDistance: <span class="number">120</span>,
+  onNodeClick: (node) => console.log(node)
+});
+network.update({ nodes: [...], links: [...] });</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stacked Area Chart -->
+    <section id="stacked-area" class="component-section">
+      <h2 class="section-title">Stacked Area Chart</h2>
+      <p class="section-description">Volume over time by faction visualization. Shows cumulative activity across multiple groups.</p>
+      <div class="demo-container">
+        <div id="stacked-area-chart"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> chart = <span class="key">new</span> StackedAreaChart(<span class="string">'container'</span>, {
+  height: <span class="number">280</span>
+});
+chart.update({
+  dates: [<span class="string">'2025-01-01'</span>, <span class="string">'2025-01-02'</span>, ...],
+  series: [[<span class="number">10</span>, <span class="number">20</span>, ...], [<span class="number">15</span>, <span class="number">25</span>, ...]],
+  factions: [{ id: <span class="string">'f1'</span>, name: <span class="string">'Faction A'</span>, color: <span class="string">'#ef4444'</span> }]
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sentiment Chart -->
+    <section id="sentiment" class="component-section">
+      <h2 class="section-title">Sentiment Chart</h2>
+      <p class="section-description">Horizontal bar chart showing sentiment by faction. Visualizes positive, neutral, and negative stances.</p>
+      <div class="demo-container">
+        <div id="sentiment-chart"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> chart = <span class="key">new</span> SentimentChart(<span class="string">'container'</span>, {
+  height: <span class="number">200</span>,
+  barHeight: <span class="number">28</span>,
+  onFactionClick: (faction) => console.log(faction)
+});
+chart.update({
+  factions: [
+    { name: <span class="string">'State Actors'</span>, sentiment: <span class="number">-0.73</span>, color: <span class="string">'#ef4444'</span> },
+    { name: <span class="string">'Media Outlets'</span>, sentiment: <span class="number">0.14</span>, color: <span class="string">'#3b82f6'</span> }
+  ]
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Venn Diagram -->
+    <section id="venn" class="component-section">
+      <h2 class="section-title">Venn Diagram</h2>
+      <p class="section-description">Faction overlap visualization showing relationships between groups.</p>
+      <div class="demo-container">
+        <div id="venn-diagram" style="height: 350px;"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> venn = <span class="key">new</span> VennDiagram(<span class="string">'container'</span>, {
+  height: <span class="number">350</span>,
+  onFactionClick: (faction) => console.log(faction)
+});
+venn.update({
+  sets: [
+    { id: <span class="string">'a'</span>, name: <span class="string">'Group A'</span>, size: <span class="number">1000</span>, color: <span class="string">'#ef4444'</span> },
+    { id: <span class="string">'b'</span>, name: <span class="string">'Group B'</span>, size: <span class="number">800</span>, color: <span class="string">'#3b82f6'</span> }
+  ],
+  overlaps: [{ factionIds: [<span class="string">'a'</span>, <span class="string">'b'</span>], overlapSize: <span class="number">200</span> }]
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline -->
+    <section id="timeline" class="component-section">
+      <h2 class="section-title">Timeline</h2>
+      <p class="section-description">Event timeline visualization showing chronological progression of activities.</p>
+      <div class="demo-container">
+        <div id="timeline-chart"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> timeline = <span class="key">new</span> Timeline(<span class="string">'container'</span>, {
+  height: <span class="number">280</span>,
+  onEventClick: (event) => console.log(event)
+});
+timeline.update({
+  events: [
+    { id: <span class="string">'1'</span>, text: <span class="string">'Campaign Launch'</span>, date: <span class="string">'2025-01-15T10:00:00Z'</span> },
+    { id: <span class="string">'2'</span>, text: <span class="string">'Viral Spread'</span>, date: <span class="string">'2025-01-18T14:30:00Z'</span> }
+  ]
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline Volume Composite -->
+    <section id="timeline-volume-composite" class="component-section">
+      <h2 class="section-title">Timeline + Volume Composite</h2>
+      <p class="section-description">Combined visualization showing volume over time with event markers. Correlate mention spikes with specific events. Toggle between faction and source views. Synchronized zoom and cross-highlighting between charts.</p>
+      <div class="demo-container">
+        <div id="timeline-volume-composite-chart" style="position: relative;"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> composite = <span class="key">new</span> TimelineVolumeComposite(<span class="string">'container'</span>, {
+  height: <span class="number">450</span>,
+  volumeHeight: <span class="number">180</span>,
+  timelineHeight: <span class="number">180</span>,
+  showViewToggle: <span class="number">true</span>,  <span class="comment">// Enable faction/source toggle</span>
+  onEventClick: (event) => console.log(event)
+});
+composite.update({
+  volumeData: {  <span class="comment">// Volume by faction</span>
+    dates: [<span class="string">'2025-01-10'</span>, <span class="string">'2025-01-11'</span>, ...],
+    series: [[<span class="number">100</span>, <span class="number">150</span>, ...], [<span class="number">80</span>, <span class="number">120</span>, ...]],
+    factions: [{ id: <span class="string">'f1'</span>, name: <span class="string">'State Actors'</span>, color: <span class="string">'#ef4444'</span> }]
+  },
+  sourceData: {  <span class="comment">// Volume by source (enables toggle)</span>
+    dates: [<span class="string">'2025-01-10'</span>, <span class="string">'2025-01-11'</span>, ...],
+    series: [[<span class="number">80</span>, <span class="number">120</span>, ...], [<span class="number">60</span>, <span class="number">90</span>, ...]],
+    sources: [{ id: <span class="string">'s1'</span>, name: <span class="string">'Twitter'</span>, color: <span class="string">'#000'</span> }]
+  },
+  events: [
+    { id: <span class="string">'1'</span>, text: <span class="string">'Initial article'</span>, date: <span class="string">'2025-01-10T08:00:00Z'</span> },
+    { id: <span class="string">'2'</span>, text: <span class="string">'Viral spread'</span>, date: <span class="string">'2025-01-12T14:30:00Z'</span> }
+  ]
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Map View -->
+    <section id="map" class="component-section">
+      <h2 class="section-title">Map View</h2>
+      <p class="section-description">Leaflet map component for location visualization with custom markers.</p>
+      <div class="demo-container">
+        <div id="map-view" style="height: 400px;"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> map = <span class="key">new</span> MapView(<span class="string">'container'</span>, {
+  height: <span class="number">400</span>,
+  defaultCenter: [<span class="number">48.8566</span>, <span class="number">2.3522</span>],
+  defaultZoom: <span class="number">4</span>,
+  onMarkerClick: (location) => console.log(location)
+});
+map.update({
+  locations: [
+    { name: <span class="string">'Paris'</span>, coordinates: { lat: <span class="number">48.8566</span>, lng: <span class="number">2.3522</span> } }
+  ]
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Faction Cards -->
+    <section id="faction-cards" class="component-section">
+      <h2 class="section-title">Faction Cards</h2>
+      <p class="section-description">Display factions as clickable cards for quick selection and filtering.</p>
+      <div class="demo-container">
+        <div id="faction-cards-demo"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> cards = <span class="key">new</span> FactionCards(<span class="string">'container'</span>, {
+  showCount: <span class="number">true</span>,
+  onFactionClick: (faction) => console.log(faction)
+});
+cards.update({
+  factions: [
+    { id: <span class="string">'1'</span>, name: <span class="string">'State Actors'</span>, color: <span class="string">'#ef4444'</span>, memberCount: <span class="number">1250</span> }
+  ]
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Narrative List -->
+    <section id="narrative-list" class="component-section">
+      <h2 class="section-title">Narrative List</h2>
+      <p class="section-description">List of narratives with sparklines and sentiment badges for tracking disinformation themes.</p>
+      <div class="demo-container">
+        <div id="narrative-list-demo"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> list = <span class="key">new</span> NarrativeList(<span class="string">'container'</span>, {
+  maxItems: <span class="number">10</span>,
+  showSentiment: <span class="number">true</span>,
+  showStatus: <span class="number">true</span>,
+  showSparkline: <span class="number">true</span>,
+  onNarrativeClick: (narrative) => console.log(narrative)
+});
+list.update({
+  narratives: [
+    { id: <span class="string">'1'</span>, text: <span class="string">'Election fraud claims'</span>, sentiment: <span class="number">-0.68</span>, status: <span class="string">'new'</span> }
+  ]
+});</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { BaseComponent } from './js/components/BaseComponent.js';
+    import { Sparkline } from './js/components/Sparkline.js';
+    import { NetworkGraph } from './js/components/NetworkGraph.js';
+    import { StackedAreaChart } from './js/components/StackedAreaChart.js';
+    import { SentimentChart } from './js/components/SentimentChart.js';
+    import { VennDiagram } from './js/components/VennDiagram.js';
+    import { Timeline } from './js/components/Timeline.js';
+    import { TimelineVolumeComposite } from './js/components/TimelineVolumeComposite.js';
+    import { MapView } from './js/components/MapView.js';
+    import { FactionCards } from './js/components/FactionCards.js';
+    import { NarrativeList } from './js/components/NarrativeList.js';
+
+    // Demo Data
+    const demoFactions = [
+      { id: 'f1', name: 'State Actors', color: '#ef4444', memberCount: 1250, sentiment: -0.73 },
+      { id: 'f2', name: 'Proxy Networks', color: '#f59e0b', memberCount: 890, sentiment: -0.48 },
+      { id: 'f3', name: 'Media Amplifiers', color: '#3b82f6', memberCount: 2100, sentiment: 0.14 },
+      { id: 'f4', name: 'Bot Networks', color: '#8b5cf6', memberCount: 15000, sentiment: -0.62 },
+      { id: 'f5', name: 'Organic Supporters', color: '#10b981', memberCount: 5600, sentiment: 0.56 }
+    ];
+
+    // Initialize Sparklines
+    const sparklineUp = new Sparkline(document.getElementById('sparkline-up'), {
+      width: 100, height: 30, color: 'var(--accent-success)'
+    });
+    sparklineUp.update([5, 8, 12, 15, 18, 22, 28, 32, 38]);
+
+    const sparklineDown = new Sparkline(document.getElementById('sparkline-down'), {
+      width: 100, height: 30, color: 'var(--accent-danger)'
+    });
+    sparklineDown.update([40, 35, 32, 28, 22, 18, 15, 12, 8]);
+
+    const sparklineVolatile = new Sparkline(document.getElementById('sparkline-volatile'), {
+      width: 100, height: 30, color: 'var(--accent-warning)'
+    });
+    sparklineVolatile.update([15, 28, 12, 35, 20, 42, 18, 38, 25]);
+
+    const sparklineArea = new Sparkline(document.getElementById('sparkline-area'), {
+      width: 100, height: 30, color: 'var(--accent-primary)', showArea: true
+    });
+    sparklineArea.update([10, 15, 12, 18, 25, 22, 30, 28, 35]);
+
+    // Initialize Network Graph
+    const networkGraph = new NetworkGraph(document.getElementById('network-graph'), {
+      height: 400,
+      onNodeClick: (node) => console.log('Clicked node:', node)
+    });
+    networkGraph.update({
+      nodes: [
+        { id: 'p1', label: 'Viktor Petrov', type: 'person' },
+        { id: 'p2', label: 'Anna Volkov', type: 'person' },
+        { id: 'p3', label: 'Dmitri Kozlov', type: 'person' },
+        { id: 'o1', label: 'State Media Corp', type: 'organization' },
+        { id: 'o2', label: 'InfoWars Network', type: 'organization' },
+        { id: 'o3', label: 'Truth Factory LLC', type: 'organization' },
+        { id: 'p4', label: 'Maria Smirnova', type: 'person' },
+        { id: 'o4', label: 'Social Analytics', type: 'organization' }
+      ],
+      links: [
+        { source: 'p1', target: 'o1', type: 'person-org' },
+        { source: 'p2', target: 'o1', type: 'person-org' },
+        { source: 'p2', target: 'o2', type: 'person-org' },
+        { source: 'p3', target: 'o2', type: 'person-org' },
+        { source: 'o1', target: 'o2', type: 'org-org' },
+        { source: 'o2', target: 'o3', type: 'org-org' },
+        { source: 'p4', target: 'o3', type: 'person-org' },
+        { source: 'p4', target: 'o4', type: 'person-org' },
+        { source: 'p1', target: 'p3', type: 'person-person' }
+      ]
+    });
+
+    // Initialize Stacked Area Chart
+    const dates = [];
+    const now = new Date();
+    for (let i = 30; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      dates.push(d.toISOString().split('T')[0]);
+    }
+
+    const generateSeries = (base, variance) => {
+      return dates.map((_, i) => Math.max(0, base + Math.sin(i * 0.3) * variance + Math.random() * variance * 0.5));
+    };
+
+    const stackedAreaChart = new StackedAreaChart(document.getElementById('stacked-area-chart'), {
+      height: 280
+    });
+    stackedAreaChart.update({
+      dates,
+      series: [
+        generateSeries(150, 50),
+        generateSeries(100, 40),
+        generateSeries(80, 30),
+        generateSeries(60, 25)
+      ],
+      factions: demoFactions.slice(0, 4)
+    });
+
+    // Initialize Sentiment Chart
+    const sentimentChart = new SentimentChart(document.getElementById('sentiment-chart'), {
+      height: 250,
+      onFactionClick: (faction) => console.log('Clicked faction:', faction)
+    });
+    sentimentChart.update({ factions: demoFactions });
+
+    // Initialize Venn Diagram
+    const vennDiagram = new VennDiagram(document.getElementById('venn-diagram'), {
+      height: 350,
+      onFactionClick: (faction) => console.log('Clicked faction:', faction)
+    });
+    vennDiagram.update({
+      sets: [
+        { id: 'f1', name: 'State Actors', size: 1000, color: '#ef4444' },
+        { id: 'f2', name: 'Proxy Networks', size: 800, color: '#f59e0b' },
+        { id: 'f3', name: 'Media Amplifiers', size: 1200, color: '#3b82f6' }
+      ],
+      overlaps: [
+        { factionIds: ['f1', 'f2'], overlapSize: 300 },
+        { factionIds: ['f2', 'f3'], overlapSize: 250 },
+        { factionIds: ['f1', 'f3'], overlapSize: 150 },
+        { factionIds: ['f1', 'f2', 'f3'], overlapSize: 75 }
+      ]
+    });
+
+    // Initialize Timeline
+    const timeline = new Timeline(document.getElementById('timeline-chart'), {
+      height: 280,
+      onEventClick: (event) => console.log('Clicked event:', event)
+    });
+    timeline.update({
+      events: [
+        { id: '1', text: 'Initial article published', date: '2025-01-10T08:00:00Z' },
+        { id: '2', text: 'Social media amplification begins', date: '2025-01-12T14:30:00Z' },
+        { id: '3', text: 'Bot network detected', date: '2025-01-13T09:15:00Z', parentEventId: '2' },
+        { id: '4', text: 'Mainstream media coverage', date: '2025-01-15T11:00:00Z' },
+        { id: '5', text: 'Official response issued', date: '2025-01-17T16:45:00Z' },
+        { id: '6', text: 'Counter-narrative emerges', date: '2025-01-19T10:30:00Z' }
+      ]
+    });
+
+    // Initialize Timeline Volume Composite
+    // Generate dates for the composite chart (matching the event date range)
+    const compositeDates = [];
+    for (let i = 0; i <= 12; i++) {
+      const d = new Date('2025-01-08');
+      d.setDate(d.getDate() + i);
+      compositeDates.push(d.toISOString().split('T')[0]);
+    }
+
+    // Generate volume data with spikes corresponding to events
+    const generateCompositeVolume = (baseVolume, spikeDay, spikeMagnitude) => {
+      return compositeDates.map((_, i) => {
+        const base = baseVolume + Math.random() * 20;
+        // Add spike around specific days
+        if (Math.abs(i - spikeDay) <= 1) {
+          return base + spikeMagnitude * (1 - Math.abs(i - spikeDay) * 0.4);
+        }
+        return base;
+      });
+    };
+
+    // Demo sources for the toggle
+    const demoSources = [
+      { id: 's1', name: 'X (Twitter)', color: '#000000' },
+      { id: 's2', name: 'Facebook', color: '#1877F2' },
+      { id: 's3', name: 'TikTok', color: '#00F2EA' },
+      { id: 's4', name: 'CNN', color: '#CC0000' }
+    ];
+
+    const timelineVolumeComposite = new TimelineVolumeComposite(
+      document.getElementById('timeline-volume-composite-chart'), 
+      {
+        height: 450,
+        volumeHeight: 180,
+        timelineHeight: 180,
+        showViewToggle: true,
+        onEventClick: (event) => console.log('Clicked event:', event)
+      }
+    );
+    timelineVolumeComposite.update({
+      volumeData: {
+        dates: compositeDates,
+        series: [
+          generateCompositeVolume(50, 2, 120),   // Spike on day 2 (article published)
+          generateCompositeVolume(30, 4, 180),   // Spike on day 4 (social media amplification)
+          generateCompositeVolume(20, 7, 80),    // Spike on day 7 (mainstream coverage)
+        ],
+        factions: [
+          { id: 'f1', name: 'State Actors', color: '#ef4444' },
+          { id: 'f2', name: 'Bot Networks', color: '#8b5cf6' },
+          { id: 'f3', name: 'Media Amplifiers', color: '#3b82f6' }
+        ]
+      },
+      sourceData: {
+        dates: compositeDates,
+        series: [
+          generateCompositeVolume(80, 2, 150),   // X - high volume, spike on article
+          generateCompositeVolume(60, 4, 100),   // Facebook - spike on amplification
+          generateCompositeVolume(40, 4, 200),   // TikTok - big spike on amplification
+          generateCompositeVolume(25, 7, 60),    // CNN - spike on mainstream coverage
+        ],
+        sources: demoSources
+      },
+      events: [
+        { id: '1', text: 'Initial article published', date: '2025-01-10T08:00:00Z' },
+        { id: '2', text: 'Social media amplification begins', date: '2025-01-12T14:30:00Z' },
+        { id: '3', text: 'Bot network detected', date: '2025-01-13T09:15:00Z', parentEventId: '2' },
+        { id: '4', text: 'Mainstream media coverage', date: '2025-01-15T11:00:00Z' },
+        { id: '5', text: 'Official response issued', date: '2025-01-17T16:45:00Z' },
+        { id: '6', text: 'Counter-narrative emerges', date: '2025-01-19T10:30:00Z' }
+      ]
+    });
+
+    // Initialize Map View
+    const mapView = new MapView(document.getElementById('map-view'), {
+      height: 400,
+      defaultCenter: [50, 10],
+      defaultZoom: 4,
+      onMarkerClick: (location) => console.log('Clicked location:', location)
+    });
+    mapView.update({
+      locations: [
+        { name: 'Moscow', coordinates: { lat: 55.7558, lng: 37.6173 }, eventCount: 45, isEvent: true },
+        { name: 'Berlin', coordinates: { lat: 52.5200, lng: 13.4050 }, narrativeCount: 12 },
+        { name: 'Paris', coordinates: { lat: 48.8566, lng: 2.3522 }, narrativeCount: 8 },
+        { name: 'Warsaw', coordinates: { lat: 52.2297, lng: 21.0122 }, eventCount: 23, isEvent: true },
+        { name: 'Kyiv', coordinates: { lat: 50.4501, lng: 30.5234 }, eventCount: 67, isEvent: true },
+        { name: 'London', coordinates: { lat: 51.5074, lng: -0.1278 }, narrativeCount: 15 },
+        { name: 'Brussels', coordinates: { lat: 50.8503, lng: 4.3517 }, narrativeCount: 6 }
+      ]
+    });
+
+    // Initialize Faction Cards
+    const factionCards = new FactionCards(document.getElementById('faction-cards-demo'), {
+      showCount: true,
+      onFactionClick: (faction) => console.log('Clicked faction:', faction)
+    });
+    factionCards.update({ factions: demoFactions });
+
+    // Initialize Narrative List
+    const narrativeList = new NarrativeList(document.getElementById('narrative-list-demo'), {
+      maxItems: 5,
+      showSentiment: true,
+      showStatus: true,
+      showSparkline: true,
+      showVolume: true,
+      onNarrativeClick: (narrative) => console.log('Clicked narrative:', narrative)
+    });
+    narrativeList.update({
+      narratives: [
+        {
+          id: '1',
+          text: 'Election infrastructure vulnerability claims',
+          description: 'Coordinated messaging about alleged weaknesses in electronic voting systems.',
+          sentiment: -0.68,
+          status: 'new',
+          factionMentions: { f1: { volume: 12500 }, f2: { volume: 8900 } },
+          volumeOverTime: dates.slice(-10).map((d, i) => ({
+            date: d,
+            factionVolumes: { f1: 800 + Math.random() * 400, f2: 500 + Math.random() * 300 }
+          }))
+        },
+        {
+          id: '2',
+          text: 'Economic instability narratives',
+          description: 'Claims of imminent financial collapse targeting specific institutions.',
+          sentiment: -0.52,
+          status: 'in_progress',
+          factionMentions: { f1: { volume: 9800 }, f3: { volume: 4200 } },
+          volumeOverTime: dates.slice(-10).map((d, i) => ({
+            date: d,
+            factionVolumes: { f1: 600 + Math.random() * 300, f3: 300 + Math.random() * 200 }
+          }))
+        },
+        {
+          id: '3',
+          text: 'Health misinformation campaign',
+          description: 'False claims about vaccine safety and government health policies.',
+          sentiment: -0.77,
+          status: 'new',
+          factionMentions: { f2: { volume: 15600 }, f4: { volume: 22000 } },
+          volumeOverTime: dates.slice(-10).map((d, i) => ({
+            date: d,
+            factionVolumes: { f2: 1200 + Math.random() * 500, f4: 1800 + Math.random() * 600 }
+          }))
+        },
+        {
+          id: '4',
+          text: 'Immigration crisis exaggeration',
+          description: 'Amplified reporting of border incidents with misleading statistics.',
+          sentiment: 0.08,
+          status: 'in_progress',
+          factionMentions: { f3: { volume: 6700 } },
+          volumeOverTime: dates.slice(-10).map((d, i) => ({
+            date: d,
+            factionVolumes: { f3: 500 + Math.random() * 250 }
+          }))
+        },
+        {
+          id: '5',
+          text: 'Climate policy opposition',
+          description: 'Coordinated attacks on environmental regulations and green energy initiatives.',
+          sentiment: 0.53,
+          status: 'new',
+          factionMentions: { f5: { volume: 4500 } },
+          volumeOverTime: dates.slice(-10).map((d, i) => ({
+            date: d,
+            factionVolumes: { f5: 350 + Math.random() * 150 }
+          }))
+        }
+      ]
+    });
+
+    // Smooth scroll and active state for sidebar navigation
+    const navLinks = document.querySelectorAll('.demo-sidebar .nav-link');
+    
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          // Remove active class from all links
+          navLinks.forEach(l => l.classList.remove('active'));
+          // Add active class to clicked link
+          link.classList.add('active');
+          // Scroll to target
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Update active nav link on scroll
+    const sections = document.querySelectorAll('.component-section');
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.dataset.target === id) {
+              link.classList.add('active');
+            }
+          });
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+
+    // Set initial active state
+    if (navLinks.length > 0) {
+      navLinks[0].classList.add('active');
+    }
+  </script>
+</body>
+</html>
