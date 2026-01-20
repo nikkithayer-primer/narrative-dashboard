@@ -75,7 +75,7 @@ export class NarrativeView extends BaseView {
 
     if (subNarratives.length > 0) {
       cards.push(`
-        <div class="card">
+        <div class="card card-full-width">
           <div class="card-header">
             <h2 class="card-title">Sub-Narratives (${subNarratives.length})</h2>
             <div class="card-header-actions">

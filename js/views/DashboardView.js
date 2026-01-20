@@ -92,19 +92,34 @@ export class DashboardView extends BaseView {
 
         <!-- Status Overview -->
         <div class="status-overview">
-          <div class="status-card status-new">
+          <div class="status-card status-new clickable" data-href="#/status/new">
+            <svg class="status-icon" viewBox="0 0 16 16" fill="currentColor" stroke="none">
+              <circle cx="8" cy="8" r="4"/>
+            </svg>
             <div class="status-count">${statusCounts.new}</div>
             <div class="status-name">New</div>
           </div>
-          <div class="status-card status-in-progress">
+          <div class="status-card status-in-progress clickable" data-href="#/status/in_progress">
+            <svg class="status-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+              <circle cx="8" cy="8" r="5"/>
+              <path d="M8 5v3l2 2"/>
+            </svg>
             <div class="status-count">${statusCounts.in_progress}</div>
             <div class="status-name">In Progress</div>
           </div>
-          <div class="status-card status-investigating">
+          <div class="status-card status-investigating clickable" data-href="#/status/under_investigation">
+            <svg class="status-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+              <circle cx="7" cy="7" r="4"/>
+              <path d="M10 10l4 4"/>
+            </svg>
             <div class="status-count">${statusCounts.under_investigation}</div>
             <div class="status-name">Investigating</div>
           </div>
-          <div class="status-card status-resolved">
+          <div class="status-card status-resolved clickable" data-href="#/status/resolved">
+            <svg class="status-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25">
+              <circle cx="8" cy="8" r="5"/>
+              <path d="M5 8l2 2 4-4"/>
+            </svg>
             <div class="status-count">${statusCounts.resolved}</div>
             <div class="status-name">Resolved</div>
           </div>
@@ -155,8 +170,8 @@ export class DashboardView extends BaseView {
       2: 'full'  // Volume & Timeline Composite - full width
     });
 
-    // Add click handlers for stat cards
-    this.container.querySelectorAll('.stat-card.clickable').forEach(card => {
+    // Add click handlers for stat cards and status cards
+    this.container.querySelectorAll('.stat-card.clickable, .status-card.clickable').forEach(card => {
       card.addEventListener('click', () => {
         const href = card.dataset.href;
         if (href) {

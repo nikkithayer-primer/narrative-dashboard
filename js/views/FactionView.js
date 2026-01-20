@@ -161,9 +161,10 @@ export class FactionView extends BaseView {
     `;
 
     // Initialize card width toggles
+    // Related Factions (index 0) and Affiliated Entities (index 1) default to half-width
     if (cards.length > 0) {
       const contentGrid = this.container.querySelector('.content-grid');
-      initAllCardToggles(contentGrid, `faction-${this.factionId}`);
+      initAllCardToggles(contentGrid, `faction-${this.factionId}`, { 0: 'half', 1: 'half' });
     }
 
     // Store pre-fetched data for component initialization
@@ -200,6 +201,8 @@ export class FactionView extends BaseView {
         })),
         overlaps: factionOverlaps
       });
+      // Enable auto-resize so diagram re-centers when card is resized
+      this.components.venn.enableAutoResize();
     }
 
     // Network Graph of affiliated entities
@@ -219,6 +222,8 @@ export class FactionView extends BaseView {
         }
       });
       this.components.network.update(networkData);
+      // Enable auto-resize so graph adjusts when card is resized
+      this.components.network.enableAutoResize();
     }
 
     // Narratives List

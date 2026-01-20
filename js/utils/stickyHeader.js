@@ -5,8 +5,10 @@
 
 let scrollContainer = null;
 let lastScrollTop = 0;
-let scrollThreshold = 50; // Pixels to scroll before triggering
+let scrollThreshold = 50; // Pixels to scroll before collapsing
+let scrollHysteresis = 30; // Buffer zone to prevent flickering
 let isInitialized = false;
+let isCollapsed = false; // Track current state to apply hysteresis
 
 /**
  * Get the actual scroll container
@@ -50,6 +52,7 @@ export function initStickyHeader() {
   
   // Reset scroll state
   lastScrollTop = getScrollTop();
+  isCollapsed = false;
   isInitialized = true;
   
   // Initial check
@@ -67,6 +70,7 @@ function handleScroll() {
 
 /**
  * Update header state based on scroll position
+ * Uses hysteresis to prevent flickering when near the threshold
  */
 function updateHeaderState() {
   const currentScrollTop = getScrollTop();
@@ -74,11 +78,17 @@ function updateHeaderState() {
   
   if (!pageHeader) return;
   
-  // Add scrolled class when scrolled past threshold
-  if (currentScrollTop > scrollThreshold) {
+  // Apply hysteresis: use different thresholds for collapsing vs expanding
+  // This prevents the flickering caused by layout shifts when the description toggles
+  if (!isCollapsed && currentScrollTop > scrollThreshold) {
+    // Collapse when scrolling down past threshold
     pageHeader.classList.add('scrolled');
-  } else {
+    isCollapsed = true;
+  } else if (isCollapsed && currentScrollTop < (scrollThreshold - scrollHysteresis)) {
+    // Only expand when scrolled back up past the hysteresis buffer
+    // This means you need to scroll higher than where you collapsed
     pageHeader.classList.remove('scrolled');
+    isCollapsed = false;
   }
   
   lastScrollTop = currentScrollTop;
@@ -94,6 +104,7 @@ export function destroyStickyHeader() {
   }
   scrollContainer = null;
   isInitialized = false;
+  isCollapsed = false;
 }
 
 /**
@@ -105,6 +116,7 @@ export function resetStickyHeader() {
     pageHeader.classList.remove('scrolled');
   }
   lastScrollTop = getScrollTop();
+  isCollapsed = false;
 }
 
 export default {

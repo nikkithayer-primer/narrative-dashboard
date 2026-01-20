@@ -538,6 +538,37 @@ body {
   border-left-color: #64c896;
 }
 
+.status-card.clickable {
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.status-card.clickable:hover {
+  background: var(--bg-tertiary);
+}
+
+.status-card .status-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.status-card.status-new .status-icon {
+  color: #64b4ff;
+}
+
+.status-card.status-in-progress .status-icon {
+  color: #ffb464;
+}
+
+.status-card.status-investigating .status-icon {
+  color: #b464ff;
+}
+
+.status-card.status-resolved .status-icon {
+  color: #64c896;
+}
+
 .status-count {
   font-size: var(--text-xl);
   font-weight: 600;

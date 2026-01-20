@@ -16,6 +16,51 @@ export class ListView extends BaseView {
     this.narrativeList = null;
   }
 
+  /**
+   * Get SVG icon for entity type
+   */
+  getEntityIcon(type, size = 16) {
+    const icons = {
+      narratives: `<svg class="entity-icon" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.25">
+        <path d="M2 2h12v12H2z" rx="1"/>
+        <path d="M4 5h8M4 8h8M4 11h5"/>
+      </svg>`,
+      factions: `<svg class="entity-icon" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.25">
+        <circle cx="8" cy="5" r="2.5"/>
+        <circle cx="4" cy="11" r="2"/>
+        <circle cx="12" cy="11" r="2"/>
+        <path d="M6 6.5L4.5 9M10 6.5l1.5 2.5"/>
+      </svg>`,
+      locations: `<svg class="entity-icon" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.25">
+        <path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/>
+        <circle cx="8" cy="6" r="2"/>
+      </svg>`,
+      events: `<svg class="entity-icon" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.25">
+        <rect x="2" y="3" width="12" height="11" rx="1"/>
+        <path d="M2 6h12M5 1v3M11 1v3"/>
+      </svg>`,
+      entities: `<svg class="entity-icon" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.25">
+        <circle cx="8" cy="4" r="2.5"/>
+        <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
+      </svg>`,
+      person: `<svg class="entity-icon" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.25">
+        <circle cx="8" cy="4" r="2.5"/>
+        <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
+      </svg>`,
+      organization: `<svg class="entity-icon" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.25">
+        <rect x="3" y="6" width="10" height="8" rx="1"/>
+        <path d="M5 6V4a3 3 0 0 1 6 0v2"/>
+        <rect x="5" y="9" width="2" height="2"/>
+        <rect x="9" y="9" width="2" height="2"/>
+      </svg>`,
+      search: `<svg class="entity-icon" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.25">
+        <circle cx="7" cy="7" r="4"/>
+        <path d="M10 10l4 4"/>
+      </svg>`
+    };
+    return icons[type] || icons.narratives;
+  }
+
   async render() {
     const config = this.getConfig();
     const items = this.getItems();
@@ -47,7 +92,7 @@ export class ListView extends BaseView {
           <div class="card">
             <div class="card-header">
               <div class="search-input-wrapper" style="max-width: 300px;">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon">${this.getEntityIcon('search', 14)}</span>
                 <input 
                   type="text" 
                   class="search-input" 
@@ -99,7 +144,7 @@ export class ListView extends BaseView {
         <div class="card">
           <div class="card-header">
             <div class="search-input-wrapper" style="max-width: 300px;">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon">${this.getEntityIcon('search', 14)}</span>
               <input 
                 type="text" 
                 class="search-input" 
@@ -128,7 +173,7 @@ export class ListView extends BaseView {
           ? `${STATUS_LABELS[this.options.statusFilter] || this.options.statusFilter} Narratives`
           : 'Narratives',
         itemName: 'narrative',
-        icon: '◈',
+        iconType: 'narratives',
         route: 'narrative',
         getSubtitle: (item) => {
           const volume = Object.values(item.factionMentions || {})
@@ -143,7 +188,7 @@ export class ListView extends BaseView {
       factions: {
         title: 'Factions',
         itemName: 'faction',
-        icon: '◇',
+        iconType: 'factions',
         route: 'faction',
         getSubtitle: (item) => `${item.memberCount ? item.memberCount.toLocaleString() + ' members' : 'No member data'}`,
         getColor: (item) => item.color
@@ -151,14 +196,14 @@ export class ListView extends BaseView {
       locations: {
         title: 'Locations',
         itemName: 'location',
-        icon: '◎',
+        iconType: 'locations',
         route: 'location',
         getSubtitle: (item) => item.type || 'Location'
       },
       events: {
         title: 'Events',
         itemName: 'event',
-        icon: '◆',
+        iconType: 'events',
         route: 'event',
         getSubtitle: (item) => {
           const date = new Date(item.date);
@@ -172,7 +217,7 @@ export class ListView extends BaseView {
       entities: {
         title: 'People & Organizations',
         itemName: 'entity',
-        icon: '◐',
+        iconType: 'entities',
         route: null, // Special handling
         getSubtitle: (item) => item.type || (item._entityType === 'person' ? 'Person' : 'Organization')
       }
@@ -227,9 +272,8 @@ export class ListView extends BaseView {
     const subtitle = config.getSubtitle ? config.getSubtitle(item) : '';
     const color = config.getColor ? config.getColor(item) : null;
     const status = config.getStatus ? config.getStatus(item) : null;
-    const icon = item._entityType === 'person' ? '👤' : 
-                 item._entityType === 'organization' ? '🏢' : 
-                 config.icon;
+    const iconType = item._entityType || config.iconType;
+    const icon = this.getEntityIcon(iconType, 16);
 
     return `
       <li class="entity-list-item" data-id="${item.id}" data-type="${item._entityType || this.entityType}">
