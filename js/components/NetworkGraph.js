@@ -262,6 +262,7 @@ export class NetworkGraph extends BaseComponent {
       .attr('class', 'node-label')
       .attr('fill', 'var(--text-secondary)')
       .attr('font-size', '11px')
+      .attr('font-family', 'var(--font-sans)')
       .style('pointer-events', 'none');
 
     // Hover effects

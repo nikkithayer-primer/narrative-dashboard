@@ -113,7 +113,8 @@ export class StackedAreaChart extends BaseComponent {
         .tickFormat(getTimeFormatter('%b %d')))
       .selectAll('text')
       .attr('fill', 'var(--text-muted)')
-      .attr('font-size', '10px');
+      .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-sans)');
 
     // Y axis
     g.append('g')
@@ -123,7 +124,8 @@ export class StackedAreaChart extends BaseComponent {
         .tickFormat(d => this.formatNumber(d)))
       .selectAll('text')
       .attr('fill', 'var(--text-muted)')
-      .attr('font-size', '10px');
+      .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-sans)');
 
     // Style axis lines
     g.selectAll('.x-axis path, .y-axis path').attr('stroke', 'var(--border-color)');
@@ -290,6 +292,7 @@ export class StackedAreaChart extends BaseComponent {
         .attr('class', 'legend-label')
         .attr('fill', 'var(--text-secondary)')
         .attr('font-size', '11px')
+        .attr('font-family', 'var(--font-sans)')
         .append('title')
         .text(faction.name);
 

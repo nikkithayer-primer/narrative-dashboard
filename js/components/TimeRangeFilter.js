@@ -10,8 +10,8 @@ import { formatDate, getTimeFormatter } from '../utils/formatters.js';
 export class TimeRangeFilter extends BaseComponent {
   constructor(containerId, options = {}) {
     super(containerId, {
-      height: 44,
-      margin: { top: 4, right: 12, bottom: 16, left: 12 },
+      height: 48,
+      margin: { top: 2, right: 12, bottom: 16, left: 12 },
       barColor: 'var(--accent-primary)',
       barOpacity: 0.6,
       selectionColor: 'var(--accent-primary)',
@@ -142,19 +142,21 @@ export class TimeRangeFilter extends BaseComponent {
     // Start date label
     axisGroup.append('text')
       .attr('x', 0)
-      .attr('y', 12)
+      .attr('y', 14)
       .attr('text-anchor', 'start')
       .attr('fill', 'var(--text-muted)')
       .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-mono)')
       .text(formatDate(xExtent[0]));
 
     // End date label
     axisGroup.append('text')
       .attr('x', innerWidth)
-      .attr('y', 12)
+      .attr('y', 14)
       .attr('text-anchor', 'end')
       .attr('fill', 'var(--text-muted)')
       .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-mono)')
       .text(formatDate(xExtent[1]));
 
     // Create brush

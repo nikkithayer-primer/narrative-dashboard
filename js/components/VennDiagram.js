@@ -98,7 +98,8 @@ export class VennDiagram extends BaseComponent {
       vennDiv.selectAll('.venn-circle text')
         .style('fill', 'var(--text-primary)')
         .style('font-size', '12px')
-        .style('font-weight', '500');
+        .style('font-weight', '500')
+        .style('font-family', 'var(--font-sans)');
 
       // Intersection labels
       vennDiv.selectAll('.venn-intersection text')

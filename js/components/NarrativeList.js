@@ -120,10 +120,8 @@ export class NarrativeList extends BaseComponent {
       item.className = 'narrative-item-wrapper';
       item.dataset.id = narrative.id;
 
-      // Build tooltip content
-      const tooltipDate = narrative.createdAt ? this.formatDate(narrative.createdAt) : '';
-      const tooltipDescription = narrative.description || '';
-      const hasTooltip = tooltipDate || tooltipDescription;
+      // Build originated date for display
+      const originatedDate = narrative.createdAt ? this.formatDate(narrative.createdAt) : '';
 
       item.innerHTML = `
         <div class="narrative-item${hasSubNarratives ? ' has-subnarratives' : ''}${isExpanded ? ' expanded' : ''}">
@@ -134,21 +132,16 @@ export class NarrativeList extends BaseComponent {
           ` : ''}
           <div class="narrative-content">
             <div class="narrative-title-row">
-              <span class="narrative-text-wrapper"${hasTooltip ? ' data-has-tooltip' : ''}>
-                <span class="narrative-text">${narrative.text}</span>
-                ${hasTooltip ? `
-                  <div class="narrative-tooltip">
-                    ${tooltipDate ? `<div class="tooltip-date">Originated: ${tooltipDate}</div>` : ''}
-                    ${tooltipDescription ? `<div class="tooltip-description">${tooltipDescription}</div>` : ''}
-                  </div>
-                ` : ''}
-              </span>
+              <span class="narrative-text">${narrative.text}</span>
             </div>
-            ${narrative.description && this.showDescription ? `
-              <p class="narrative-description">
-                ${narrative.description}
-                <a href="#" class="source-link" data-id="${narrative.id}" data-type="narrative">View source</a>
-              </p>
+            ${this.showDescription ? `
+              ${originatedDate ? `<p class="narrative-originated">Originated: ${originatedDate}</p>` : ''}
+              ${narrative.description ? `
+                <p class="narrative-description">
+                  ${narrative.description}
+                  <a href="#" class="source-link" data-id="${narrative.id}" data-type="narrative">View source</a>
+                </p>
+              ` : ''}
             ` : ''}
             ${hasSubNarratives ? `
               <button class="narrative-expand-toggle" data-narrative-id="${narrative.id}" title="${isExpanded ? 'Collapse' : 'Expand'} themes">
@@ -180,10 +173,8 @@ export class NarrativeList extends BaseComponent {
               const subVolume = this.calculateSubNarrativeVolume(sub);
               sparklineIndex++;
               
-              // Build tooltip for subnarrative
-              const subTooltipDate = sub.createdAt ? this.formatDate(sub.createdAt) : '';
-              const subTooltipDescription = sub.description || '';
-              const subHasTooltip = subTooltipDate || subTooltipDescription;
+              // Build originated date for subnarrative
+              const subOriginatedDate = sub.createdAt ? this.formatDate(sub.createdAt) : '';
               
               return `
                 <li class="subnarrative-nested-item" data-id="${sub.id}">
@@ -193,16 +184,12 @@ export class NarrativeList extends BaseComponent {
                     </svg>
                   </div>
                   <div class="subnarrative-content">
-                    <span class="subnarrative-text-wrapper"${subHasTooltip ? ' data-has-tooltip' : ''}>
-                      <span class="subnarrative-text">${sub.text}</span>
-                      ${subHasTooltip ? `
-                        <div class="narrative-tooltip">
-                          ${subTooltipDate ? `<div class="tooltip-date">Originated: ${subTooltipDate}</div>` : ''}
-                          ${subTooltipDescription ? `<div class="tooltip-description">${subTooltipDescription}</div>` : ''}
-                        </div>
-                      ` : ''}
-                    </span>
+                    <span class="subnarrative-text">${sub.text}</span>
                     <span class="badge badge-${this.getSentimentClass(sub.sentiment)}">${this.formatSentiment(sub.sentiment)}</span>
+                    ${this.showDescription ? `
+                      ${subOriginatedDate ? `<p class="narrative-originated">Originated: ${subOriginatedDate}</p>` : ''}
+                      ${sub.description ? `<p class="narrative-description">${sub.description}</p>` : ''}
+                    ` : ''}
                   </div>
                   <div class="subnarrative-meta">
                     <span class="subnarrative-volume">${this.formatNumber(subVolume)}</span>

@@ -56,6 +56,7 @@ export class SentimentChart extends BaseComponent {
       .attr('text-anchor', 'start')
       .attr('fill', 'var(--accent-danger)')
       .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-sans)')
       .text('Negative');
 
     g.append('text')
@@ -64,6 +65,7 @@ export class SentimentChart extends BaseComponent {
       .attr('text-anchor', 'middle')
       .attr('fill', 'var(--text-muted)')
       .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-sans)')
       .text('Neutral');
 
     g.append('text')
@@ -72,6 +74,7 @@ export class SentimentChart extends BaseComponent {
       .attr('text-anchor', 'end')
       .attr('fill', 'var(--accent-success)')
       .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-sans)')
       .text('Positive');
 
     // Draw bars
@@ -92,6 +95,7 @@ export class SentimentChart extends BaseComponent {
         .attr('text-anchor', 'end')
         .attr('fill', 'var(--text-secondary)')
         .attr('font-size', '12px')
+        .attr('font-family', 'var(--font-sans)')
         .text(faction.name.length > 22 ? faction.name.slice(0, 20) + '...' : faction.name);
 
       // Background bar
@@ -141,6 +145,7 @@ export class SentimentChart extends BaseComponent {
         .attr('fill', barWidth >= minBarWidthForLabel ? 'var(--bg-primary)' : 'var(--text-secondary)')
         .attr('font-size', '10px')
         .attr('font-weight', '600')
+        .attr('font-family', 'var(--font-sans)')
         .text(this.formatSentimentValue(faction.sentiment));
 
       // Faction color indicator at the value position

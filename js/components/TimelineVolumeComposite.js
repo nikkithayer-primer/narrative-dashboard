@@ -218,6 +218,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         .attr('text-anchor', 'middle')
         .attr('fill', 'var(--text-muted)')
         .attr('font-size', '12px')
+        .attr('font-family', 'var(--font-sans)')
         .text('No volume data available');
       return;
     }
@@ -235,6 +236,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         .attr('text-anchor', 'middle')
         .attr('fill', 'var(--text-muted)')
         .attr('font-size', '12px')
+        .attr('font-family', 'var(--font-sans)')
         .text(`No ${this.currentView} data available`);
       return;
     }
@@ -297,7 +299,8 @@ export class TimelineVolumeComposite extends BaseComponent {
         .tickFormat(d => this.formatNumber(d)))
       .selectAll('text')
       .attr('fill', 'var(--text-muted)')
-      .attr('font-size', '10px');
+      .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-sans)');
 
     this.volumeGroup.selectAll('.y-axis path').attr('stroke', 'var(--border-color)');
     this.volumeGroup.selectAll('.y-axis line').attr('stroke', 'var(--border-color)');
@@ -327,6 +330,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         .attr('text-anchor', 'middle')
         .attr('fill', 'var(--text-muted)')
         .attr('font-size', '12px')
+        .attr('font-family', 'var(--font-sans)')
         .text('No events available');
       return;
     }
@@ -413,6 +417,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         .attr('y', isTop ? 0 : 12)
         .attr('font-size', '10px')
         .attr('fill', 'var(--text-primary)')
+        .attr('font-family', 'var(--font-sans)')
         .text(displayText);
 
       label.append('text')
@@ -420,6 +425,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         .attr('y', isTop ? 12 : 24)
         .attr('font-size', '9px')
         .attr('fill', 'var(--text-muted)')
+        .attr('font-family', 'var(--font-mono)')
         .text(dateText);
     });
 
@@ -532,7 +538,8 @@ export class TimelineVolumeComposite extends BaseComponent {
       .tickFormat(getTimeFormatter('%b %d')))
       .selectAll('text')
       .attr('fill', 'var(--text-muted)')
-      .attr('font-size', '10px');
+      .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-sans)');
 
     this.axisGroup.select('.domain').attr('stroke', 'var(--border-color)');
     this.axisGroup.selectAll('.tick line').attr('stroke', 'var(--border-color)');
@@ -568,6 +575,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         .attr('class', 'legend-label')
         .attr('fill', 'var(--text-secondary)')
         .attr('font-size', '11px')
+        .attr('font-family', 'var(--font-sans)')
         .append('title')
         .text(item.name);
 
@@ -610,6 +618,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         .attr('y', 10)
         .attr('font-size', '11px')
         .attr('fill', 'var(--text-muted)')
+        .attr('font-family', 'var(--font-sans)')
         .text(`+${items.length - maxItems} more`);
     }
   }

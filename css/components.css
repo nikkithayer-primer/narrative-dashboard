@@ -1082,6 +1082,14 @@
   padding: var(--space-sm) !important;
 }
 
+/* Narrative/Theme Originated Date */
+.narrative-originated {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-xs);
+  margin-bottom: 0;
+}
+
 /* Narrative/Theme Description */
 .narrative-description,
 .subnarrative-description {
@@ -1488,53 +1496,6 @@
 }
 
 /* Narrative Hover Tooltip */
-.narrative-text-wrapper,
-.subnarrative-text-wrapper {
-  position: relative;
-  display: inline;
-}
-
-.narrative-tooltip {
-  position: absolute;
-  left: 0;
-  top: 100%;
-  margin-top: var(--space-sm);
-  z-index: 9999;
-  min-width: 320px;
-  max-width: 550px;
-  padding: var(--space-sm) var(--space-md);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-4px);
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
-  pointer-events: none;
-}
-
-.narrative-text-wrapper[data-has-tooltip]:hover .narrative-tooltip,
-.subnarrative-text-wrapper[data-has-tooltip]:hover .narrative-tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.tooltip-date {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  margin-bottom: var(--space-xs);
-}
-
-.tooltip-description {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  line-height: 1.5;
-  max-height: 120px;
-  overflow-y: auto;
-}
-
 /* Full-width card modifier */
 .card.card-full-width {
   grid-column: 1 / -1;

@@ -174,7 +174,8 @@ export class Timeline extends BaseComponent {
       .tickFormat(getTimeFormatter('%b %d')))
       .selectAll('text')
       .attr('fill', 'var(--text-muted)')
-      .attr('font-size', '10px');
+      .attr('font-size', '10px')
+      .attr('font-family', 'var(--font-sans)');
 
     axisGroup.select('.domain').attr('stroke', 'var(--border-color)');
     axisGroup.selectAll('.tick line').attr('stroke', 'var(--border-color)');
