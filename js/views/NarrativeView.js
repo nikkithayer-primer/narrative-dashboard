@@ -5,6 +5,8 @@
 
 import { BaseView } from './BaseView.js';
 import { DataService } from '../data/DataService.js';
+import { PageHeader } from '../utils/PageHeader.js';
+import { CardBuilder } from '../utils/CardBuilder.js';
 import { SubNarrativeList } from '../components/SubNarrativeList.js';
 import { SentimentChart } from '../components/SentimentChart.js';
 import { VennDiagram } from '../components/VennDiagram.js';
@@ -24,21 +26,81 @@ export class NarrativeView extends BaseView {
   async render() {
     const narrative = DataService.getNarrative(this.narrativeId);
     if (!narrative) {
-      this.container.innerHTML = `
-        <div class="page-header">
-          <div class="breadcrumb">
-            <a href="#/dashboard">Dashboard</a> <span>/</span> Narrative not found
-          </div>
-          <h1>Narrative not found</h1>
-        </div>
-      `;
+      this.renderNotFound('Narrative');
       return;
     }
 
-    // Fetch all data upfront to determine which cards to show
+    // Fetch all data upfront
+    const data = this.fetchNarrativeData(narrative);
+    
+    // Build cards HTML
+    const cardsHtml = this.buildCardsHtml(narrative, data);
+
+    // Build page header
     const mission = narrative.missionId 
       ? DataService.getMission(narrative.missionId) 
       : null;
+    
+    const subtitleParts = [
+      `<span class="badge badge-${this.getSentimentClass(narrative.sentiment)}">${this.formatSentiment(narrative.sentiment)}</span>`,
+      mission ? `<span class="text-muted ml-2">Mission: ${mission.name}</span>` : ''
+    ].filter(Boolean).join('');
+
+    const headerHtml = PageHeader.render({
+      breadcrumbs: [
+        { label: 'Dashboard', href: '#/dashboard' },
+        { label: 'Narratives', href: '#/narratives' },
+        'Detail'
+      ],
+      title: narrative.text,
+      badge: `<span class="badge badge-status-${narrative.status || 'new'}">${this.formatStatus(narrative.status || 'new')}</span>`,
+      subtitle: subtitleParts,
+      description: narrative.description,
+      descriptionLink: narrative.description 
+        ? `<a href="#" class="source-link" id="narrative-source-link">View source</a>` 
+        : ''
+    });
+
+    this.container.innerHTML = `
+      ${headerHtml}
+      <div class="content-area">
+        <div class="content-grid">
+          ${cardsHtml}
+        </div>
+      </div>
+    `;
+
+    // Initialize card width toggles
+    if (cardsHtml) {
+      const contentGrid = this.container.querySelector('.content-grid');
+      initAllCardToggles(contentGrid, `narrative-${this.narrativeId}`);
+    }
+
+    // Store pre-fetched data for component initialization
+    this._prefetchedData = { narrative, ...data };
+
+    await this.initializeComponents();
+
+    // Set up source link handler
+    const sourceLink = this.container.querySelector('#narrative-source-link');
+    if (sourceLink) {
+      sourceLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        getSourceViewer().open(narrative, 'narrative');
+      });
+    }
+
+    // Set up description toggle for themes
+    const descToggle = this.container.querySelector('#subnarrative-desc-toggle');
+    if (descToggle && this.components.subNarrativeList) {
+      descToggle.addEventListener('click', () => {
+        const isShowing = this.components.subNarrativeList.toggleDescription();
+        descToggle.classList.toggle('active', isShowing);
+      });
+    }
+  }
+
+  fetchNarrativeData(narrative) {
     const subNarratives = DataService.getSubNarrativesForNarrative(narrative.id);
     const factionData = DataService.getFactionsForNarrative(narrative.id);
     const factions = factionData.map(f => f.faction).filter(Boolean);
@@ -74,165 +136,57 @@ export class NarrativeView extends BaseView {
     // Documents data
     const documents = DataService.getDocumentsForNarrative(narrative.id);
 
-    // Build cards HTML conditionally
+    return {
+      subNarratives, factionData, factions, factionOverlaps,
+      events, allEvents, hasVolumeData, sourceVolumeTime, hasSourceData, hasVolumeTimeline,
+      locations, mapLocations, personIds, orgIds, hasNetwork, documents
+    };
+  }
+
+  buildCardsHtml(narrative, data) {
     const cards = [];
 
-    if (subNarratives.length > 0) {
-      cards.push(`
-        <div class="card card-full-width">
-          <div class="card-header">
-            <h2 class="card-title">Sub-Narratives (${subNarratives.length})</h2>
-            <div class="card-header-actions">
-              <button class="card-action-btn description-toggle" title="Toggle descriptions" id="subnarrative-desc-toggle">
-                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M3 4h10M3 8h10M3 12h6"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div class="card-body no-padding" id="narrative-subnarratives"></div>
-        </div>
-      `);
+    if (data.subNarratives.length > 0) {
+      cards.push(CardBuilder.create('Themes', 'narrative-subnarratives', {
+        count: data.subNarratives.length,
+        fullWidth: true,
+        noPadding: true,
+        actions: CardBuilder.descriptionToggle('subnarrative-desc-toggle')
+      }));
     }
 
-    if (hasVolumeTimeline) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Volume Over Time & Events</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="narrative-volume-timeline"></div>
-        </div>
-      `);
+    if (data.hasVolumeTimeline) {
+      cards.push(CardBuilder.create('Volume Over Time & Events', 'narrative-volume-timeline'));
     }
 
-    if (factionData.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Sentiment by Faction</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="narrative-sentiment-chart"></div>
-        </div>
-      `);
+    if (data.factionData.length > 0) {
+      cards.push(CardBuilder.create('Sentiment by Faction', 'narrative-sentiment-chart'));
     }
 
-    // Faction Overlaps and Network side by side (half width each)
-    if (factions.length >= 2) {
-      cards.push(`
-        <div class="card card-half-width">
-          <div class="card-header">
-            <h2 class="card-title">Faction Overlaps</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="narrative-venn"></div>
-        </div>
-      `);
+    if (data.factions.length >= 2) {
+      cards.push(CardBuilder.create('Faction Overlaps', 'narrative-venn', { halfWidth: true }));
     }
 
-    if (hasNetwork) {
-      cards.push(`
-        <div class="card card-half-width">
-          <div class="card-header">
-            <h2 class="card-title">People & Organizations</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="narrative-network"></div>
-        </div>
-      `);
+    if (data.hasNetwork) {
+      cards.push(CardBuilder.create('People & Organizations', 'narrative-network', { halfWidth: true }));
     }
 
-    // Documents and Map side by side (half width each)
-    if (documents.length > 0) {
-      cards.push(`
-        <div class="card card-half-width">
-          <div class="card-header">
-            <h2 class="card-title">Source Documents (${documents.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="narrative-documents"></div>
-        </div>
-      `);
+    if (data.documents.length > 0) {
+      cards.push(CardBuilder.create('Source Documents', 'narrative-documents', {
+        count: data.documents.length,
+        halfWidth: true,
+        noPadding: true
+      }));
     }
 
-    if (mapLocations.length > 0) {
-      cards.push(`
-        <div class="card card-half-width">
-          <div class="card-header">
-            <h2 class="card-title">Related Locations & Events</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="narrative-map"></div>
-        </div>
-      `);
+    if (data.mapLocations.length > 0) {
+      cards.push(CardBuilder.create('Related Locations & Events', 'narrative-map', {
+        halfWidth: true,
+        noPadding: true
+      }));
     }
 
-    this.container.innerHTML = `
-      <div class="page-header">
-        <div class="breadcrumb">
-          <a href="#/dashboard">Dashboard</a>
-          <span>/</span>
-          <a href="#/narratives">Narratives</a>
-          <span>/</span>
-          Detail
-        </div>
-        <div class="page-title-row">
-          <h1>${narrative.text}</h1>
-          <span class="badge badge-status-${narrative.status || 'new'}">${this.formatStatus(narrative.status || 'new')}</span>
-        </div>
-        <p class="subtitle">
-          <span class="badge badge-${this.getSentimentClass(narrative.sentiment)}">${this.formatSentiment(narrative.sentiment)}</span>
-          ${mission ? `<span class="text-muted ml-2">Mission: ${mission.name}</span>` : ''}
-        </p>
-        ${narrative.description ? `
-          <p class="narrative-detail-description header-description">
-            ${narrative.description}
-            <a href="#" class="source-link" id="narrative-source-link">View source</a>
-          </p>
-        ` : ''}
-      </div>
-
-      <div class="content-area">
-        <div class="content-grid">
-          ${cards.join('')}
-        </div>
-      </div>
-    `;
-
-    // Initialize card width toggles
-    if (cards.length > 0) {
-      const contentGrid = this.container.querySelector('.content-grid');
-      initAllCardToggles(contentGrid, `narrative-${this.narrativeId}`);
-    }
-
-    // Store pre-fetched data for component initialization
-    this._prefetchedData = {
-      narrative, subNarratives, factionData, factions, factionOverlaps,
-      events, allEvents, hasVolumeData, sourceVolumeTime, hasSourceData,
-      mapLocations, personIds, orgIds, documents
-    };
-
-    await this.initializeComponents();
-
-    // Set up source link handler
-    const sourceLink = this.container.querySelector('#narrative-source-link');
-    if (sourceLink) {
-      sourceLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        getSourceViewer().open(narrative, 'narrative');
-      });
-    }
-
-    // Set up description toggle for sub-narratives
-    const descToggle = this.container.querySelector('#subnarrative-desc-toggle');
-    if (descToggle && this.components.subNarrativeList) {
-      descToggle.addEventListener('click', () => {
-        const isShowing = this.components.subNarrativeList.toggleDescription();
-        descToggle.classList.toggle('active', isShowing);
-      });
-    }
+    return cards.join('');
   }
 
   async initializeComponents() {
@@ -242,7 +196,7 @@ export class NarrativeView extends BaseView {
       mapLocations, personIds, orgIds, documents
     } = this._prefetchedData;
 
-    // Sub-Narratives List
+    // Themes List
     if (subNarratives.length > 0) {
       this.components.subNarrativeList = new SubNarrativeList('narrative-subnarratives', {
         onSubNarrativeClick: (s) => {
@@ -298,6 +252,7 @@ export class NarrativeView extends BaseView {
         }
       });
       this.components.sentimentChart.update({ factions: sentimentFactions });
+      this.components.sentimentChart.enableAutoResize();
     }
 
     // Venn Diagram
@@ -317,7 +272,6 @@ export class NarrativeView extends BaseView {
         })),
         overlaps: factionOverlaps
       });
-      // Enable auto-resize so diagram re-centers when card is resized
       this.components.venn.enableAutoResize();
     }
 
@@ -344,7 +298,6 @@ export class NarrativeView extends BaseView {
         }
       });
       this.components.network.update(networkData);
-      // Enable auto-resize so graph re-centers when card is resized
       this.components.network.enableAutoResize();
     }
 
@@ -359,7 +312,6 @@ export class NarrativeView extends BaseView {
       this.components.documentList.update({ documents });
     }
   }
-
 }
 
 export default NarrativeView;

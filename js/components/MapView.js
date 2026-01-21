@@ -44,10 +44,9 @@ export class MapView extends BaseComponent {
       attributionControl: false
     }).setView(this.options.defaultCenter, this.options.defaultZoom);
 
-    // Dark tile layer (CartoDB Dark Matter)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      subdomains: 'abcd'
+    // Default tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
     }).addTo(this.map);
 
     // Add custom zoom controls

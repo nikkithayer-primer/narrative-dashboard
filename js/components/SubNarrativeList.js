@@ -1,6 +1,6 @@
 /**
  * SubNarrativeList.js
- * List of sub-narratives with indicators
+ * List of themes with indicators
  */
 
 import { BaseComponent } from './BaseComponent.js';
@@ -36,7 +36,7 @@ export class SubNarrativeList extends BaseComponent {
     this.sparklines = [];
 
     if (!this.data || !this.data.subNarratives || !this.data.subNarratives.length) {
-      this.showEmptyState('No sub-narratives found');
+      this.showEmptyState('No themes found');
       return;
     }
 

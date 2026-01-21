@@ -88,27 +88,12 @@ export function formatSentimentValue(sentiment) {
 export function getSentimentColor(sentiment) {
   const value = normalizeSentiment(sentiment);
   
-  // Color stops: negative (red) -> neutral (gray) -> positive (green)
-  const negativeColor = { r: 200, g: 80, b: 80 };   // #c85050
-  const neutralColor = { r: 156, g: 163, b: 175 };  // #9ca3af
-  const positiveColor = { r: 80, g: 180, b: 100 };  // #50b464
-
-  let r, g, b;
+  // Simple binary: negative = red, positive = green
   if (value < 0) {
-    // Interpolate between negative and neutral
-    const t = (value + 1); // 0 to 1 range for negative side
-    r = Math.round(negativeColor.r + (neutralColor.r - negativeColor.r) * t);
-    g = Math.round(negativeColor.g + (neutralColor.g - negativeColor.g) * t);
-    b = Math.round(negativeColor.b + (neutralColor.b - negativeColor.b) * t);
+    return '#E57373'; // var(--sentiment-negative)
   } else {
-    // Interpolate between neutral and positive
-    const t = value; // 0 to 1 range for positive side
-    r = Math.round(neutralColor.r + (positiveColor.r - neutralColor.r) * t);
-    g = Math.round(neutralColor.g + (positiveColor.g - neutralColor.g) * t);
-    b = Math.round(neutralColor.b + (positiveColor.b - neutralColor.b) * t);
+    return '#66BB6A'; // var(--sentiment-positive)
   }
-
-  return `rgb(${r}, ${g}, ${b})`;
 }
 
 /**

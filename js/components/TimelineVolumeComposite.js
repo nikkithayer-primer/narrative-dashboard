@@ -313,9 +313,9 @@ export class TimelineVolumeComposite extends BaseComponent {
     this.volumeLayers = this.volumeGroup.selectAll('.volume-layer')
       .data(stackedData)
       .join('path')
-      .attr('class', 'volume-layer')
+      .attr('class', d => `volume-layer volume-layer-${d.key}`)
       .attr('fill', d => this.colorScale(d.key))
-      .attr('fill-opacity', 0.7)
+      .attr('fill-opacity', 0.8)
       .attr('d', this.areaGenerator);
   }
 
@@ -553,7 +553,7 @@ export class TimelineVolumeComposite extends BaseComponent {
       const legendItem = this.legendGroup.append('g')
         .attr('class', 'legend-item')
         .attr('transform', `translate(${i * legendItemWidth}, 0)`)
-        .style('cursor', isFactionView ? 'pointer' : 'default');
+        .style('cursor', 'pointer');
 
       legendItem.append('rect')
         .attr('width', 12)
@@ -576,16 +576,31 @@ export class TimelineVolumeComposite extends BaseComponent {
         legendItem.on('click', () => {
           this.options.onFactionClick(item);
         });
-
-        // Add hover effect
-        legendItem
-          .on('mouseover', function() {
-            d3.select(this).select('text').attr('fill', 'var(--accent-primary)');
-          })
-          .on('mouseout', function() {
-            d3.select(this).select('text').attr('fill', 'var(--text-secondary)');
-          });
       }
+
+      // Add hover effect to highlight corresponding area
+      const self = this;
+      legendItem
+        .on('mouseover', function() {
+          d3.select(this).select('text').attr('fill', 'var(--accent-primary)');
+          // Highlight the corresponding area, dim others
+          if (self.volumeLayers) {
+            self.volumeLayers
+              .attr('fill-opacity', d => d.key === item.id ? 1 : 0.4)
+              .attr('stroke', d => d.key === item.id ? item.color : 'none')
+              .attr('stroke-width', d => d.key === item.id ? 2 : 0);
+          }
+        })
+        .on('mouseout', function() {
+          d3.select(this).select('text').attr('fill', 'var(--text-secondary)');
+          // Restore all areas to normal opacity
+          if (self.volumeLayers) {
+            self.volumeLayers
+              .attr('fill-opacity', 0.8)
+              .attr('stroke', 'none')
+              .attr('stroke-width', 0);
+          }
+        });
     });
 
     // Show "+N more" if there are more items
@@ -701,7 +716,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         this.hoverLine.attr('opacity', 1);
         this.hoverDots.attr('opacity', 1);
         if (this.volumeLayers) {
-          this.volumeLayers.attr('fill-opacity', 0.5);
+          this.volumeLayers.attr('fill-opacity', 0.6);
         }
       })
       .on('mouseleave', () => {
@@ -709,7 +724,7 @@ export class TimelineVolumeComposite extends BaseComponent {
         this.hoverDots.attr('opacity', 0);
         this.hideTooltip();
         if (this.volumeLayers) {
-          this.volumeLayers.attr('fill-opacity', 0.7);
+          this.volumeLayers.attr('fill-opacity', 0.8);
         }
       });
   }

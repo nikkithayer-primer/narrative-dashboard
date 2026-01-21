@@ -4,6 +4,9 @@
  * Demonstrates the full data model capabilities
  */
 
+export const datasetId = 'american-politics';
+export const datasetName = 'American Politics';
+
 export const mockData = {
   sources: [
     // Social Media (flat)
@@ -28,9 +31,9 @@ export const mockData = {
   ],
 
   sourceCategories: [
-    { id: 'social', name: 'Social Media', color: '#9C27B0' },
-    { id: 'national_news', name: 'National News', color: '#2196F3' },
-    { id: 'international_news', name: 'International News', color: '#4CAF50' }
+    { id: 'social', name: 'Social Media', color: '#B07AA1' },
+    { id: 'national_news', name: 'National News', color: '#4E79A7' },
+    { id: 'international_news', name: 'International News', color: '#59A14F' }
   ],
 
   missions: [
@@ -38,21 +41,21 @@ export const mockData = {
       id: 'mission-001',
       name: 'Understand sentiment towards the American military',
       description: 'Track narratives related to US military operations, personnel, and public perception',
-      color: '#1E88E5',
+      color: '#4E79A7',
       createdAt: '2024-01-01T00:00:00Z'
     },
     {
       id: 'mission-002',
       name: 'Understand narratives around American health',
       description: 'Monitor health-related narratives including diet, healthcare policy, and wellness trends',
-      color: '#43A047',
+      color: '#59A14F',
       createdAt: '2024-01-01T00:00:00Z'
     },
     {
       id: 'mission-003',
       name: 'Monitor political discourse',
       description: 'Track political narratives across the spectrum',
-      color: '#E53935',
+      color: '#E15759',
       createdAt: '2024-01-01T00:00:00Z'
     }
   ],
@@ -771,7 +774,7 @@ export const mockData = {
     {
       id: 'faction-001',
       name: 'American Right Wing',
-      color: '#E53935',
+      color: '#E15759',
       relatedFactionIds: ['faction-004'],
       memberCount: 15000000,
       affiliatedPersonIds: ['person-003'],
@@ -780,7 +783,7 @@ export const mockData = {
     {
       id: 'faction-002',
       name: 'Democratic Socialists of America',
-      color: '#D81B60',
+      color: '#4E79A7',
       relatedFactionIds: ['faction-003'],
       memberCount: 500000,
       affiliatedPersonIds: [],
@@ -789,7 +792,7 @@ export const mockData = {
     {
       id: 'faction-003',
       name: 'BLM Supporters',
-      color: '#7C4DFF',
+      color: '#B07AA1',
       relatedFactionIds: ['faction-002'],
       memberCount: 8000000,
       affiliatedPersonIds: [],
@@ -798,7 +801,7 @@ export const mockData = {
     {
       id: 'faction-004',
       name: 'Law Enforcement Supporters',
-      color: '#1E88E5',
+      color: '#59A14F',
       relatedFactionIds: ['faction-001'],
       memberCount: 12000000,
       affiliatedPersonIds: [],
@@ -807,7 +810,7 @@ export const mockData = {
     {
       id: 'faction-005',
       name: 'Health Activists',
-      color: '#00ACC1',
+      color: '#76B7B2',
       relatedFactionIds: ['faction-006'],
       memberCount: 5000000,
       affiliatedPersonIds: [],
@@ -816,7 +819,7 @@ export const mockData = {
     {
       id: 'faction-006',
       name: 'Vegans',
-      color: '#43A047',
+      color: '#F28E2B',
       relatedFactionIds: ['faction-005'],
       memberCount: 8000000,
       affiliatedPersonIds: [],

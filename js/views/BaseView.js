@@ -11,6 +11,7 @@ import {
   formatStatus,
   truncateText
 } from '../utils/formatters.js';
+import { PageHeader } from '../utils/PageHeader.js';
 
 export class BaseView {
   /**
@@ -141,18 +142,20 @@ export class BaseView {
   }
 
   /**
-   * Render a "not found" page
+   * Render a "not found" page using PageHeader utility
    * @param {string} entityType - Type of entity (e.g., "Narrative", "Person")
    */
   renderNotFound(entityType) {
-    this.container.innerHTML = `
-      <div class="page-header">
-        <div class="breadcrumb">
-          <a href="#/dashboard">Dashboard</a> <span>/</span> ${entityType} not found
-        </div>
-        <h1>${entityType} not found</h1>
-      </div>
-    `;
+    this.container.innerHTML = PageHeader.notFound(entityType);
+  }
+
+  /**
+   * Create a page header using PageHeader utility
+   * @param {Object} config - Header configuration
+   * @returns {string} Header HTML
+   */
+  createPageHeader(config) {
+    return PageHeader.render(config);
   }
 }
 

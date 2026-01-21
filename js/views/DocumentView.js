@@ -5,6 +5,8 @@
 
 import { BaseView } from './BaseView.js';
 import { DataService } from '../data/DataService.js';
+import { PageHeader } from '../utils/PageHeader.js';
+import { CardBuilder } from '../utils/CardBuilder.js';
 import { NarrativeList } from '../components/NarrativeList.js';
 import { SubNarrativeList } from '../components/SubNarrativeList.js';
 import { MapView } from '../components/MapView.js';
@@ -34,18 +36,41 @@ export class DocumentView extends BaseView {
   async render() {
     const doc = DataService.getDocument(this.documentId);
     if (!doc) {
-      this.container.innerHTML = `
-        <div class="page-header">
-          <div class="breadcrumb">
-            <a href="#/dashboard">Dashboard</a> <span>/</span> Document not found
-          </div>
-          <h1>Document not found</h1>
-        </div>
-      `;
+      this.renderNotFound('Document');
       return;
     }
 
-    // Fetch related entities
+    // Fetch all related data
+    const data = this.fetchDocumentData(doc);
+    
+    // Build cards HTML
+    const cardsHtml = this.buildCardsHtml(doc, data);
+
+    // Build custom header (documents have a unique header format)
+    const headerHtml = this.renderDocumentHeader(doc, data.source);
+
+    this.container.innerHTML = `
+      ${headerHtml}
+      <div class="content-area">
+        <div class="content-grid">
+          ${cardsHtml}
+        </div>
+      </div>
+    `;
+
+    // Initialize card width toggles
+    if (cardsHtml) {
+      const contentGrid = this.container.querySelector('.content-grid');
+      initAllCardToggles(contentGrid, `doc-${this.documentId}`);
+    }
+
+    // Store pre-fetched data for component initialization
+    this._prefetchedData = { doc, ...data };
+
+    await this.initializeComponents();
+  }
+
+  fetchDocumentData(doc) {
     const source = DataService.getSourceForDocument(this.documentId);
     const narratives = DataService.getNarrativesForDocument(this.documentId);
     const subNarratives = DataService.getSubNarrativesForDocument(this.documentId);
@@ -53,85 +78,64 @@ export class DocumentView extends BaseView {
     const organizations = DataService.getOrganizationsForDocument(this.documentId);
     const locations = DataService.getLocationsForDocument(this.documentId);
     const events = DataService.getEventsForDocument(this.documentId);
-
     const hasNetwork = persons.length > 0 || organizations.length > 0;
 
-    // Build cards HTML conditionally
+    return {
+      source, narratives, subNarratives, persons, organizations, locations, events, hasNetwork
+    };
+  }
+
+  buildCardsHtml(doc, data) {
     const cards = [];
 
-    if (narratives.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Narratives (${narratives.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="doc-narratives"></div>
-        </div>
-      `);
+    if (data.narratives.length > 0) {
+      cards.push(CardBuilder.create('Related Narratives', 'doc-narratives', {
+        count: data.narratives.length,
+        noPadding: true
+      }));
     }
 
-    if (subNarratives.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Sub-Narratives (${subNarratives.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="doc-subnarratives"></div>
-        </div>
-      `);
+    if (data.subNarratives.length > 0) {
+      cards.push(CardBuilder.create('Related Themes', 'doc-subnarratives', {
+        count: data.subNarratives.length,
+        noPadding: true
+      }));
     }
 
-    if (hasNetwork) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Mentioned People & Organizations</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="doc-network"></div>
-        </div>
-      `);
+    if (data.hasNetwork) {
+      cards.push(CardBuilder.create('Mentioned People & Organizations', 'doc-network'));
     }
 
-    if (locations.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Mentioned Locations</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="doc-map"></div>
-        </div>
-      `);
+    if (data.locations.length > 0) {
+      cards.push(CardBuilder.create('Mentioned Locations', 'doc-map', { noPadding: true }));
     }
 
-    if (events.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Events (${events.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="doc-timeline"></div>
-        </div>
-      `);
+    if (data.events.length > 0) {
+      cards.push(CardBuilder.create('Related Events', 'doc-timeline', {
+        count: data.events.length
+      }));
     }
 
-    this.container.innerHTML = `
+    return cards.join('');
+  }
+
+  renderDocumentHeader(doc, source) {
+    const breadcrumbsHtml = PageHeader.renderBreadcrumbs([
+      { label: 'Dashboard', href: '#/dashboard' },
+      'Document'
+    ]);
+
+    const sourceHtml = source ? `
+      <div class="document-source-badge" ${source.color ? `style="background: ${source.color}20; border-color: ${source.color}40; color: ${source.color}"` : ''}>
+        ${source.name}
+      </div>
+    ` : '';
+
+    return `
       <div class="page-header">
-        <div class="breadcrumb">
-          <a href="#/dashboard">Dashboard</a>
-          <span>/</span>
-          Document
-        </div>
+        ${breadcrumbsHtml}
         <div class="document-detail-header">
-          ${source ? `
-            <div class="document-source-badge" ${source.color ? `style="background: ${source.color}20; border-color: ${source.color}40; color: ${source.color}"` : ''}>
-              ${source.name}
-            </div>
-          ` : ''}
+          ${sourceHtml}
           <span class="document-date-detail">${this.formatDate(doc.publishedDate)}</span>
         </div>
         <h1>${doc.title}</h1>
@@ -147,27 +151,7 @@ export class DocumentView extends BaseView {
           </a>
         </div>
       </div>
-
-      <div class="content-area">
-        <div class="content-grid">
-          ${cards.join('')}
-        </div>
-      </div>
     `;
-
-    // Initialize card width toggles
-    if (cards.length > 0) {
-      const contentGrid = this.container.querySelector('.content-grid');
-      initAllCardToggles(contentGrid, `doc-${this.documentId}`);
-    }
-
-    // Store pre-fetched data for component initialization
-    this._prefetchedData = {
-      doc, source, narratives, subNarratives,
-      persons, organizations, locations, events
-    };
-
-    await this.initializeComponents();
   }
 
   async initializeComponents() {
@@ -186,7 +170,7 @@ export class DocumentView extends BaseView {
       this.components.narrativeList.update({ narratives });
     }
 
-    // Sub-Narratives List
+    // Themes List
     if (subNarratives.length > 0) {
       this.components.subNarrativeList = new SubNarrativeList('doc-subnarratives', {
         maxItems: 10,
@@ -235,7 +219,6 @@ export class DocumentView extends BaseView {
       this.components.timeline.update({ events });
     }
   }
-
 }
 
 export default DocumentView;

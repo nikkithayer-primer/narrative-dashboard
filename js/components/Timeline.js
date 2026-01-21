@@ -214,7 +214,7 @@ export class Timeline extends BaseComponent {
         .attr('cy', 0)
         .attr('r', isSubEvent ? 6 : 10)
         .attr('fill', isSubEvent ? 'var(--accent-warning)' : 'var(--accent-primary)')
-        .attr('stroke', 'var(--bg-primary)')
+        .attr('stroke', 'var(--bg-secondary)')
         .attr('stroke-width', 2);
 
       // Event card - dynamic height based on text
@@ -239,8 +239,9 @@ export class Timeline extends BaseComponent {
         .attr('width', cardWidth)
         .attr('height', cardHeight)
         .attr('rx', 6)
-        .attr('fill', 'var(--bg-card)')
-        .attr('stroke', 'var(--border-color)');
+        .attr('fill', 'var(--bg-primary)')
+        .attr('stroke', 'var(--border-color)')
+        .attr('filter', 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.08))');
 
       // Event text with wrapping using foreignObject
       card.append('foreignObject')

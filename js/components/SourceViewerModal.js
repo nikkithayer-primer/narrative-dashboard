@@ -1,6 +1,6 @@
 /**
  * SourceViewerModal.js
- * Modal for viewing the aggregated sources that contribute to a narrative/sub-narrative
+ * Modal for viewing the aggregated sources that contribute to a narrative/theme
  */
 
 export class SourceViewerModal {
@@ -15,8 +15,8 @@ export class SourceViewerModal {
   }
 
   /**
-   * Open the source viewer modal for a narrative or sub-narrative
-   * @param {Object} item - The narrative or sub-narrative object
+   * Open the source viewer modal for a narrative or theme
+   * @param {Object} item - The narrative or theme object
    * @param {string} type - 'narrative' or 'subnarrative'
    */
   open(item, type = 'narrative') {
@@ -25,7 +25,7 @@ export class SourceViewerModal {
       return;
     }
 
-    const typeLabel = type === 'subnarrative' ? 'Sub-Narrative' : 'Narrative';
+    const typeLabel = type === 'subnarrative' ? 'Theme' : 'Narrative';
 
     this.modalContent.innerHTML = `
       <div class="modal-header">

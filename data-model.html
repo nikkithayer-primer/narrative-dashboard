@@ -5,25 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Primer - Data Model Reference</title>
   
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Local Fonts via main.css -->
+  <link rel="stylesheet" href="css/main.css">
   
   <style>
     :root {
-      --bg-primary: #1a1a1e;
-      --bg-secondary: #222226;
-      --bg-tertiary: #2a2a2f;
-      --bg-hover: #32323a;
-      --border-color: #3a3a42;
-      --border-subtle: #2e2e34;
-      --text-primary: #e0e0e4;
-      --text-secondary: #9090a0;
-      --text-muted: #606070;
-      --accent-primary: #6b8acd;
-      --accent-secondary: #5a7ab8;
-      --accent-muted: #4a6090;
+      --bg-primary: #F8F9FA;
+      --bg-secondary: #FFFFFF;
+      --bg-tertiary: #F0F2F5;
+      --bg-hover: #E8EAED;
+      --border-color: #B6BFC9;
+      --border-subtle: #D8DDE3;
+      --text-strong: #212636;
+      --text-primary: #3B485C;
+      --text-secondary: #506078;
+      --text-muted: #66778C;
+      --accent-primary: #3169ED;
+      --accent-secondary: #2855C5;
+      --accent-muted: #E8EEFF;
+      
+      /* Sentiment colors */
+      --sentiment-positive: #66BB6A;
+      --sentiment-negative: #E57373;
       
       /* Entity colors */
       --color-mission: #8b5cf6;
@@ -34,8 +37,9 @@
       --color-entity: #ec4899;
       --color-source: #06b6d4;
       
-      --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+      --font-sans: 'Neue Haas Grotesk Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Neue Haas Grotesk Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'SF Mono', Consolas, monospace;
     }
 
     *, *::before, *::after {
@@ -523,7 +527,7 @@
       <h1 class="page-title">Data Model Documentation</h1>
       <p class="page-description">
         This reference documents the complete data model for the Primer Intelligence Dashboard. 
-        The model supports tracking of disinformation narratives and sub-narratives, factions, events, 
+        The model supports tracking of disinformation narratives and themes, factions, events, 
         locations, people, and organizations across intelligence missions.
       </p>
     </section>
@@ -751,7 +755,7 @@
     <section class="erd-section">
       <h2 class="section-title">Monitor-Alert System</h2>
       <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 13px;">
-        Monitors define scoped watchlists with configurable triggers. When conditions are met, alerts are generated referencing the relevant narratives, sub-narratives, events, and sub-events that match the criteria.
+        Monitors define scoped watchlists with configurable triggers. When conditions are met, alerts are generated referencing the relevant narratives, themes, events, and sub-events that match the criteria.
       </p>
       <div class="erd-container">
         <svg class="erd-diagram" viewBox="0 0 1100 450">
@@ -1558,49 +1562,49 @@
                 <span class="field-name">title</span>
                 <div class="field-meta">
                   <span class="field-type required">string</span>
-                  <p class="field-desc">Short title identifying the sub-narrative</p>
+                  <p class="field-desc">Short title identifying the theme</p>
                 </div>
               </li>
               <li class="field-item">
                 <span class="field-name">description</span>
                 <div class="field-meta">
                   <span class="field-type">string</span>
-                  <p class="field-desc">Detailed description of the sub-narrative theme</p>
+                  <p class="field-desc">Detailed description of the theme</p>
                 </div>
               </li>
               <li class="field-item">
                 <span class="field-name">factionIds</span>
                 <div class="field-meta">
                   <span class="field-type">string[] (UUID)</span>
-                  <p class="field-desc">Factions mentioned in this sub-narrative</p>
+                  <p class="field-desc">Factions mentioned in this theme</p>
                 </div>
               </li>
               <li class="field-item">
                 <span class="field-name">personIds</span>
                 <div class="field-meta">
                   <span class="field-type">string[] (UUID)</span>
-                  <p class="field-desc">People mentioned in this sub-narrative</p>
+                  <p class="field-desc">People mentioned in this theme</p>
                 </div>
               </li>
               <li class="field-item">
                 <span class="field-name">organizationIds</span>
                 <div class="field-meta">
                   <span class="field-type">string[] (UUID)</span>
-                  <p class="field-desc">Organizations mentioned in this sub-narrative</p>
+                  <p class="field-desc">Organizations mentioned in this theme</p>
                 </div>
               </li>
               <li class="field-item">
                 <span class="field-name">locationIds</span>
                 <div class="field-meta">
                   <span class="field-type">string[] (UUID)</span>
-                  <p class="field-desc">Locations referenced in this sub-narrative</p>
+                  <p class="field-desc">Locations referenced in this theme</p>
                 </div>
               </li>
               <li class="field-item">
                 <span class="field-name">eventIds</span>
                 <div class="field-meta">
                   <span class="field-type">string[] (UUID)</span>
-                  <p class="field-desc">Events referenced in this sub-narrative</p>
+                  <p class="field-desc">Events referenced in this theme</p>
                 </div>
               </li>
             </ul>
@@ -1727,7 +1731,7 @@
                 <span class="field-name">options.includeSubNarratives</span>
                 <div class="field-meta">
                   <span class="field-type">boolean</span>
-                  <p class="field-desc">When true, include sub-narratives of matched narratives in results (default: true)</p>
+                  <p class="field-desc">When true, include themes of matched narratives in results (default: true)</p>
                 </div>
               </li>
               <li class="field-item">
@@ -1803,7 +1807,7 @@
                 <span class="field-name">matchedSubNarrativeIds</span>
                 <div class="field-meta">
                   <span class="field-type">string[] (UUID)</span>
-                  <p class="field-desc">Sub-narratives currently matching monitor criteria (computed at runtime)</p>
+                  <p class="field-desc">Themes currently matching monitor criteria (computed at runtime)</p>
                 </div>
               </li>
               <li class="field-item">
@@ -1915,7 +1919,7 @@
                 <span class="field-name">relatedSubNarrativeIds</span>
                 <div class="field-meta">
                   <span class="field-type">string[] (UUID)</span>
-                  <p class="field-desc">Sub-narratives relevant to this alert</p>
+                  <p class="field-desc">Themes relevant to this alert</p>
                 </div>
               </li>
               <li class="field-item">
@@ -1985,7 +1989,7 @@
                 </span>
               </td>
               <td>1:N</td>
-              <td>A narrative can have multiple sub-narratives</td>
+              <td>A narrative can have multiple themes</td>
             </tr>
             <tr>
               <td>
@@ -2529,7 +2533,7 @@
                 </span>
               </td>
               <td>N:M</td>
-              <td>Sub-narratives matching monitor criteria (computed)</td>
+              <td>Themes matching monitor criteria (computed)</td>
             </tr>
             <tr>
               <td>
@@ -2597,7 +2601,7 @@
                 </span>
               </td>
               <td>N:M</td>
-              <td>Alerts can reference sub-narratives that triggered them</td>
+              <td>Alerts can reference themes that triggered them</td>
             </tr>
             <tr>
               <td>

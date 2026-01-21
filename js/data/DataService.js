@@ -123,6 +123,7 @@ export const DataService = {
     return narratives;
   },
   getNarrative: (id) => findById('narratives', id),
+  getNarrativeById: (id) => findById('narratives', id),
   
   // Get narratives by status (with optional time range)
   getNarrativesByStatus: (status, timeRange = null) => {
@@ -149,34 +150,41 @@ export const DataService = {
     return counts;
   },
 
-  // Sub-Narratives
+  // Themes
   getSubNarratives: () => dataStore.data.subNarratives,
   getSubNarrative: (id) => findById('subNarratives', id),
+  getSubNarrativeById: (id) => findById('subNarratives', id),
 
   // Factions
   getFactions: () => dataStore.data.factions,
   getFaction: (id) => findById('factions', id),
+  getFactionById: (id) => findById('factions', id),
   getFactionOverlaps: () => dataStore.data.factionOverlaps,
 
   // Locations
   getLocations: () => dataStore.data.locations,
   getLocation: (id) => findById('locations', id),
+  getLocationById: (id) => findById('locations', id),
 
   // Events
   getEvents: () => dataStore.data.events,
   getEvent: (id) => findById('events', id),
+  getEventById: (id) => findById('events', id),
 
   // Persons
   getPersons: () => dataStore.data.persons,
   getPerson: (id) => findById('persons', id),
+  getPersonById: (id) => findById('persons', id),
 
   // Organizations
   getOrganizations: () => dataStore.data.organizations,
   getOrganization: (id) => findById('organizations', id),
+  getOrganizationById: (id) => findById('organizations', id),
 
   // Documents
   getDocuments: () => dataStore.data.documents || [],
   getDocument: (id) => findById('documents', id),
+  getDocumentById: (id) => findById('documents', id),
 
   // Sources
   getSources: () => dataStore.data.sources || [],
@@ -466,7 +474,7 @@ export const DataService = {
   },
 
   /**
-   * Get documents for a sub-narrative
+   * Get documents for a theme
    */
   getDocumentsForSubNarrative: (subNarrativeId) => {
     const subNarrative = dataStore.data.subNarratives.find(s => s.id === subNarrativeId);
@@ -535,7 +543,7 @@ export const DataService = {
   },
 
   /**
-   * Get sub-narratives mentioned in a document
+   * Get themes mentioned in a document
    */
   getSubNarrativesForDocument: (documentId) => {
     const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
@@ -726,8 +734,14 @@ export const DataService = {
   // Dashboard Aggregations (with time range support)
   // ============================================
 
-  getDashboardStats: (missionId = null, timeRange = null) => {
-    const narratives = DataService.getNarratives(missionId, timeRange);
+  getDashboardStats: (missionId = null, timeRange = null, statusFilter = null) => {
+    let narratives = DataService.getNarratives(missionId, timeRange);
+    
+    // Apply status filter if provided (statusFilter is an array of statuses)
+    if (statusFilter && statusFilter.length > 0) {
+      narratives = narratives.filter(n => statusFilter.includes(n.status || 'new'));
+    }
+    
     const subNarratives = dataStore.data.subNarratives.filter(s =>
       narratives.some(n => n.id === s.parentNarrativeId)
     );
@@ -747,10 +761,18 @@ export const DataService = {
     // Sort by volume
     narrativesWithVolume.sort((a, b) => b.totalVolume - a.totalVolume);
 
-    // Filter events by time range
+    // Filter events by time range and by narratives (if status filter is active)
     let events = dataStore.data.events;
     if (timeRange) {
       events = events.filter(e => DataService.isDateInRange(e.date, timeRange));
+    }
+    if (statusFilter) {
+      // Only show events linked to filtered narratives
+      const narrativeIds = new Set(narratives.map(n => n.id));
+      events = events.filter(e => {
+        // Check if event is linked to any filtered narrative
+        return narratives.some(n => (n.eventIds || []).includes(e.id));
+      });
     }
 
     return {
@@ -768,9 +790,15 @@ export const DataService = {
     };
   },
 
-  // Aggregate volume over time across multiple narratives (with time range support)
-  getAggregateVolumeOverTime: (missionId = null, timeRange = null) => {
-    const narratives = DataService.getNarratives(missionId);
+  // Aggregate volume over time across multiple narratives (with time range and status support)
+  getAggregateVolumeOverTime: (missionId = null, timeRange = null, statusFilter = null) => {
+    let narratives = DataService.getNarratives(missionId);
+    
+    // Apply status filter if provided (statusFilter is an array of statuses)
+    if (statusFilter && statusFilter.length > 0) {
+      narratives = narratives.filter(n => statusFilter.includes(n.status || 'new'));
+    }
+    
     const factions = dataStore.data.factions;
     const dateMap = new Map();
 
@@ -795,15 +823,75 @@ export const DataService = {
     return { dates, series, factions };
   },
 
-  // Get all locations with related narratives and events (with time range support)
-  getAllLocationsWithCounts: (timeRange = null) => {
-    const narratives = timeRange 
+  // Aggregate faction sentiments across all narratives (weighted by volume)
+  getAggregateFactionSentiments: (missionId = null, timeRange = null, statusFilter = null) => {
+    let narratives = DataService.getNarratives(missionId);
+    
+    // Apply status filter if provided
+    if (statusFilter && statusFilter.length > 0) {
+      narratives = narratives.filter(n => statusFilter.includes(n.status || 'new'));
+    }
+    
+    // Filter by time range if provided
+    if (timeRange) {
+      narratives = narratives.filter(n => DataService.narrativeHasActivityInRange(n, timeRange));
+    }
+    
+    const factions = dataStore.data.factions;
+    const factionStats = new Map();
+    
+    // Initialize stats for each faction
+    factions.forEach(f => {
+      factionStats.set(f.id, { totalVolume: 0, weightedSentiment: 0 });
+    });
+    
+    // Aggregate volume and sentiment across narratives
+    narratives.forEach(n => {
+      Object.entries(n.factionMentions || {}).forEach(([factionId, data]) => {
+        const stats = factionStats.get(factionId);
+        if (stats && data.volume && typeof data.sentiment === 'number') {
+          stats.totalVolume += data.volume;
+          stats.weightedSentiment += data.sentiment * data.volume;
+        }
+      });
+    });
+    
+    // Calculate weighted average sentiment and return factions with data
+    return factions
+      .map(f => {
+        const stats = factionStats.get(f.id);
+        if (stats.totalVolume === 0) return null;
+        return {
+          ...f,
+          sentiment: stats.weightedSentiment / stats.totalVolume,
+          volume: stats.totalVolume
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.volume - a.volume); // Sort by volume descending
+  },
+
+  // Get all locations with related narratives and events (with time range and status support)
+  getAllLocationsWithCounts: (timeRange = null, statusFilter = null) => {
+    let narratives = timeRange 
       ? dataStore.data.narratives.filter(n => DataService.narrativeHasActivityInRange(n, timeRange))
       : dataStore.data.narratives;
     
-    const events = timeRange
+    // Apply status filter if provided (statusFilter is an array of statuses)
+    if (statusFilter && statusFilter.length > 0) {
+      narratives = narratives.filter(n => statusFilter.includes(n.status || 'new'));
+    }
+    
+    let events = timeRange
       ? dataStore.data.events.filter(e => DataService.isDateInRange(e.date, timeRange))
       : dataStore.data.events;
+    
+    // If status filter is active, only include events linked to filtered narratives
+    if (statusFilter) {
+      events = events.filter(e => {
+        return narratives.some(n => (n.eventIds || []).includes(e.id));
+      });
+    }
 
     return dataStore.data.locations.map(loc => {
       const relatedNarratives = narratives.filter(n =>
@@ -822,12 +910,20 @@ export const DataService = {
     });
   },
 
-  // Get recent events (with time range support)
-  getRecentEvents: (limit = 10, timeRange = null) => {
+  // Get recent events (with time range and status support)
+  getRecentEvents: (limit = 10, timeRange = null, statusFilter = null) => {
     let events = [...dataStore.data.events];
     
     if (timeRange) {
       events = events.filter(e => DataService.isDateInRange(e.date, timeRange));
+    }
+    
+    // If status filter is active, only include events linked to narratives with that status
+    if (statusFilter && statusFilter.length > 0) {
+      const narratives = dataStore.data.narratives.filter(n => statusFilter.includes(n.status || 'new'));
+      events = events.filter(e => {
+        return narratives.some(n => (n.eventIds || []).includes(e.id));
+      });
     }
     
     return events
@@ -937,9 +1033,15 @@ export const DataService = {
     }).filter(Boolean).sort((a, b) => b.volume - a.volume);
   },
 
-  // Aggregate source volumes over time (with time range support)
-  getAggregateSourceVolumeOverTime: (missionId = null, timeRange = null) => {
-    const narratives = DataService.getNarratives(missionId);
+  // Aggregate source volumes over time (with time range and status support)
+  getAggregateSourceVolumeOverTime: (missionId = null, timeRange = null, statusFilter = null) => {
+    let narratives = DataService.getNarratives(missionId);
+    
+    // Apply status filter if provided (statusFilter is an array of statuses)
+    if (statusFilter && statusFilter.length > 0) {
+      narratives = narratives.filter(n => statusFilter.includes(n.status || 'new'));
+    }
+    
     const sources = dataStore.data.sources || [];
     const dateMap = new Map();
 

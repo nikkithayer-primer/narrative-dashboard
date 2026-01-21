@@ -5,6 +5,8 @@
 
 import { BaseView } from './BaseView.js';
 import { DataService } from '../data/DataService.js';
+import { PageHeader } from '../utils/PageHeader.js';
+import { CardBuilder } from '../utils/CardBuilder.js';
 import { VennDiagram } from '../components/VennDiagram.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
 import { NarrativeList } from '../components/NarrativeList.js';
@@ -20,18 +22,51 @@ export class FactionView extends BaseView {
   async render() {
     const faction = DataService.getFaction(this.factionId);
     if (!faction) {
-      this.container.innerHTML = `
-        <div class="page-header">
-          <div class="breadcrumb">
-            <a href="#/dashboard">Dashboard</a> <span>/</span> Faction not found
-          </div>
-          <h1>Faction not found</h1>
-        </div>
-      `;
+      this.renderNotFound('Faction');
       return;
     }
 
-    // Fetch all data upfront to determine which cards to show
+    // Fetch all data upfront
+    const data = this.fetchFactionData(faction);
+    
+    // Build cards HTML
+    const cardsHtml = this.buildCardsHtml(faction, data);
+
+    // Build page header
+    const headerHtml = PageHeader.render({
+      breadcrumbs: [
+        { label: 'Dashboard', href: '#/dashboard' },
+        { label: 'Factions', href: '#/factions' },
+        faction.name
+      ],
+      title: faction.name,
+      iconColor: faction.color,
+      subtitle: faction.memberCount ? `${this.formatNumber(faction.memberCount)} members` : ''
+    });
+
+    this.container.innerHTML = `
+      ${headerHtml}
+      <div class="content-area">
+        <div class="content-grid">
+          ${cardsHtml}
+        </div>
+      </div>
+    `;
+
+    // Initialize card width toggles
+    // Related Factions (index 0) and Affiliated Entities (index 1) default to half-width
+    if (cardsHtml) {
+      const contentGrid = this.container.querySelector('.content-grid');
+      initAllCardToggles(contentGrid, `faction-${this.factionId}`, { 0: 'half', 1: 'half' });
+    }
+
+    // Store pre-fetched data for component initialization
+    this._prefetchedData = { faction, ...data };
+
+    await this.initializeComponents();
+  }
+
+  fetchFactionData(faction) {
     const relatedFactions = DataService.getRelatedFactions(this.factionId);
     const factionOverlaps = DataService.getFactionOverlapsFor(this.factionId);
     const narratives = DataService.getNarrativesForFaction(this.factionId);
@@ -58,108 +93,40 @@ export class FactionView extends BaseView {
     const hasNetwork = affiliatedPersons.length > 0 || affiliatedOrgs.length > 0;
     const allFactions = [faction, ...relatedFactions];
 
-    // Build cards HTML conditionally
+    return {
+      relatedFactions, factionOverlaps, narratives,
+      affiliatedPersons, affiliatedOrgs, personsWithSentiment,
+      orgsWithSentiment, hasNetwork, allFactions
+    };
+  }
+
+  buildCardsHtml(faction, data) {
     const cards = [];
 
-    if (allFactions.length >= 1) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Factions</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="faction-venn"></div>
-        </div>
-      `);
+    if (data.allFactions.length >= 1) {
+      cards.push(CardBuilder.create('Related Factions', 'faction-venn', { halfWidth: true }));
     }
 
-    if (hasNetwork) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Affiliated Entities</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="faction-network"></div>
-        </div>
-      `);
+    if (data.hasNetwork) {
+      cards.push(CardBuilder.create('Affiliated Entities', 'faction-network', { halfWidth: true }));
     }
 
-    if (narratives.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Narratives (${narratives.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="faction-narratives"></div>
-        </div>
-      `);
+    if (data.narratives.length > 0) {
+      cards.push(CardBuilder.create('Narratives', 'faction-narratives', {
+        count: data.narratives.length,
+        noPadding: true
+      }));
     }
 
-    if (personsWithSentiment.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Sentiment Toward People</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="faction-person-sentiment"></div>
-        </div>
-      `);
+    if (data.personsWithSentiment.length > 0) {
+      cards.push(CardBuilder.create('Sentiment Toward People', 'faction-person-sentiment', { halfWidth: true }));
     }
 
-    if (orgsWithSentiment.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Sentiment Toward Organizations</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="faction-org-sentiment"></div>
-        </div>
-      `);
+    if (data.orgsWithSentiment.length > 0) {
+      cards.push(CardBuilder.create('Sentiment Toward Organizations', 'faction-org-sentiment', { halfWidth: true }));
     }
 
-    this.container.innerHTML = `
-      <div class="page-header">
-        <div class="breadcrumb">
-          <a href="#/dashboard">Dashboard</a>
-          <span>/</span>
-          <a href="#/factions">Factions</a>
-          <span>/</span>
-          ${faction.name}
-        </div>
-        <h1>
-          <span style="display: inline-block; width: 20px; height: 20px; background: ${faction.color}; border-radius: 4px; margin-right: 12px; vertical-align: middle;"></span>
-          ${faction.name}
-        </h1>
-        <p class="subtitle">
-          ${faction.memberCount ? `${this.formatNumber(faction.memberCount)} members` : ''}
-        </p>
-      </div>
-
-      <div class="content-area">
-        <div class="content-grid">
-          ${cards.join('')}
-        </div>
-      </div>
-    `;
-
-    // Initialize card width toggles
-    // Related Factions (index 0) and Affiliated Entities (index 1) default to half-width
-    if (cards.length > 0) {
-      const contentGrid = this.container.querySelector('.content-grid');
-      initAllCardToggles(contentGrid, `faction-${this.factionId}`, { 0: 'half', 1: 'half' });
-    }
-
-    // Store pre-fetched data for component initialization
-    this._prefetchedData = {
-      faction, relatedFactions, factionOverlaps, narratives,
-      affiliatedPersons, affiliatedOrgs, personsWithSentiment, orgsWithSentiment, allFactions
-    };
-
-    await this.initializeComponents();
+    return cards.join('');
   }
 
   async initializeComponents() {
@@ -187,7 +154,6 @@ export class FactionView extends BaseView {
         })),
         overlaps: factionOverlaps
       });
-      // Enable auto-resize so diagram re-centers when card is resized
       this.components.venn.enableAutoResize();
     }
 
@@ -208,7 +174,6 @@ export class FactionView extends BaseView {
         }
       });
       this.components.network.update(networkData);
-      // Enable auto-resize so graph adjusts when card is resized
       this.components.network.enableAutoResize();
     }
 
@@ -232,6 +197,7 @@ export class FactionView extends BaseView {
         }
       });
       this.components.personSentiment.update({ factions: personsWithSentiment });
+      this.components.personSentiment.enableAutoResize();
     }
 
     // Org Sentiment Chart
@@ -243,9 +209,9 @@ export class FactionView extends BaseView {
         }
       });
       this.components.orgSentiment.update({ factions: orgsWithSentiment });
+      this.components.orgSentiment.enableAutoResize();
     }
   }
-
 }
 
 export default FactionView;

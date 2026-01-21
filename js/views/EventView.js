@@ -5,6 +5,8 @@
 
 import { BaseView } from './BaseView.js';
 import { DataService } from '../data/DataService.js';
+import { PageHeader } from '../utils/PageHeader.js';
+import { CardBuilder } from '../utils/CardBuilder.js';
 import { Timeline } from '../components/Timeline.js';
 import { MapView } from '../components/MapView.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
@@ -20,27 +22,17 @@ export class EventView extends BaseView {
   async render() {
     const event = DataService.getEvent(this.eventId);
     if (!event) {
-      this.container.innerHTML = `
-        <div class="page-header">
-          <div class="breadcrumb">
-            <a href="#/dashboard">Dashboard</a> <span>/</span> Event not found
-          </div>
-          <h1>Event not found</h1>
-        </div>
-      `;
+      this.renderNotFound('Event');
       return;
     }
 
-    // Fetch all data upfront to determine which cards to show
-    const parentEvent = DataService.getParentEvent(this.eventId);
-    const subEvents = DataService.getSubEventsForEvent(this.eventId);
-    const location = DataService.getLocationForEvent(this.eventId);
-    const persons = DataService.getPersonsForEvent(this.eventId);
-    const organizations = DataService.getOrganizationsForEvent(this.eventId);
-    const narratives = DataService.getNarrativesForEvent(this.eventId);
+    // Fetch all data upfront
+    const data = this.fetchEventData(event);
+    
+    // Build cards HTML
+    const cardsHtml = this.buildCardsHtml(event, data);
 
-    const hasNetwork = persons.length > 0 || organizations.length > 0;
-
+    // Format date for subtitle
     const eventDate = new Date(event.date);
     const formattedDate = eventDate.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -51,100 +43,96 @@ export class EventView extends BaseView {
       minute: '2-digit'
     });
 
-    // Build cards HTML conditionally
-    const cards = [];
+    const subtitleParts = [
+      formattedDate,
+      data.location ? data.location.name : ''
+    ].filter(Boolean).join(' • ');
 
-    // Timeline always shows (includes main event)
-    cards.push(`
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Event Timeline ${subEvents.length > 0 ? `(${subEvents.length} sub-events)` : ''}</h2>
-          <div class="card-header-actions"></div>
-        </div>
-        <div class="card-body" id="event-timeline"></div>
+    // Build breadcrumbs with optional parent event
+    const breadcrumbs = [
+      { label: 'Dashboard', href: '#/dashboard' },
+      { label: 'Events', href: '#/events' }
+    ];
+    if (data.parentEvent) {
+      breadcrumbs.push({ label: this.truncateText(data.parentEvent.text, 30), href: `#/event/${data.parentEvent.id}` });
+    }
+    breadcrumbs.push(this.truncateText(event.text, 40));
+
+    // Build page header
+    const headerHtml = PageHeader.render({
+      breadcrumbs: breadcrumbs,
+      title: event.text,
+      subtitle: subtitleParts
+    });
+
+    // Build parent link HTML if applicable
+    const parentLinkHtml = data.parentEvent ? `
+      <div class="parent-link" onclick="window.location.hash='#/event/${data.parentEvent.id}'">
+        <span class="parent-link-icon">↑</span>
+        <span class="parent-link-text">${data.parentEvent.text}</span>
       </div>
-    `);
-
-    if (location) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Location</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="event-map"></div>
-        </div>
-      `);
-    }
-
-    if (hasNetwork) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">People & Organizations Involved</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="event-network"></div>
-        </div>
-      `);
-    }
-
-    if (narratives.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Narratives (${narratives.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="event-narratives"></div>
-        </div>
-      `);
-    }
+    ` : '';
 
     this.container.innerHTML = `
-      <div class="page-header">
-        <div class="breadcrumb">
-          <a href="#/dashboard">Dashboard</a>
-          <span>/</span>
-          <a href="#/events">Events</a>
-          <span>/</span>
-          ${parentEvent ? `<a href="#/event/${parentEvent.id}">${this.truncateText(parentEvent.text, 30)}</a> <span>/</span>` : ''}
-          ${this.truncateText(event.text, 40)}
-        </div>
-        <h1>${event.text}</h1>
-        <p class="subtitle">
-          ${formattedDate}
-          ${location ? ` • ${location.name}` : ''}
-        </p>
-      </div>
-
+      ${headerHtml}
       <div class="content-area">
-        ${parentEvent ? `
-          <div class="parent-link" onclick="window.location.hash='#/event/${parentEvent.id}'">
-            <span class="parent-link-icon">↑</span>
-            <span class="parent-link-text">${parentEvent.text}</span>
-          </div>
-        ` : ''}
-
+        ${parentLinkHtml}
         <div class="content-grid">
-          ${cards.join('')}
+          ${cardsHtml}
         </div>
       </div>
     `;
 
     // Initialize card width toggles
     // Map (index 1) and People & Orgs (index 2) default to half-width
-    if (cards.length > 0) {
+    if (cardsHtml) {
       const contentGrid = this.container.querySelector('.content-grid');
       initAllCardToggles(contentGrid, `event-${this.eventId}`, { 1: 'half', 2: 'half' });
     }
 
     // Store pre-fetched data for component initialization
-    this._prefetchedData = {
-      event, subEvents, location, persons, organizations, narratives
-    };
+    this._prefetchedData = { event, ...data };
 
     await this.initializeComponents();
+  }
+
+  fetchEventData(event) {
+    const parentEvent = DataService.getParentEvent(this.eventId);
+    const subEvents = DataService.getSubEventsForEvent(this.eventId);
+    const location = DataService.getLocationForEvent(this.eventId);
+    const persons = DataService.getPersonsForEvent(this.eventId);
+    const organizations = DataService.getOrganizationsForEvent(this.eventId);
+    const narratives = DataService.getNarrativesForEvent(this.eventId);
+    const hasNetwork = persons.length > 0 || organizations.length > 0;
+
+    return { parentEvent, subEvents, location, persons, organizations, narratives, hasNetwork };
+  }
+
+  buildCardsHtml(event, data) {
+    const cards = [];
+
+    // Timeline always shows (includes main event)
+    const timelineTitle = data.subEvents.length > 0 
+      ? `Event Timeline (${data.subEvents.length} sub-events)` 
+      : 'Event Timeline';
+    cards.push(CardBuilder.create(timelineTitle, 'event-timeline'));
+
+    if (data.location) {
+      cards.push(CardBuilder.create('Location', 'event-map', { halfWidth: true, noPadding: true }));
+    }
+
+    if (data.hasNetwork) {
+      cards.push(CardBuilder.create('People & Organizations Involved', 'event-network', { halfWidth: true }));
+    }
+
+    if (data.narratives.length > 0) {
+      cards.push(CardBuilder.create('Related Narratives', 'event-narratives', {
+        count: data.narratives.length,
+        noPadding: true
+      }));
+    }
+
+    return cards.join('');
   }
 
   async initializeComponents() {
@@ -204,7 +192,6 @@ export class EventView extends BaseView {
       this.components.narrativeList.update({ narratives });
     }
   }
-
 }
 
 export default EventView;

@@ -10,6 +10,7 @@ export { SubNarrativeView } from './SubNarrativeView.js';
 export { FactionView } from './FactionView.js';
 export { LocationView } from './LocationView.js';
 export { EventView } from './EventView.js';
+export { EntityDetailView } from './EntityDetailView.js';
 export { PersonView } from './PersonView.js';
 export { OrganizationView } from './OrganizationView.js';
 export { DocumentView } from './DocumentView.js';

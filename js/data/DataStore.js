@@ -7,8 +7,34 @@
 class DataStore {
   constructor() {
     this.storageKey = 'narrativeOS_data';
+    this.datasetKey = 'narrativeOS_currentDataset';
     this.listeners = new Set();
+    this.currentDataset = localStorage.getItem(this.datasetKey) || 'american-politics';
     this.data = this.load();
+  }
+
+  // ============================================
+  // Dataset Switching
+  // ============================================
+
+  /**
+   * Get the current dataset ID
+   * @returns {string} Current dataset identifier
+   */
+  getCurrentDataset() {
+    return this.currentDataset;
+  }
+
+  /**
+   * Switch to a different dataset
+   * @param {string} datasetId - Identifier for the new dataset
+   * @param {Object} mockDataModule - The mock data object to load
+   */
+  switchDataset(datasetId, mockDataModule) {
+    this.currentDataset = datasetId;
+    localStorage.setItem(this.datasetKey, datasetId);
+    this.data = { ...mockDataModule };
+    this.save();
   }
 
   // ============================================
@@ -211,7 +237,7 @@ class DataStore {
   }
 
   deleteNarrative(id) {
-    // Remove associated sub-narratives
+    // Remove associated themes
     this.data.subNarratives = this.data.subNarratives.filter(s => s.parentNarrativeId !== id);
     this.data.narratives = this.data.narratives.filter(n => n.id !== id);
     this.save();
@@ -428,7 +454,7 @@ class DataStore {
 
   deletePerson(id) {
     this.deleteEntity('persons', id, () => {
-      // Clean up references in narratives, sub-narratives, events, and factions
+      // Clean up references in narratives, themes, events, and factions
       this.removeIdFromArrayField('narratives', 'personIds', id);
       this.removeIdFromArrayField('subNarratives', 'personIds', id);
       this.removeIdFromArrayField('events', 'personIds', id);
@@ -456,7 +482,7 @@ class DataStore {
 
   deleteOrganization(id) {
     this.deleteEntity('organizations', id, () => {
-      // Clean up references in narratives, sub-narratives, events, and factions
+      // Clean up references in narratives, themes, events, and factions
       this.removeIdFromArrayField('narratives', 'organizationIds', id);
       this.removeIdFromArrayField('subNarratives', 'organizationIds', id);
       this.removeIdFromArrayField('events', 'organizationIds', id);
@@ -541,11 +567,12 @@ class DataStore {
   }
 
   generateColor() {
+    // Cohesive data visualization palette - optimized for charts and stacked areas
     const colors = [
-      '#E53935', '#D81B60', '#8E24AA', '#5E35B1', '#3949AB',
-      '#1E88E5', '#039BE5', '#00ACC1', '#00897B', '#43A047',
-      '#7CB342', '#C0CA33', '#FDD835', '#FFB300', '#FB8C00',
-      '#F4511E', '#6D4C41', '#757575', '#546E7A'
+      '#4E79A7', '#F28E2B', '#E15759', '#76B7B2', '#59A14F',
+      '#EDC948', '#B07AA1', '#FF9DA7', '#9C755F', '#BAB0AC',
+      '#5B8FA8', '#FFAB5E', '#D4A5A5', '#8CD17D', '#A0CBE8',
+      '#F1CE63', '#D37295', '#86BCB6', '#B6992D', '#6B8E8E'
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   }

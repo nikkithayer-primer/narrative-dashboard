@@ -96,10 +96,13 @@ export class StackedAreaChart extends BaseComponent {
     const layers = g.selectAll('.chart-layer')
       .data(stackedData)
       .join('path')
-      .attr('class', 'chart-layer')
+      .attr('class', d => `chart-layer chart-layer-${d.key}`)
       .attr('fill', d => color(d.key))
-      .attr('fill-opacity', 0.7)
+      .attr('fill-opacity', 0.8)
       .attr('d', area);
+    
+    // Store layers reference for legend hover
+    this.layers = layers;
 
     // X axis
     g.append('g')
@@ -252,13 +255,13 @@ export class StackedAreaChart extends BaseComponent {
         hoverLine.attr('opacity', 1);
         hoverDots.attr('opacity', 1);
         tooltip.style('opacity', 1);
-        layers.attr('fill-opacity', 0.5);
+        layers.attr('fill-opacity', 0.6);
       })
       .on('mouseleave', () => {
         hoverLine.attr('opacity', 0);
         hoverDots.attr('opacity', 0);
         tooltip.style('opacity', 0);
-        layers.attr('fill-opacity', 0.7);
+        layers.attr('fill-opacity', 0.8);
       });
 
     // Legend
@@ -272,7 +275,7 @@ export class StackedAreaChart extends BaseComponent {
       const legendItem = legend.append('g')
         .attr('class', 'legend-item')
         .attr('transform', `translate(${i * legendItemWidth}, 0)`)
-        .style('cursor', this.options.onFactionClick ? 'pointer' : 'default');
+        .style('cursor', 'pointer');
 
       legendItem.append('rect')
         .attr('width', 12)
@@ -295,16 +298,27 @@ export class StackedAreaChart extends BaseComponent {
         legendItem.on('click', () => {
           this.options.onFactionClick(faction);
         });
-
-        // Add hover effect
-        legendItem
-          .on('mouseover', function() {
-            d3.select(this).select('text').attr('fill', 'var(--accent-primary)');
-          })
-          .on('mouseout', function() {
-            d3.select(this).select('text').attr('fill', 'var(--text-secondary)');
-          });
       }
+
+      // Add hover effect to highlight corresponding area
+      const self = this;
+      legendItem
+        .on('mouseover', function() {
+          d3.select(this).select('text').attr('fill', 'var(--accent-primary)');
+          // Highlight the corresponding area, dim others
+          self.layers
+            .attr('fill-opacity', d => d.key === faction.id ? 1 : 0.4)
+            .attr('stroke', d => d.key === faction.id ? faction.color : 'none')
+            .attr('stroke-width', d => d.key === faction.id ? 2 : 0);
+        })
+        .on('mouseout', function() {
+          d3.select(this).select('text').attr('fill', 'var(--text-secondary)');
+          // Restore all areas to normal opacity
+          self.layers
+            .attr('fill-opacity', 0.8)
+            .attr('stroke', 'none')
+            .attr('stroke-width', 0);
+        });
     });
   }
 

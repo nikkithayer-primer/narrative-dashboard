@@ -5,6 +5,8 @@
 
 import { BaseView } from './BaseView.js';
 import { DataService } from '../data/DataService.js';
+import { PageHeader } from '../utils/PageHeader.js';
+import { CardBuilder } from '../utils/CardBuilder.js';
 import { MapView } from '../components/MapView.js';
 import { NarrativeList } from '../components/NarrativeList.js';
 import { Timeline } from '../components/Timeline.js';
@@ -20,112 +22,90 @@ export class LocationView extends BaseView {
   async render() {
     const location = DataService.getLocation(this.locationId);
     if (!location) {
-      this.container.innerHTML = `
-        <div class="page-header">
-          <div class="breadcrumb">
-            <a href="#/dashboard">Dashboard</a> <span>/</span> Location not found
-          </div>
-          <h1>Location not found</h1>
-        </div>
-      `;
+      this.renderNotFound('Location');
       return;
     }
 
-    // Fetch all data upfront to determine which cards to show
-    const narratives = DataService.getNarrativesForLocation(this.locationId);
-    const events = DataService.getEventsForLocation(this.locationId);
-    const persons = DataService.getPersonsForLocation(this.locationId);
-    const organizations = DataService.getOrganizationsForLocation(this.locationId);
+    // Fetch all data upfront
+    const data = this.fetchLocationData(location);
+    
+    // Build cards HTML
+    const cardsHtml = this.buildCardsHtml(location, data);
 
-    const hasNetwork = persons.length > 0 || organizations.length > 0;
+    // Build subtitle
+    const subtitleParts = [
+      location.type ? `Type: ${location.type}` : '',
+      location.coordinates ? `Coordinates: ${location.coordinates.lat.toFixed(4)}, ${location.coordinates.lng.toFixed(4)}` : ''
+    ].filter(Boolean).join(' • ');
 
-    // Build cards HTML conditionally
-    const cards = [];
-
-    // Map always shows (it's the primary view for a location)
-    if (location.coordinates) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Location Map</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="location-map"></div>
-        </div>
-      `);
-    }
-
-    if (narratives.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Narratives (${narratives.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="location-narratives"></div>
-        </div>
-      `);
-    }
-
-    if (events.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Events at this Location (${events.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="location-timeline"></div>
-        </div>
-      `);
-    }
-
-    if (hasNetwork) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Associated People & Organizations</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="location-network"></div>
-        </div>
-      `);
-    }
+    // Build page header
+    const headerHtml = PageHeader.render({
+      breadcrumbs: [
+        { label: 'Dashboard', href: '#/dashboard' },
+        { label: 'Locations', href: '#/locations' },
+        location.name
+      ],
+      title: location.name,
+      subtitle: subtitleParts
+    });
 
     this.container.innerHTML = `
-      <div class="page-header">
-        <div class="breadcrumb">
-          <a href="#/dashboard">Dashboard</a>
-          <span>/</span>
-          <a href="#/locations">Locations</a>
-          <span>/</span>
-          ${location.name}
-        </div>
-        <h1>${location.name}</h1>
-        <p class="subtitle">
-          ${location.type ? `Type: ${location.type}` : ''}
-          ${location.coordinates ? ` • Coordinates: ${location.coordinates.lat.toFixed(4)}, ${location.coordinates.lng.toFixed(4)}` : ''}
-        </p>
-      </div>
-
+      ${headerHtml}
       <div class="content-area">
         <div class="content-grid">
-          ${cards.join('')}
+          ${cardsHtml}
         </div>
       </div>
     `;
 
     // Initialize card width toggles
-    if (cards.length > 0) {
+    if (cardsHtml) {
       const contentGrid = this.container.querySelector('.content-grid');
       initAllCardToggles(contentGrid, `location-${this.locationId}`);
     }
 
     // Store pre-fetched data for component initialization
-    this._prefetchedData = {
-      location, narratives, events, persons, organizations
-    };
+    this._prefetchedData = { location, ...data };
 
     await this.initializeComponents();
+  }
+
+  fetchLocationData(location) {
+    const narratives = DataService.getNarrativesForLocation(this.locationId);
+    const events = DataService.getEventsForLocation(this.locationId);
+    const persons = DataService.getPersonsForLocation(this.locationId);
+    const organizations = DataService.getOrganizationsForLocation(this.locationId);
+    const hasNetwork = persons.length > 0 || organizations.length > 0;
+
+    return { narratives, events, persons, organizations, hasNetwork };
+  }
+
+  buildCardsHtml(location, data) {
+    const cards = [];
+
+    // Map always shows (it's the primary view for a location)
+    if (location.coordinates) {
+      cards.push(CardBuilder.create('Location Map', 'location-map', { noPadding: true }));
+    }
+
+    if (data.narratives.length > 0) {
+      cards.push(CardBuilder.create('Related Narratives', 'location-narratives', {
+        count: data.narratives.length,
+        noPadding: true
+      }));
+    }
+
+    if (data.events.length > 0) {
+      cards.push(CardBuilder.create('Events at this Location', 'location-timeline', {
+        count: data.events.length
+      }));
+    }
+
+    if (data.hasNetwork) {
+      cards.push(CardBuilder.create('Associated People & Organizations', 'location-network'));
+    }
+
+    return cards.join('');
   }
 
   async initializeComponents() {
@@ -194,7 +174,6 @@ export class LocationView extends BaseView {
       this.components.network.update(networkData);
     }
   }
-
 }
 
 export default LocationView;

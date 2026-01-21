@@ -1,10 +1,12 @@
 /**
  * SubNarrativeView.js
- * Detail view for a sub-narrative (similar to NarrativeView but with parent link)
+ * Detail view for a theme (similar to NarrativeView but with parent link)
  */
 
 import { BaseView } from './BaseView.js';
 import { DataService } from '../data/DataService.js';
+import { PageHeader } from '../utils/PageHeader.js';
+import { CardBuilder } from '../utils/CardBuilder.js';
 import { StackedAreaChart } from '../components/StackedAreaChart.js';
 import { SentimentChart } from '../components/SentimentChart.js';
 import { VennDiagram } from '../components/VennDiagram.js';
@@ -23,18 +25,77 @@ export class SubNarrativeView extends BaseView {
   async render() {
     const subNarrative = DataService.getSubNarrative(this.subNarrativeId);
     if (!subNarrative) {
-      this.container.innerHTML = `
-        <div class="page-header">
-          <div class="breadcrumb">
-            <a href="#/dashboard">Dashboard</a> <span>/</span> Sub-Narrative not found
-          </div>
-          <h1>Sub-Narrative not found</h1>
-        </div>
-      `;
+      this.renderNotFound('Theme');
       return;
     }
 
-    // Fetch all data upfront to determine which cards to show
+    // Fetch all data upfront
+    const data = this.fetchSubNarrativeData(subNarrative);
+    
+    // Build cards HTML
+    const cardsHtml = this.buildCardsHtml(subNarrative, data);
+
+    // Build breadcrumbs with optional parent narrative
+    const breadcrumbs = [
+      { label: 'Dashboard', href: '#/dashboard' },
+      { label: 'Narratives', href: '#/narratives' }
+    ];
+    if (data.parentNarrative) {
+      breadcrumbs.push({ label: 'Parent', href: `#/narrative/${data.parentNarrative.id}` });
+    }
+    breadcrumbs.push('Theme');
+
+    // Build page header
+    const headerHtml = PageHeader.render({
+      breadcrumbs: breadcrumbs,
+      title: subNarrative.text,
+      subtitle: `<span class="badge badge-${this.getSentimentClass(subNarrative.sentiment)}">${this.formatSentiment(subNarrative.sentiment)}</span>`,
+      description: subNarrative.description,
+      descriptionLink: subNarrative.description 
+        ? `<a href="#" class="source-link" id="subnarrative-source-link">View source</a>` 
+        : ''
+    });
+
+    // Build parent link HTML if applicable
+    const parentLinkHtml = data.parentNarrative ? `
+      <div class="parent-link" onclick="window.location.hash='#/narrative/${data.parentNarrative.id}'">
+        <span class="parent-link-icon">↑</span>
+        <span class="parent-link-text">${data.parentNarrative.text}</span>
+      </div>
+    ` : '';
+
+    this.container.innerHTML = `
+      ${headerHtml}
+      <div class="content-area">
+        ${parentLinkHtml}
+        <div class="content-grid">
+          ${cardsHtml}
+        </div>
+      </div>
+    `;
+
+    // Initialize card width toggles
+    if (cardsHtml) {
+      const contentGrid = this.container.querySelector('.content-grid');
+      initAllCardToggles(contentGrid, `subnarrative-${this.subNarrativeId}`);
+    }
+
+    // Store pre-fetched data for component initialization
+    this._prefetchedData = { subNarrative, ...data };
+
+    await this.initializeComponents();
+
+    // Set up source link handler
+    const sourceLink = this.container.querySelector('#subnarrative-source-link');
+    if (sourceLink) {
+      sourceLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        getSourceViewer().open(subNarrative, 'subnarrative');
+      });
+    }
+  }
+
+  fetchSubNarrativeData(subNarrative) {
     const parentNarrative = DataService.getParentNarrative(this.subNarrativeId);
     const factionData = DataService.getFactionsForSubNarrative(subNarrative.id);
     const factions = factionData.map(f => f.faction).filter(Boolean);
@@ -52,139 +113,40 @@ export class SubNarrativeView extends BaseView {
     const orgIds = subNarrative.organizationIds || [];
     const hasNetwork = personIds.length > 0 || orgIds.length > 0;
 
-    // Build cards HTML conditionally
+    return {
+      parentNarrative, factionData, factions, factionOverlaps,
+      hasVolumeData, locations, events, personIds, orgIds, hasNetwork
+    };
+  }
+
+  buildCardsHtml(subNarrative, data) {
     const cards = [];
 
-    if (hasVolumeData) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Volume by Faction Over Time</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="sub-volume-chart"></div>
-        </div>
-      `);
+    if (data.hasVolumeData) {
+      cards.push(CardBuilder.create('Volume by Faction Over Time', 'sub-volume-chart'));
     }
 
-    if (factionData.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Sentiment by Faction</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="sub-sentiment-chart"></div>
-        </div>
-      `);
+    if (data.factionData.length > 0) {
+      cards.push(CardBuilder.create('Sentiment by Faction', 'sub-sentiment-chart'));
     }
 
-    if (factions.length >= 2) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Faction Overlaps</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="sub-venn"></div>
-        </div>
-      `);
+    if (data.factions.length >= 2) {
+      cards.push(CardBuilder.create('Faction Overlaps', 'sub-venn'));
     }
 
-    if (locations.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Locations</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="sub-map"></div>
-        </div>
-      `);
+    if (data.locations.length > 0) {
+      cards.push(CardBuilder.create('Related Locations', 'sub-map', { noPadding: true }));
     }
 
-    if (events.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Events</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="sub-timeline"></div>
-        </div>
-      `);
+    if (data.events.length > 0) {
+      cards.push(CardBuilder.create('Related Events', 'sub-timeline'));
     }
 
-    if (hasNetwork) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">People & Organizations</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="sub-network"></div>
-        </div>
-      `);
+    if (data.hasNetwork) {
+      cards.push(CardBuilder.create('People & Organizations', 'sub-network'));
     }
 
-    this.container.innerHTML = `
-      <div class="page-header">
-        <div class="breadcrumb">
-          <a href="#/dashboard">Dashboard</a>
-          <span>/</span>
-          <a href="#/narratives">Narratives</a>
-          <span>/</span>
-          ${parentNarrative ? `<a href="#/narrative/${parentNarrative.id}">Parent</a> <span>/</span>` : ''}
-          Sub-Narrative
-        </div>
-        <h1>${subNarrative.text}</h1>
-        <p class="subtitle">
-          <span class="badge badge-${this.getSentimentClass(subNarrative.sentiment)}">${this.formatSentiment(subNarrative.sentiment)}</span>
-        </p>
-        ${subNarrative.description ? `
-          <p class="narrative-detail-description header-description">
-            ${subNarrative.description}
-            <a href="#" class="source-link" id="subnarrative-source-link">View source</a>
-          </p>
-        ` : ''}
-      </div>
-
-      <div class="content-area">
-        ${parentNarrative ? `
-          <div class="parent-link" onclick="window.location.hash='#/narrative/${parentNarrative.id}'">
-            <span class="parent-link-icon">↑</span>
-            <span class="parent-link-text">${parentNarrative.text}</span>
-          </div>
-        ` : ''}
-
-        <div class="content-grid">
-          ${cards.join('')}
-        </div>
-      </div>
-    `;
-
-    // Initialize card width toggles
-    if (cards.length > 0) {
-      const contentGrid = this.container.querySelector('.content-grid');
-      initAllCardToggles(contentGrid, `subnarrative-${this.subNarrativeId}`);
-    }
-
-    // Store pre-fetched data for component initialization
-    this._prefetchedData = {
-      subNarrative, factionData, factions, factionOverlaps,
-      hasVolumeData, locations, events, personIds, orgIds
-    };
-
-    await this.initializeComponents();
-
-    // Set up source link handler
-    const sourceLink = this.container.querySelector('#subnarrative-source-link');
-    if (sourceLink) {
-      sourceLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        getSourceViewer().open(subNarrative, 'subnarrative');
-      });
-    }
+    return cards.join('');
   }
 
   async initializeComponents() {
@@ -223,6 +185,7 @@ export class SubNarrativeView extends BaseView {
         }
       });
       this.components.sentimentChart.update({ factions: sentimentFactions });
+      this.components.sentimentChart.enableAutoResize();
     }
 
     // Venn Diagram
@@ -242,6 +205,7 @@ export class SubNarrativeView extends BaseView {
         })),
         overlaps: factionOverlaps
       });
+      this.components.venn.enableAutoResize();
     }
 
     // Map
@@ -278,9 +242,9 @@ export class SubNarrativeView extends BaseView {
         }
       });
       this.components.network.update(networkData);
+      this.components.network.enableAutoResize();
     }
   }
-
 }
 
 export default SubNarrativeView;
