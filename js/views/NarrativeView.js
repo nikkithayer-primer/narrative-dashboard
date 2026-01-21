@@ -236,6 +236,7 @@ export class NarrativeView extends BaseView {
         sourceData,
         events: allEvents
       });
+      this.components.volumeTimeline.enableAutoResize();
     }
 
     // Sentiment Chart

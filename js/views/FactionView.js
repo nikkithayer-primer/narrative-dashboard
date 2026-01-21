@@ -11,6 +11,7 @@ import { VennDiagram } from '../components/VennDiagram.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
 import { NarrativeList } from '../components/NarrativeList.js';
 import { SentimentChart } from '../components/SentimentChart.js';
+import { DocumentList } from '../components/DocumentList.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
 export class FactionView extends BaseView {
@@ -90,11 +91,12 @@ export class FactionView extends BaseView {
         color: faction.color
       }));
 
+    const documents = DataService.getDocumentsForFaction(this.factionId);
     const hasNetwork = affiliatedPersons.length > 0 || affiliatedOrgs.length > 0;
     const allFactions = [faction, ...relatedFactions];
 
     return {
-      relatedFactions, factionOverlaps, narratives,
+      relatedFactions, factionOverlaps, narratives, documents,
       affiliatedPersons, affiliatedOrgs, personsWithSentiment,
       orgsWithSentiment, hasNetwork, allFactions
     };
@@ -126,12 +128,19 @@ export class FactionView extends BaseView {
       cards.push(CardBuilder.create('Sentiment Toward Organizations', 'faction-org-sentiment', { halfWidth: true }));
     }
 
+    if (data.documents.length > 0) {
+      cards.push(CardBuilder.create('Source Documents', 'faction-documents', {
+        count: data.documents.length,
+        noPadding: true
+      }));
+    }
+
     return cards.join('');
   }
 
   async initializeComponents() {
     const {
-      faction, factionOverlaps, narratives,
+      faction, factionOverlaps, narratives, documents,
       affiliatedPersons, affiliatedOrgs, personsWithSentiment, orgsWithSentiment, allFactions
     } = this._prefetchedData;
 
@@ -210,6 +219,17 @@ export class FactionView extends BaseView {
       });
       this.components.orgSentiment.update({ factions: orgsWithSentiment });
       this.components.orgSentiment.enableAutoResize();
+    }
+
+    // Document List
+    if (documents.length > 0) {
+      this.components.documentList = new DocumentList('faction-documents', {
+        maxItems: 10,
+        onDocumentClick: (doc) => {
+          window.location.hash = `#/document/${doc.id}`;
+        }
+      });
+      this.components.documentList.update({ documents });
     }
   }
 }

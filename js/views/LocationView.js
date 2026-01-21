@@ -11,6 +11,7 @@ import { MapView } from '../components/MapView.js';
 import { NarrativeList } from '../components/NarrativeList.js';
 import { Timeline } from '../components/Timeline.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
+import { DocumentList } from '../components/DocumentList.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
 export class LocationView extends BaseView {
@@ -59,9 +60,10 @@ export class LocationView extends BaseView {
     `;
 
     // Initialize card width toggles
+    // Cards 2 (Narratives), 3 (Network), and 4 (Documents) should be half width
     if (cardsHtml) {
       const contentGrid = this.container.querySelector('.content-grid');
-      initAllCardToggles(contentGrid, `location-${this.locationId}`);
+      initAllCardToggles(contentGrid, `location-${this.locationId}`, { 2: 'half', 3: 'half', 4: 'half' });
     }
 
     // Store pre-fetched data for component initialization
@@ -75,19 +77,28 @@ export class LocationView extends BaseView {
     const events = DataService.getEventsForLocation(this.locationId);
     const persons = DataService.getPersonsForLocation(this.locationId);
     const organizations = DataService.getOrganizationsForLocation(this.locationId);
+    const documents = DataService.getDocumentsForLocation(this.locationId);
     const hasNetwork = persons.length > 0 || organizations.length > 0;
 
-    return { narratives, events, persons, organizations, hasNetwork };
+    return { narratives, events, persons, organizations, documents, hasNetwork };
   }
 
   buildCardsHtml(location, data) {
     const cards = [];
 
-    // Map always shows (it's the primary view for a location)
+    // 1. Map (full width)
     if (location.coordinates) {
       cards.push(CardBuilder.create('Location Map', 'location-map', { noPadding: true }));
     }
 
+    // 2. Events (full width, under map)
+    if (data.events.length > 0) {
+      cards.push(CardBuilder.create('Events at this Location', 'location-timeline', {
+        count: data.events.length
+      }));
+    }
+
+    // 3. Narratives (half width)
     if (data.narratives.length > 0) {
       cards.push(CardBuilder.create('Related Narratives', 'location-narratives', {
         count: data.narratives.length,
@@ -95,21 +106,24 @@ export class LocationView extends BaseView {
       }));
     }
 
-    if (data.events.length > 0) {
-      cards.push(CardBuilder.create('Events at this Location', 'location-timeline', {
-        count: data.events.length
-      }));
-    }
-
+    // 4. Network (half width, next to narratives)
     if (data.hasNetwork) {
       cards.push(CardBuilder.create('Associated People & Organizations', 'location-network'));
+    }
+
+    // 5. Documents
+    if (data.documents.length > 0) {
+      cards.push(CardBuilder.create('Source Documents', 'location-documents', {
+        count: data.documents.length,
+        noPadding: true
+      }));
     }
 
     return cards.join('');
   }
 
   async initializeComponents() {
-    const { location, narratives, events, persons, organizations } = this._prefetchedData;
+    const { location, narratives, events, persons, organizations, documents } = this._prefetchedData;
 
     // Map centered on this location
     if (location.coordinates) {
@@ -172,6 +186,17 @@ export class LocationView extends BaseView {
         }
       });
       this.components.network.update(networkData);
+    }
+
+    // Document List
+    if (documents.length > 0) {
+      this.components.documentList = new DocumentList('location-documents', {
+        maxItems: 10,
+        onDocumentClick: (doc) => {
+          window.location.hash = `#/document/${doc.id}`;
+        }
+      });
+      this.components.documentList.update({ documents });
     }
   }
 }

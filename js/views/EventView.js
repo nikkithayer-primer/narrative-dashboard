@@ -11,6 +11,7 @@ import { Timeline } from '../components/Timeline.js';
 import { MapView } from '../components/MapView.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
 import { NarrativeList } from '../components/NarrativeList.js';
+import { DocumentList } from '../components/DocumentList.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
 export class EventView extends BaseView {
@@ -103,9 +104,10 @@ export class EventView extends BaseView {
     const persons = DataService.getPersonsForEvent(this.eventId);
     const organizations = DataService.getOrganizationsForEvent(this.eventId);
     const narratives = DataService.getNarrativesForEvent(this.eventId);
+    const documents = DataService.getDocumentsForEvent(this.eventId);
     const hasNetwork = persons.length > 0 || organizations.length > 0;
 
-    return { parentEvent, subEvents, location, persons, organizations, narratives, hasNetwork };
+    return { parentEvent, subEvents, location, persons, organizations, narratives, documents, hasNetwork };
   }
 
   buildCardsHtml(event, data) {
@@ -132,11 +134,18 @@ export class EventView extends BaseView {
       }));
     }
 
+    if (data.documents.length > 0) {
+      cards.push(CardBuilder.create('Source Documents', 'event-documents', {
+        count: data.documents.length,
+        noPadding: true
+      }));
+    }
+
     return cards.join('');
   }
 
   async initializeComponents() {
-    const { event, subEvents, location, persons, organizations, narratives } = this._prefetchedData;
+    const { event, subEvents, location, persons, organizations, narratives, documents } = this._prefetchedData;
 
     // Timeline with this event and its sub-events
     const allEvents = [event, ...subEvents];
@@ -190,6 +199,17 @@ export class EventView extends BaseView {
         }
       });
       this.components.narrativeList.update({ narratives });
+    }
+
+    // Document List
+    if (documents.length > 0) {
+      this.components.documentList = new DocumentList('event-documents', {
+        maxItems: 10,
+        onDocumentClick: (doc) => {
+          window.location.hash = `#/document/${doc.id}`;
+        }
+      });
+      this.components.documentList.update({ documents });
     }
   }
 }

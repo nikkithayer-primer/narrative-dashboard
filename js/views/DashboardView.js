@@ -280,6 +280,7 @@ export class DashboardView extends BaseView {
         sourceData: hasSourceData ? sourceData : null,
         events: recentEvents
       });
+      this.components.volumeTimeline.enableAutoResize();
     }
 
     // Sentiment by Faction (aggregated across all narratives)

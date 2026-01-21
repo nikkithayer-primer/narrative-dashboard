@@ -529,6 +529,26 @@ export const DataService = {
       .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
   },
 
+  /**
+   * Get documents for a faction (via narratives the faction is engaged with)
+   */
+  getDocumentsForFaction: (factionId) => {
+    const documents = dataStore.data.documents || [];
+    const narratives = dataStore.data.narratives || [];
+    
+    // Find narratives this faction is engaged with
+    const factionNarrativeIds = new Set(
+      narratives
+        .filter(n => n.factionMentions && n.factionMentions[factionId])
+        .map(n => n.id)
+    );
+    
+    // Return documents that belong to those narratives
+    return documents
+      .filter(d => (d.narrativeIds || []).some(nId => factionNarrativeIds.has(nId)))
+      .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+  },
+
   // Reverse lookups - get entities for a document
 
   /**

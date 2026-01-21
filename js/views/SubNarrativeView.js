@@ -169,6 +169,7 @@ export class SubNarrativeView extends BaseView {
         }
       });
       this.components.volumeChart.update({ dates, series, factions });
+      this.components.volumeChart.enableAutoResize();
     }
 
     // Sentiment Chart
