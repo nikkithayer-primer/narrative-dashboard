@@ -9,6 +9,7 @@ import { NarrativeList } from '../components/NarrativeList.js';
 import { MapView } from '../components/MapView.js';
 import { TimelineVolumeComposite } from '../components/TimelineVolumeComposite.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
+import { formatDateWithYear } from '../utils/formatters.js';
 
 export class DashboardView extends BaseView {
   constructor(container, options = {}) {
@@ -25,8 +26,7 @@ export class DashboardView extends BaseView {
     // Build subtitle with filter info
     let subtitle = mission ? `Mission: ${mission.name}` : 'All missions overview';
     if (this.timeRange) {
-      const formatDate = d3.timeFormat('%b %d, %Y');
-      subtitle += ` | ${formatDate(this.timeRange.start)} - ${formatDate(this.timeRange.end)}`;
+      subtitle += ` | ${formatDateWithYear(this.timeRange.start)} - ${formatDateWithYear(this.timeRange.end)}`;
     }
 
     this.container.innerHTML = `
@@ -138,25 +138,25 @@ export class DashboardView extends BaseView {
                 </button>
               </div>
             </div>
-            <div class="card-body no-padding" id="dashboard-narrative-list"></div>
-          </div>
-
-          <!-- Map -->
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Activity Locations</h2>
-              <div class="card-header-actions"></div>
-            </div>
-            <div class="card-body no-padding" id="dashboard-map"></div>
+            <div class="card-body no-padding card-body-scrollable" id="dashboard-narrative-list"></div>
           </div>
 
           <!-- Volume Over Time & Events Combined -->
-          <div class="card card-full">
+          <div class="card">
             <div class="card-header">
               <h2 class="card-title">Volume Over Time & Events</h2>
               <div class="card-header-actions"></div>
             </div>
             <div class="card-body" id="dashboard-volume-timeline"></div>
+          </div>
+
+          <!-- Map -->
+          <div class="card card-full">
+            <div class="card-header">
+              <h2 class="card-title">Activity Locations</h2>
+              <div class="card-header-actions"></div>
+            </div>
+            <div class="card-body no-padding" id="dashboard-map"></div>
           </div>
         </div>
       </div>
@@ -166,8 +166,8 @@ export class DashboardView extends BaseView {
     const contentGrid = this.container.querySelector('.content-grid');
     initAllCardToggles(contentGrid, 'dashboard', {
       0: 'half', // Top Narratives - default half
-      1: 'half', // Map - default half
-      2: 'full'  // Volume & Timeline Composite - full width
+      1: 'half', // Volume & Timeline Composite - default half
+      2: 'full'  // Map - full width
     });
 
     // Add click handlers for stat cards and status cards

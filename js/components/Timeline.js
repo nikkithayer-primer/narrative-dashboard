@@ -4,6 +4,7 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
+import { formatDateTime, getTimeFormatter } from '../utils/formatters.js';
 
 export class Timeline extends BaseComponent {
   constructor(containerId, options = {}) {
@@ -170,7 +171,7 @@ export class Timeline extends BaseComponent {
     axisGroup.selectAll('*').remove();
     axisGroup.call(d3.axisBottom(xScale)
       .ticks(Math.min(events.length, 8))
-      .tickFormat(d3.timeFormat('%b %d')))
+      .tickFormat(getTimeFormatter('%b %d')))
       .selectAll('text')
       .attr('fill', 'var(--text-muted)')
       .attr('font-size', '10px');
@@ -269,7 +270,7 @@ export class Timeline extends BaseComponent {
         .attr('fill', 'var(--text-muted)')
         .attr('font-size', '10px')
         .attr('font-family', 'var(--font-mono)')
-        .text(d3.timeFormat('%b %d, %H:%M')(new Date(event.date)));
+        .text(formatDateTime(event.date));
 
       // Hover effects
       eventGroup

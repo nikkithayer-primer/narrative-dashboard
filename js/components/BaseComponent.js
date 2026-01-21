@@ -4,6 +4,16 @@
  * Provides standard lifecycle methods and utilities
  */
 
+import {
+  normalizeSentiment,
+  getSentimentClass,
+  formatSentiment,
+  formatSentimentValue,
+  getSentimentColor,
+  formatNumber,
+  formatDate
+} from '../utils/formatters.js';
+
 export class BaseComponent {
   constructor(containerId, options = {}) {
     this.containerId = containerId;
@@ -170,119 +180,58 @@ export class BaseComponent {
 
   /**
    * Format number with locale string
+   * Delegates to shared formatters.js
    */
   formatNumber(num) {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
-    }
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toLocaleString();
+    return formatNumber(num);
   }
 
   /**
    * Format date for display
+   * Delegates to shared formatters.js
    */
   formatDate(date) {
-    const d = new Date(date);
-    return d3.timeFormat('%b %d')(d);
+    return formatDate(date);
   }
 
   /**
-   * Get sentiment color - supports both numeric (-1 to 1) and legacy categorical values
-   * @param {number|string} sentiment - Numeric value from -1 to 1, or legacy 'positive'/'neutral'/'negative'
-   * @returns {string} CSS color value
+   * Get sentiment color based on numeric sentiment value
+   * Delegates to shared formatters.js
    */
   getSentimentColor(sentiment) {
-    // Handle legacy categorical values
-    if (typeof sentiment === 'string') {
-      const legacyColors = {
-        positive: '#50b464',
-        neutral: '#9ca3af',
-        negative: '#c85050'
-      };
-      return legacyColors[sentiment] || legacyColors.neutral;
-    }
-
-    // Handle numeric sentiment (-1 to 1)
-    const value = this.normalizeSentiment(sentiment);
-    
-    // Color stops: negative (red) -> neutral (gray) -> positive (green)
-    const negativeColor = { r: 200, g: 80, b: 80 };   // #c85050
-    const neutralColor = { r: 156, g: 163, b: 175 };  // #9ca3af
-    const positiveColor = { r: 80, g: 180, b: 100 };  // #50b464
-
-    let r, g, b;
-    if (value < 0) {
-      // Interpolate between negative and neutral
-      const t = (value + 1); // 0 to 1 range for negative side
-      r = Math.round(negativeColor.r + (neutralColor.r - negativeColor.r) * t);
-      g = Math.round(negativeColor.g + (neutralColor.g - negativeColor.g) * t);
-      b = Math.round(negativeColor.b + (neutralColor.b - negativeColor.b) * t);
-    } else {
-      // Interpolate between neutral and positive
-      const t = value; // 0 to 1 range for positive side
-      r = Math.round(neutralColor.r + (positiveColor.r - neutralColor.r) * t);
-      g = Math.round(neutralColor.g + (positiveColor.g - neutralColor.g) * t);
-      b = Math.round(neutralColor.b + (positiveColor.b - neutralColor.b) * t);
-    }
-
-    return `rgb(${r}, ${g}, ${b})`;
+    return getSentimentColor(sentiment);
   }
 
   /**
    * Normalize sentiment value to -1 to 1 range
-   * Handles both numeric values and legacy categorical strings
-   * @param {number|string} sentiment
-   * @returns {number} Value between -1 and 1
+   * Delegates to shared formatters.js
    */
   normalizeSentiment(sentiment) {
-    if (typeof sentiment === 'string') {
-      const legacyMap = { positive: 1, neutral: 0, negative: -1 };
-      return legacyMap[sentiment] ?? 0;
-    }
-    if (typeof sentiment !== 'number' || isNaN(sentiment)) {
-      return 0;
-    }
-    return Math.max(-1, Math.min(1, sentiment));
+    return normalizeSentiment(sentiment);
   }
 
   /**
    * Format sentiment value for display
-   * @param {number|string} sentiment
-   * @returns {string} Human-readable sentiment label
+   * Delegates to shared formatters.js
    */
   formatSentimentLabel(sentiment) {
-    const value = this.normalizeSentiment(sentiment);
-    if (value <= -0.6) return 'Very Negative';
-    if (value <= -0.2) return 'Negative';
-    if (value < 0.2) return 'Neutral';
-    if (value < 0.6) return 'Positive';
-    return 'Very Positive';
+    return formatSentiment(sentiment);
   }
 
   /**
    * Format sentiment value as a number string
-   * @param {number|string} sentiment
-   * @returns {string} Formatted number (e.g., "+0.75", "-0.25", "0.00")
+   * Delegates to shared formatters.js
    */
   formatSentimentValue(sentiment) {
-    const value = this.normalizeSentiment(sentiment);
-    const sign = value > 0 ? '+' : '';
-    return `${sign}${value.toFixed(2)}`;
+    return formatSentimentValue(sentiment);
   }
 
   /**
-   * Get sentiment class - supports both numeric and legacy categorical values
-   * @param {number|string} sentiment
-   * @returns {string} CSS class suffix
+   * Get sentiment class based on numeric sentiment value
+   * Delegates to shared formatters.js
    */
   getSentimentClass(sentiment) {
-    const value = this.normalizeSentiment(sentiment);
-    if (value < -0.2) return 'negative';
-    if (value > 0.2) return 'positive';
-    return 'neutral';
+    return getSentimentClass(sentiment);
   }
 
   /**

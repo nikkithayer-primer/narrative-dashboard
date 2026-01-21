@@ -11,6 +11,7 @@ import { VennDiagram } from '../components/VennDiagram.js';
 import { MapView } from '../components/MapView.js';
 import { TimelineVolumeComposite } from '../components/TimelineVolumeComposite.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
+import { DocumentList } from '../components/DocumentList.js';
 import { getSourceViewer } from '../components/SourceViewerModal.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
@@ -70,6 +71,9 @@ export class NarrativeView extends BaseView {
     const orgIds = narrative.organizationIds || [];
     const hasNetwork = personIds.length > 0 || orgIds.length > 0;
 
+    // Documents data
+    const documents = DataService.getDocumentsForNarrative(narrative.id);
+
     // Build cards HTML conditionally
     const cards = [];
 
@@ -115,9 +119,10 @@ export class NarrativeView extends BaseView {
       `);
     }
 
+    // Faction Overlaps and Network side by side (half width each)
     if (factions.length >= 2) {
       cards.push(`
-        <div class="card">
+        <div class="card card-half-width">
           <div class="card-header">
             <h2 class="card-title">Faction Overlaps</h2>
             <div class="card-header-actions"></div>
@@ -127,26 +132,39 @@ export class NarrativeView extends BaseView {
       `);
     }
 
-    if (mapLocations.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Locations & Events</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="narrative-map"></div>
-        </div>
-      `);
-    }
-
     if (hasNetwork) {
       cards.push(`
-        <div class="card">
+        <div class="card card-half-width">
           <div class="card-header">
             <h2 class="card-title">People & Organizations</h2>
             <div class="card-header-actions"></div>
           </div>
           <div class="card-body" id="narrative-network"></div>
+        </div>
+      `);
+    }
+
+    // Documents and Map side by side (half width each)
+    if (documents.length > 0) {
+      cards.push(`
+        <div class="card card-half-width">
+          <div class="card-header">
+            <h2 class="card-title">Source Documents (${documents.length})</h2>
+            <div class="card-header-actions"></div>
+          </div>
+          <div class="card-body no-padding" id="narrative-documents"></div>
+        </div>
+      `);
+    }
+
+    if (mapLocations.length > 0) {
+      cards.push(`
+        <div class="card card-half-width">
+          <div class="card-header">
+            <h2 class="card-title">Related Locations & Events</h2>
+            <div class="card-header-actions"></div>
+          </div>
+          <div class="card-body no-padding" id="narrative-map"></div>
         </div>
       `);
     }
@@ -193,7 +211,7 @@ export class NarrativeView extends BaseView {
     this._prefetchedData = {
       narrative, subNarratives, factionData, factions, factionOverlaps,
       events, allEvents, hasVolumeData, sourceVolumeTime, hasSourceData,
-      mapLocations, personIds, orgIds
+      mapLocations, personIds, orgIds, documents
     };
 
     await this.initializeComponents();
@@ -221,7 +239,7 @@ export class NarrativeView extends BaseView {
     const {
       narrative, subNarratives, factionData, factions, factionOverlaps,
       allEvents, hasVolumeData, sourceVolumeTime, hasSourceData,
-      mapLocations, personIds, orgIds
+      mapLocations, personIds, orgIds, documents
     } = this._prefetchedData;
 
     // Sub-Narratives List
@@ -299,6 +317,8 @@ export class NarrativeView extends BaseView {
         })),
         overlaps: factionOverlaps
       });
+      // Enable auto-resize so diagram re-centers when card is resized
+      this.components.venn.enableAutoResize();
     }
 
     // Map
@@ -324,6 +344,19 @@ export class NarrativeView extends BaseView {
         }
       });
       this.components.network.update(networkData);
+      // Enable auto-resize so graph re-centers when card is resized
+      this.components.network.enableAutoResize();
+    }
+
+    // Document List
+    if (documents.length > 0) {
+      this.components.documentList = new DocumentList('narrative-documents', {
+        maxItems: 10,
+        onDocumentClick: (doc) => {
+          window.location.hash = `#/document/${doc.id}`;
+        }
+      });
+      this.components.documentList.update({ documents });
     }
   }
 

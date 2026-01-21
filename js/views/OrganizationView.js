@@ -10,7 +10,7 @@ import { FactionCards } from '../components/FactionCards.js';
 import { SentimentChart } from '../components/SentimentChart.js';
 import { MapView } from '../components/MapView.js';
 import { NarrativeList } from '../components/NarrativeList.js';
-import { SubNarrativeList } from '../components/SubNarrativeList.js';
+import { DocumentList } from '../components/DocumentList.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
 export class OrganizationView extends BaseView {
@@ -39,7 +39,7 @@ export class OrganizationView extends BaseView {
     const affiliatedFactions = DataService.getAffiliatedFactionsForOrganization(this.organizationId);
     const locations = DataService.getLocationsForOrganization(this.organizationId);
     const narratives = DataService.getNarrativesForOrganization(this.organizationId);
-    const subNarratives = DataService.getSubNarrativesForOrganization(this.organizationId);
+    const documents = DataService.getDocumentsForOrganization(this.organizationId);
 
     // Build sentiment data - how factions feel about this org
     const factionSentimentData = Object.entries(org.factionSentiment || {})
@@ -114,14 +114,14 @@ export class OrganizationView extends BaseView {
       `);
     }
 
-    if (subNarratives.length > 0) {
+    if (documents.length > 0) {
       cards.push(`
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title">Related Sub-Narratives (${subNarratives.length})</h2>
+            <h2 class="card-title">Source Documents (${documents.length})</h2>
             <div class="card-header-actions"></div>
           </div>
-          <div class="card-body no-padding" id="org-subnarratives"></div>
+          <div class="card-body no-padding" id="org-documents"></div>
         </div>
       `);
     }
@@ -160,7 +160,7 @@ export class OrganizationView extends BaseView {
     // Store pre-fetched data for component initialization
     this._prefetchedData = {
       org, relatedPersons, relatedOrgs, affiliatedFactions,
-      locations, narratives, subNarratives, factionSentimentData
+      locations, narratives, documents, factionSentimentData
     };
 
     await this.initializeComponents();
@@ -169,7 +169,7 @@ export class OrganizationView extends BaseView {
   async initializeComponents() {
     const {
       relatedPersons, relatedOrgs, affiliatedFactions,
-      locations, narratives, subNarratives, factionSentimentData
+      locations, narratives, documents, factionSentimentData
     } = this._prefetchedData;
 
     // Network Graph
@@ -233,15 +233,15 @@ export class OrganizationView extends BaseView {
       this.components.narrativeList.update({ narratives });
     }
 
-    // Sub-Narratives List
-    if (subNarratives.length > 0) {
-      this.components.subNarrativeList = new SubNarrativeList('org-subnarratives', {
-        maxItems: 8,
-        onSubNarrativeClick: (s) => {
-          window.location.hash = `#/subnarrative/${s.id}`;
+    // Document List
+    if (documents.length > 0) {
+      this.components.documentList = new DocumentList('org-documents', {
+        maxItems: 10,
+        onDocumentClick: (doc) => {
+          window.location.hash = `#/document/${doc.id}`;
         }
       });
-      this.components.subNarrativeList.update({ subNarratives });
+      this.components.documentList.update({ documents });
     }
   }
 

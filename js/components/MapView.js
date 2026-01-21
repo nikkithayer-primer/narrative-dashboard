@@ -88,14 +88,39 @@ export class MapView extends BaseComponent {
 
       const marker = L.marker(coords, { icon: markerIcon });
 
+      // Build narratives list
+      const narrativesList = (loc.narratives && loc.narratives.length > 0)
+        ? `<div class="popup-section">
+            <p class="popup-section-title">Narratives</p>
+            <ul class="popup-list">
+              ${loc.narratives.slice(0, 5).map(n => 
+                `<li><a href="#/narrative/${n.id}" class="popup-item-link">${n.text.length > 60 ? n.text.substring(0, 60) + '...' : n.text}</a></li>`
+              ).join('')}
+              ${loc.narratives.length > 5 ? `<li class="popup-more">+${loc.narratives.length - 5} more</li>` : ''}
+            </ul>
+          </div>`
+        : '';
+
+      // Build events list
+      const eventsList = (loc.events && loc.events.length > 0)
+        ? `<div class="popup-section">
+            <p class="popup-section-title">Events</p>
+            <ul class="popup-list">
+              ${loc.events.slice(0, 5).map(e => 
+                `<li><a href="#/event/${e.id}" class="popup-item-link">${e.text}</a></li>`
+              ).join('')}
+              ${loc.events.length > 5 ? `<li class="popup-more">+${loc.events.length - 5} more</li>` : ''}
+            </ul>
+          </div>`
+        : '';
+
       // Popup content with view link
       const popupContent = `
         <div class="map-popup">
           <h4>${loc.name}</h4>
-          ${loc.type ? `<p class="location-type">${loc.type}</p>` : ''}
           ${loc.eventText ? `<p class="event-text">${loc.eventText}</p>` : ''}
-          ${loc.narrativeCount ? `<p class="meta">${loc.narrativeCount} related narratives</p>` : ''}
-          ${loc.eventCount ? `<p class="meta">${loc.eventCount} events</p>` : ''}
+          ${narrativesList}
+          ${eventsList}
           <a href="#/location/${loc.id}" class="map-popup-link">View Location →</a>
         </div>
       `;

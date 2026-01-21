@@ -12,5 +12,6 @@ export { LocationView } from './LocationView.js';
 export { EventView } from './EventView.js';
 export { PersonView } from './PersonView.js';
 export { OrganizationView } from './OrganizationView.js';
+export { DocumentView } from './DocumentView.js';
 export { ListView } from './ListView.js';
 export { EditorView } from './EditorView.js';

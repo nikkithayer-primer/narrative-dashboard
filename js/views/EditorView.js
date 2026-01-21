@@ -1495,13 +1495,8 @@ export class EditorView {
 
   /**
    * Normalize sentiment value to numeric (-1 to 1)
-   * Handles both numeric and legacy categorical values
    */
   normalizeSentimentValue(sentiment) {
-    if (typeof sentiment === 'string') {
-      const legacyMap = { positive: 1, neutral: 0, negative: -1 };
-      return legacyMap[sentiment] ?? 0;
-    }
     if (typeof sentiment !== 'number' || isNaN(sentiment)) {
       return 0;
     }

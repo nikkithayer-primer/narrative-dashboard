@@ -77,7 +77,6 @@ export class SentimentChart extends BaseComponent {
     // Draw bars
     factions.forEach((faction, i) => {
       const y = i * (barHeight + 12) + 10;
-      // Use normalizeSentiment to handle both numeric and legacy string values
       const value = this.normalizeSentiment(faction.sentiment);
       const barStart = x(Math.min(0, value));
       const barWidth = Math.abs(x(value) - x(0));

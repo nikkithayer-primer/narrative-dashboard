@@ -565,6 +565,14 @@
         <span class="dot" style="background: #60a5fa"></span>
         SubEvent
       </a>
+      <a href="#monitor" class="nav-pill">
+        <span class="dot" style="background: #14b8a6"></span>
+        Monitor
+      </a>
+      <a href="#alert" class="nav-pill">
+        <span class="dot" style="background: #f97316"></span>
+        Alert
+      </a>
     </nav>
 
     <!-- Entity Relationship Diagram -->
@@ -734,6 +742,150 @@
             <text x="50" y="54" fill="#606070" font-size="10">Many-to-Many</text>
             <line x1="0" y1="75" x2="40" y2="75" stroke="#505058" stroke-width="1" stroke-dasharray="3,3"/>
             <text x="50" y="79" fill="#606070" font-size="10">SubNarrative links</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Monitor-Alert ERD -->
+    <section class="erd-section">
+      <h2 class="section-title">Monitor-Alert System</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 13px;">
+        Monitors define scoped watchlists with configurable triggers. When conditions are met, alerts are generated referencing the relevant narratives, sub-narratives, events, and sub-events that match the criteria.
+      </p>
+      <div class="erd-container">
+        <svg class="erd-diagram" viewBox="0 0 1100 450">
+          <!-- Connection Lines -->
+          <!-- Monitor to scope entities -->
+          <path d="M 200 200 L 350 60" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 200 200 L 350 110" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 200 200 L 350 160" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 200 200 L 350 210" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 200 200 L 350 260" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 200 200 L 350 310" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="260" y="130" fill="#9090a0" font-size="10">watches</text>
+          
+          <!-- Monitor to Alert -->
+          <path d="M 200 230 L 200 340" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="210" y="290" fill="#9090a0" font-size="10">generates</text>
+          
+          <!-- Monitor to Matched Results -->
+          <path d="M 220 200 L 580 80" stroke="#14b8a6" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 220 200 L 580 140" stroke="#14b8a6" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 220 200 L 580 200" stroke="#14b8a6" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 220 200 L 580 260" stroke="#14b8a6" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="380" y="160" fill="#14b8a6" font-size="10">matches (computed)</text>
+          
+          <!-- Alert to Narrative/Event -->
+          <path d="M 280 370 L 580 80" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 280 370 L 580 140" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 280 370 L 580 200" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 280 370 L 580 260" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="420" y="340" fill="#9090a0" font-size="10">references</text>
+
+          <!-- Scope Box -->
+          <rect x="330" y="30" width="200" height="310" rx="8" fill="none" stroke="#3a3a42" stroke-width="1" stroke-dasharray="6,3"/>
+          <text x="345" y="55" fill="#606070" font-size="11" font-weight="500">SCOPE ENTITIES</text>
+
+          <!-- Matched Results Box -->
+          <rect x="560" y="50" width="170" height="240" rx="8" fill="none" stroke="#14b8a6" stroke-width="1" stroke-dasharray="6,3"/>
+          <text x="575" y="75" fill="#14b8a6" font-size="11" font-weight="500">MATCHED RESULTS</text>
+
+          <!-- Monitor -->
+          <g transform="translate(80, 175)">
+            <rect width="140" height="50" rx="6" fill="#2a2a2f" stroke="#14b8a6" stroke-width="2"/>
+            <circle cx="18" cy="25" r="8" fill="#14b8a6"/>
+            <text x="36" y="30" fill="#e0e0e4" font-size="13" font-weight="600">Monitor</text>
+          </g>
+
+          <!-- Alert -->
+          <g transform="translate(80, 345)">
+            <rect width="140" height="50" rx="6" fill="#2a2a2f" stroke="#f97316" stroke-width="2"/>
+            <circle cx="18" cy="25" r="8" fill="#f97316"/>
+            <text x="36" y="30" fill="#e0e0e4" font-size="13" font-weight="600">Alert</text>
+          </g>
+
+          <!-- Scope Entities -->
+          <g transform="translate(350, 65)">
+            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#ec4899" stroke-width="1.5"/>
+            <circle cx="14" cy="16" r="5" fill="#ec4899"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">Person</text>
+          </g>
+          <g transform="translate(350, 105)">
+            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#a855f7" stroke-width="1.5"/>
+            <circle cx="14" cy="16" r="5" fill="#a855f7"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">Organization</text>
+          </g>
+          <g transform="translate(350, 145)">
+            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#f59e0b" stroke-width="1.5"/>
+            <circle cx="14" cy="16" r="5" fill="#f59e0b"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">Faction</text>
+          </g>
+          <g transform="translate(350, 185)">
+            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#ef4444" stroke-width="1.5"/>
+            <circle cx="14" cy="16" r="5" fill="#ef4444"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">Narrative</text>
+          </g>
+          <g transform="translate(350, 225)">
+            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#10b981" stroke-width="1.5"/>
+            <circle cx="14" cy="16" r="5" fill="#10b981"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">Location</text>
+          </g>
+          <g transform="translate(350, 265)">
+            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#3b82f6" stroke-width="1.5"/>
+            <circle cx="14" cy="16" r="5" fill="#3b82f6"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">Event</text>
+          </g>
+
+          <!-- Matched Results -->
+          <g transform="translate(580, 85)">
+            <rect width="130" height="32" rx="4" fill="#2a2a2f" stroke="#ef4444" stroke-width="1.5"/>
+            <circle cx="14" cy="16" r="5" fill="#ef4444"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">Narrative</text>
+          </g>
+          <g transform="translate(580, 125)">
+            <rect width="130" height="32" rx="4" fill="#2a2a2f" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <circle cx="14" cy="16" r="5" fill="#ef4444" opacity="0.6"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">SubNarrative</text>
+          </g>
+          <g transform="translate(580, 175)">
+            <rect width="130" height="32" rx="4" fill="#2a2a2f" stroke="#3b82f6" stroke-width="1.5"/>
+            <circle cx="14" cy="16" r="5" fill="#3b82f6"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">Event</text>
+          </g>
+          <g transform="translate(580, 215)">
+            <rect width="130" height="32" rx="4" fill="#2a2a2f" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <circle cx="14" cy="16" r="5" fill="#3b82f6" opacity="0.6"/>
+            <text x="26" y="20" fill="#e0e0e4" font-size="10">SubEvent</text>
+          </g>
+
+          <!-- Trigger Types Label -->
+          <g transform="translate(760, 80)">
+            <text x="0" y="0" fill="#9090a0" font-size="11" font-weight="500">TRIGGER TYPES</text>
+            <text x="0" y="22" fill="#606070" font-size="10">• Volume Spike</text>
+            <text x="0" y="38" fill="#606070" font-size="10">• Sentiment Shift</text>
+            <text x="0" y="54" fill="#606070" font-size="10">• New Narrative</text>
+            <text x="0" y="70" fill="#606070" font-size="10">• New Event</text>
+            <text x="0" y="86" fill="#606070" font-size="10">• Faction Engagement</text>
+          </g>
+
+          <!-- Options Label -->
+          <g transform="translate(760, 195)">
+            <text x="0" y="0" fill="#9090a0" font-size="11" font-weight="500">OPTIONS</text>
+            <text x="0" y="22" fill="#606070" font-size="10">• includeSubEvents</text>
+            <text x="0" y="38" fill="#606070" font-size="10">• includeSubNarratives</text>
+            <text x="0" y="54" fill="#606070" font-size="10">• includeRelatedEvents</text>
+          </g>
+
+          <!-- Legend -->
+          <g transform="translate(760, 290)">
+            <text x="0" y="0" fill="#9090a0" font-size="11" font-weight="500">LEGEND</text>
+            <line x1="0" y1="20" x2="30" y2="20" stroke="#606070" stroke-width="1.5"/>
+            <text x="38" y="24" fill="#606070" font-size="10">One-to-Many</text>
+            <line x1="0" y1="42" x2="30" y2="42" stroke="#606070" stroke-width="1.5" stroke-dasharray="4,4"/>
+            <text x="38" y="46" fill="#606070" font-size="10">Many-to-Many</text>
+            <line x1="0" y1="64" x2="30" y2="64" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="4,4"/>
+            <text x="38" y="68" fill="#14b8a6" font-size="10">Computed</text>
           </g>
         </svg>
       </div>
@@ -1511,6 +1663,278 @@
             </ul>
           </div>
         </article>
+
+        <!-- Monitor -->
+        <article id="monitor" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(20, 184, 166, 0.2); color: #14b8a6;">◉</div>
+            <div class="entity-info">
+              <h3>Monitor</h3>
+              <p>Automated rules for tracking entities and triggering alerts</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">name</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Display name for the monitor</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Detailed description of what this monitor tracks</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">scope</span>
+                <div class="field-meta">
+                  <span class="field-type required">object</span>
+                  <p class="field-desc">Defines what entities to watch</p>
+                  <p class="field-enum">
+                    Contains optional arrays: <code>personIds</code> <code>organizationIds</code> <code>factionIds</code> <code>narrativeIds</code> <code>locationIds</code> <code>eventIds</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">options</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Configuration options for monitor behavior</p>
+                  <p class="field-enum">
+                    <code>includeSubEvents</code> <code>includeSubNarratives</code> <code>includeRelatedEvents</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">options.includeSubEvents</span>
+                <div class="field-meta">
+                  <span class="field-type">boolean</span>
+                  <p class="field-desc">When true, include sub-events of matched events in results (default: true)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">options.includeSubNarratives</span>
+                <div class="field-meta">
+                  <span class="field-type">boolean</span>
+                  <p class="field-desc">When true, include sub-narratives of matched narratives in results (default: true)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">options.includeRelatedEvents</span>
+                <div class="field-meta">
+                  <span class="field-type">boolean</span>
+                  <p class="field-desc">When true, include events related to scoped entities (persons, orgs, locations) in results (default: true)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">triggers</span>
+                <div class="field-meta">
+                  <span class="field-type required">object</span>
+                  <p class="field-desc">Conditions that generate alerts</p>
+                  <p class="field-enum">
+                    <code>newNarrative</code> <code>newEvent</code> <code>volumeSpike</code> <code>sentimentShift</code> <code>factionEngagement</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">triggers.volumeSpike</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Volume threshold trigger { threshold: number, timeWindow: string }</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">triggers.sentimentShift</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Sentiment change trigger { threshold: number, direction: enum }</p>
+                  <p class="field-enum">
+                    Direction: <code>positive</code> <code>negative</code> <code>any</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">triggers.factionEngagement</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Faction activity trigger { factionIds: string[], threshold: number }</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">enabled</span>
+                <div class="field-meta">
+                  <span class="field-type required">boolean</span>
+                  <p class="field-desc">Whether the monitor is currently active</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">createdAt</span>
+                <div class="field-meta">
+                  <span class="field-type">datetime</span>
+                  <p class="field-desc">When the monitor was created (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">lastTriggered</span>
+                <div class="field-meta">
+                  <span class="field-type">datetime</span>
+                  <p class="field-desc">When the monitor last generated an alert (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">matchedNarrativeIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Narratives currently matching monitor criteria (computed at runtime)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">matchedSubNarrativeIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Sub-narratives currently matching monitor criteria (computed at runtime)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">matchedEventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Events currently matching monitor criteria (computed at runtime)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">matchedSubEventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Sub-events currently matching monitor criteria (computed at runtime, when options.includeSubEvents is true)</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Alert -->
+        <article id="alert" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">⚡</div>
+            <div class="entity-info">
+              <h3>Alert</h3>
+              <p>Notifications generated when monitor conditions are met</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">monitorId</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Foreign key to the Monitor that generated this alert</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">type</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Type of trigger that fired</p>
+                  <p class="field-enum">
+                    <code>volume_spike</code> <code>sentiment_shift</code> <code>new_narrative</code> <code>new_event</code> <code>faction_engagement</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">title</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Short summary of the alert</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">description</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Detailed description of what triggered the alert</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">severity</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Alert priority level</p>
+                  <p class="field-enum">
+                    <code>critical</code> <code>high</code> <code>medium</code> <code>low</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">triggeredAt</span>
+                <div class="field-meta">
+                  <span class="field-type required">datetime</span>
+                  <p class="field-desc">When the alert was generated (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">acknowledged</span>
+                <div class="field-meta">
+                  <span class="field-type">boolean</span>
+                  <p class="field-desc">Whether the alert has been reviewed</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">relatedNarrativeIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Narratives relevant to this alert</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">relatedEventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Events relevant to this alert</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">relatedSubNarrativeIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Sub-narratives relevant to this alert</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">relatedSubEventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Sub-events relevant to this alert</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">metadata</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Trigger-specific data (e.g., volume count, sentiment delta)</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -1954,6 +2378,244 @@
               <td>N:M</td>
               <td>Factions can overlap with other factions</td>
             </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">watches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Monitors can watch multiple people</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">watches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Monitors can watch multiple organizations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">watches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(245, 158, 11, 0.15);">
+                  <span class="dot" style="background: var(--color-faction)"></span>
+                  Faction
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Monitors can watch multiple factions</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">watches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Monitors can watch existing narratives for updates</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">watches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(16, 185, 129, 0.15);">
+                  <span class="dot" style="background: var(--color-location)"></span>
+                  Location
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Monitors can watch multiple locations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">watches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Monitors can watch multiple events directly</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">matches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Events matching monitor criteria (computed)</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">matches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  SubEvent
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Sub-events matching monitor criteria (computed)</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">matches</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  SubNarrative
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Sub-narratives matching monitor criteria (computed)</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">generates</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(249, 115, 22, 0.15);">
+                  <span class="dot" style="background: #f97316"></span>
+                  Alert
+                </span>
+              </td>
+              <td>1:N</td>
+              <td>A monitor generates multiple alerts over time</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(249, 115, 22, 0.15);">
+                  <span class="dot" style="background: #f97316"></span>
+                  Alert
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Alerts can reference narratives that triggered them</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(249, 115, 22, 0.15);">
+                  <span class="dot" style="background: #f97316"></span>
+                  Alert
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Alerts can reference events that triggered them</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(249, 115, 22, 0.15);">
+                  <span class="dot" style="background: #f97316"></span>
+                  Alert
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  SubNarrative
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Alerts can reference sub-narratives that triggered them</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(249, 115, 22, 0.15);">
+                  <span class="dot" style="background: #f97316"></span>
+                  Alert
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  SubEvent
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Alerts can reference sub-events that triggered them</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -1967,6 +2629,8 @@
         <button class="schema-tab active" data-tab="mission-schema">Mission</button>
         <button class="schema-tab" data-tab="narrative-schema">Narrative</button>
         <button class="schema-tab" data-tab="event-schema">Event</button>
+        <button class="schema-tab" data-tab="monitor-schema">Monitor</button>
+        <button class="schema-tab" data-tab="alert-schema">Alert</button>
         <button class="schema-tab" data-tab="full-schema">Full Export</button>
       </div>
 
@@ -2040,6 +2704,103 @@
         </div>
       </div>
 
+      <div id="monitor-schema" class="schema-content">
+        <div class="code-block">
+          <pre><span class="comment">// Monitor entity example</span>
+{
+  <span class="key">"id"</span>: <span class="string">"cc0e8400-e29b-41d4-a716-446655440050"</span>,
+  <span class="key">"name"</span>: <span class="string">"Trump Activity Tracker"</span>,
+  <span class="key">"description"</span>: <span class="string">"Monitor narratives and events mentioning Donald Trump with high engagement"</span>,
+  <span class="key">"scope"</span>: {
+    <span class="key">"personIds"</span>: [
+      <span class="string">"880e8400-e29b-41d4-a716-446655440010"</span>
+    ],
+    <span class="key">"factionIds"</span>: [
+      <span class="string">"770e8400-e29b-41d4-a716-446655440002"</span>,
+      <span class="string">"770e8400-e29b-41d4-a716-446655440003"</span>
+    ],
+    <span class="key">"eventIds"</span>: [
+      <span class="string">"bb0e8400-e29b-41d4-a716-446655440040"</span>
+    ]
+  },
+  <span class="key">"options"</span>: {
+    <span class="key">"includeSubEvents"</span>: <span class="boolean">true</span>,
+    <span class="key">"includeSubNarratives"</span>: <span class="boolean">true</span>,
+    <span class="key">"includeRelatedEvents"</span>: <span class="boolean">true</span>
+  },
+  <span class="key">"triggers"</span>: {
+    <span class="key">"newNarrative"</span>: <span class="boolean">true</span>,
+    <span class="key">"newEvent"</span>: <span class="boolean">true</span>,
+    <span class="key">"volumeSpike"</span>: {
+      <span class="key">"threshold"</span>: <span class="number">500</span>,
+      <span class="key">"timeWindow"</span>: <span class="string">"24h"</span>
+    },
+    <span class="key">"sentimentShift"</span>: {
+      <span class="key">"threshold"</span>: <span class="number">0.15</span>,
+      <span class="key">"direction"</span>: <span class="string">"any"</span>
+    },
+    <span class="key">"factionEngagement"</span>: <span class="boolean">null</span>
+  },
+  <span class="key">"enabled"</span>: <span class="boolean">true</span>,
+  <span class="key">"createdAt"</span>: <span class="string">"2025-06-01T09:00:00Z"</span>,
+  <span class="key">"lastTriggered"</span>: <span class="string">"2026-01-20T14:30:00Z"</span>,
+
+  <span class="comment">// Computed fields (populated at runtime when evaluating monitor)</span>
+  <span class="key">"matchedNarrativeIds"</span>: [
+    <span class="string">"660e8400-e29b-41d4-a716-446655440001"</span>,
+    <span class="string">"660e8400-e29b-41d4-a716-446655440005"</span>
+  ],
+  <span class="key">"matchedSubNarrativeIds"</span>: [
+    <span class="string">"sub-009"</span>,
+    <span class="string">"sub-010"</span>
+  ],
+  <span class="key">"matchedEventIds"</span>: [
+    <span class="string">"bb0e8400-e29b-41d4-a716-446655440040"</span>,
+    <span class="string">"bb0e8400-e29b-41d4-a716-446655440041"</span>
+  ],
+  <span class="key">"matchedSubEventIds"</span>: [
+    <span class="string">"bb0e8400-e29b-41d4-a716-446655440042"</span>
+  ]
+}</pre>
+        </div>
+      </div>
+
+      <div id="alert-schema" class="schema-content">
+        <div class="code-block">
+          <pre><span class="comment">// Alert entity example</span>
+{
+  <span class="key">"id"</span>: <span class="string">"dd0e8400-e29b-41d4-a716-446655440060"</span>,
+  <span class="key">"monitorId"</span>: <span class="string">"cc0e8400-e29b-41d4-a716-446655440050"</span>,
+  <span class="key">"type"</span>: <span class="string">"volume_spike"</span>,
+  <span class="key">"title"</span>: <span class="string">"Volume spike detected for Trump Activity Tracker"</span>,
+  <span class="key">"description"</span>: <span class="string">"847 mentions detected in the last 24 hours, exceeding threshold of 500"</span>,
+  <span class="key">"severity"</span>: <span class="string">"high"</span>,
+  <span class="key">"triggeredAt"</span>: <span class="string">"2026-01-20T14:30:00Z"</span>,
+  <span class="key">"acknowledged"</span>: <span class="boolean">false</span>,
+  <span class="key">"relatedNarrativeIds"</span>: [
+    <span class="string">"660e8400-e29b-41d4-a716-446655440001"</span>,
+    <span class="string">"660e8400-e29b-41d4-a716-446655440005"</span>
+  ],
+  <span class="key">"relatedSubNarrativeIds"</span>: [
+    <span class="string">"sub-009"</span>,
+    <span class="string">"sub-010"</span>
+  ],
+  <span class="key">"relatedEventIds"</span>: [
+    <span class="string">"bb0e8400-e29b-41d4-a716-446655440040"</span>
+  ],
+  <span class="key">"relatedSubEventIds"</span>: [
+    <span class="string">"bb0e8400-e29b-41d4-a716-446655440042"</span>
+  ],
+  <span class="key">"metadata"</span>: {
+    <span class="key">"actualValue"</span>: <span class="number">847</span>,
+    <span class="key">"threshold"</span>: <span class="number">500</span>,
+    <span class="key">"timeWindow"</span>: <span class="string">"24h"</span>,
+    <span class="key">"percentOver"</span>: <span class="number">69.4</span>
+  }
+}</pre>
+        </div>
+      </div>
+
       <div id="full-schema" class="schema-content">
         <div class="code-block">
           <pre><span class="comment">// Complete data export structure</span>
@@ -2072,6 +2833,12 @@
   ],
   <span class="key">"subEvents"</span>: [
     { <span class="comment">/* SubEvent objects */</span> }
+  ],
+  <span class="key">"monitors"</span>: [
+    { <span class="comment">/* Monitor objects */</span> }
+  ],
+  <span class="key">"alerts"</span>: [
+    { <span class="comment">/* Alert objects */</span> }
   ]
 }</pre>
         </div>

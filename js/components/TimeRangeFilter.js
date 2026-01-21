@@ -5,6 +5,7 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
+import { formatDate, getTimeFormatter } from '../utils/formatters.js';
 
 export class TimeRangeFilter extends BaseComponent {
   constructor(containerId, options = {}) {
@@ -145,7 +146,7 @@ export class TimeRangeFilter extends BaseComponent {
       .attr('text-anchor', 'start')
       .attr('fill', 'var(--text-muted)')
       .attr('font-size', '10px')
-      .text(d3.timeFormat('%b %d')(xExtent[0]));
+      .text(formatDate(xExtent[0]));
 
     // End date label
     axisGroup.append('text')
@@ -154,7 +155,7 @@ export class TimeRangeFilter extends BaseComponent {
       .attr('text-anchor', 'end')
       .attr('fill', 'var(--text-muted)')
       .attr('font-size', '10px')
-      .text(d3.timeFormat('%b %d')(xExtent[1]));
+      .text(formatDate(xExtent[1]));
 
     // Create brush
     const brush = d3.brushX()
@@ -233,7 +234,6 @@ export class TimeRangeFilter extends BaseComponent {
       return;
     }
 
-    const formatDate = d3.timeFormat('%b %d');
     label.textContent = `${formatDate(start)} - ${formatDate(end)}`;
   }
 

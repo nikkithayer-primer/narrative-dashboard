@@ -7,7 +7,6 @@ import { BaseView } from './BaseView.js';
 import { DataService } from '../data/DataService.js';
 import { MapView } from '../components/MapView.js';
 import { NarrativeList } from '../components/NarrativeList.js';
-import { SubNarrativeList } from '../components/SubNarrativeList.js';
 import { Timeline } from '../components/Timeline.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
@@ -34,7 +33,6 @@ export class LocationView extends BaseView {
 
     // Fetch all data upfront to determine which cards to show
     const narratives = DataService.getNarrativesForLocation(this.locationId);
-    const subNarratives = DataService.getSubNarrativesForLocation(this.locationId);
     const events = DataService.getEventsForLocation(this.locationId);
     const persons = DataService.getPersonsForLocation(this.locationId);
     const organizations = DataService.getOrganizationsForLocation(this.locationId);
@@ -65,18 +63,6 @@ export class LocationView extends BaseView {
             <div class="card-header-actions"></div>
           </div>
           <div class="card-body no-padding" id="location-narratives"></div>
-        </div>
-      `);
-    }
-
-    if (subNarratives.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Sub-Narratives (${subNarratives.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="location-subnarratives"></div>
         </div>
       `);
     }
@@ -136,14 +122,14 @@ export class LocationView extends BaseView {
 
     // Store pre-fetched data for component initialization
     this._prefetchedData = {
-      location, narratives, subNarratives, events, persons, organizations
+      location, narratives, events, persons, organizations
     };
 
     await this.initializeComponents();
   }
 
   async initializeComponents() {
-    const { location, narratives, subNarratives, events, persons, organizations } = this._prefetchedData;
+    const { location, narratives, events, persons, organizations } = this._prefetchedData;
 
     // Map centered on this location
     if (location.coordinates) {
@@ -170,17 +156,6 @@ export class LocationView extends BaseView {
         }
       });
       this.components.narrativeList.update({ narratives });
-    }
-
-    // Sub-Narratives List
-    if (subNarratives.length > 0) {
-      this.components.subNarrativeList = new SubNarrativeList('location-subnarratives', {
-        maxItems: 8,
-        onSubNarrativeClick: (s) => {
-          window.location.hash = `#/subnarrative/${s.id}`;
-        }
-      });
-      this.components.subNarrativeList.update({ subNarratives });
     }
 
     // Events Timeline

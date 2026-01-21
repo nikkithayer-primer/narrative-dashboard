@@ -9,7 +9,6 @@ import { Timeline } from '../components/Timeline.js';
 import { MapView } from '../components/MapView.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
 import { NarrativeList } from '../components/NarrativeList.js';
-import { SubNarrativeList } from '../components/SubNarrativeList.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
 export class EventView extends BaseView {
@@ -39,7 +38,6 @@ export class EventView extends BaseView {
     const persons = DataService.getPersonsForEvent(this.eventId);
     const organizations = DataService.getOrganizationsForEvent(this.eventId);
     const narratives = DataService.getNarrativesForEvent(this.eventId);
-    const subNarratives = DataService.getSubNarrativesForEvent(this.eventId);
 
     const hasNetwork = persons.length > 0 || organizations.length > 0;
 
@@ -103,18 +101,6 @@ export class EventView extends BaseView {
       `);
     }
 
-    if (subNarratives.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Related Sub-Narratives (${subNarratives.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="event-subnarratives"></div>
-        </div>
-      `);
-    }
-
     this.container.innerHTML = `
       <div class="page-header">
         <div class="breadcrumb">
@@ -147,21 +133,22 @@ export class EventView extends BaseView {
     `;
 
     // Initialize card width toggles
+    // Map (index 1) and People & Orgs (index 2) default to half-width
     if (cards.length > 0) {
       const contentGrid = this.container.querySelector('.content-grid');
-      initAllCardToggles(contentGrid, `event-${this.eventId}`);
+      initAllCardToggles(contentGrid, `event-${this.eventId}`, { 1: 'half', 2: 'half' });
     }
 
     // Store pre-fetched data for component initialization
     this._prefetchedData = {
-      event, subEvents, location, persons, organizations, narratives, subNarratives
+      event, subEvents, location, persons, organizations, narratives
     };
 
     await this.initializeComponents();
   }
 
   async initializeComponents() {
-    const { event, subEvents, location, persons, organizations, narratives, subNarratives } = this._prefetchedData;
+    const { event, subEvents, location, persons, organizations, narratives } = this._prefetchedData;
 
     // Timeline with this event and its sub-events
     const allEvents = [event, ...subEvents];
@@ -215,17 +202,6 @@ export class EventView extends BaseView {
         }
       });
       this.components.narrativeList.update({ narratives });
-    }
-
-    // Sub-Narratives List
-    if (subNarratives.length > 0) {
-      this.components.subNarrativeList = new SubNarrativeList('event-subnarratives', {
-        maxItems: 8,
-        onSubNarrativeClick: (s) => {
-          window.location.hash = `#/subnarrative/${s.id}`;
-        }
-      });
-      this.components.subNarrativeList.update({ subNarratives });
     }
   }
 

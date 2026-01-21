@@ -25,19 +25,17 @@ export function formatStatus(status) {
 
 /**
  * Normalize sentiment value to -1 to 1 range
- * Handles both numeric values and legacy categorical strings
- * @param {number|string} sentiment
+ * @param {number} sentiment
  * @returns {number} Value between -1 and 1
  */
 export function normalizeSentiment(sentiment) {
   if (typeof sentiment === 'string') {
     // Handle numeric strings
-    if (!isNaN(parseFloat(sentiment))) {
-      return Math.max(-1, Math.min(1, parseFloat(sentiment)));
+    const parsed = parseFloat(sentiment);
+    if (!isNaN(parsed)) {
+      return Math.max(-1, Math.min(1, parsed));
     }
-    // Handle legacy categorical values
-    const legacyMap = { positive: 1, neutral: 0, negative: -1 };
-    return legacyMap[sentiment] ?? 0;
+    return 0;
   }
   if (typeof sentiment !== 'number' || isNaN(sentiment)) {
     return 0;
@@ -46,8 +44,8 @@ export function normalizeSentiment(sentiment) {
 }
 
 /**
- * Get sentiment CSS class - supports both numeric and legacy categorical values
- * @param {number|string} sentiment
+ * Get sentiment CSS class based on numeric sentiment value
+ * @param {number} sentiment
  * @returns {string} CSS class suffix ('positive', 'neutral', or 'negative')
  */
 export function getSentimentClass(sentiment) {
@@ -83,22 +81,11 @@ export function formatSentimentValue(sentiment) {
 }
 
 /**
- * Get sentiment color - supports both numeric (-1 to 1) and legacy categorical values
- * @param {number|string} sentiment - Numeric value from -1 to 1, or legacy 'positive'/'neutral'/'negative'
+ * Get sentiment color based on numeric sentiment value
+ * @param {number} sentiment - Numeric value from -1 to 1
  * @returns {string} CSS color value
  */
 export function getSentimentColor(sentiment) {
-  // Handle legacy categorical values
-  if (typeof sentiment === 'string' && isNaN(parseFloat(sentiment))) {
-    const legacyColors = {
-      positive: '#50b464',
-      neutral: '#9ca3af',
-      negative: '#c85050'
-    };
-    return legacyColors[sentiment] || legacyColors.neutral;
-  }
-
-  // Handle numeric sentiment (-1 to 1)
   const value = normalizeSentiment(sentiment);
   
   // Color stops: negative (red) -> neutral (gray) -> positive (green)
@@ -140,7 +127,7 @@ export function formatNumber(num) {
 }
 
 /**
- * Format date for display
+ * Format date for display (short: "Jan 15")
  * @param {string|Date} date - Date to format
  * @returns {string} Formatted date string
  */
@@ -150,7 +137,47 @@ export function formatDate(date) {
 }
 
 /**
- * Format date with full details
+ * Format date with year (medium: "Jan 15, 2024")
+ * @param {string|Date} date - Date to format
+ * @returns {string} Formatted date string with year
+ */
+export function formatDateWithYear(date) {
+  const d = new Date(date);
+  return d3.timeFormat('%b %d, %Y')(d);
+}
+
+/**
+ * Format date long (full month: "January 15, 2024")
+ * @param {string|Date} date - Date to format
+ * @returns {string} Formatted date string with full month and year
+ */
+export function formatDateLong(date) {
+  const d = new Date(date);
+  return d3.timeFormat('%B %d, %Y')(d);
+}
+
+/**
+ * Format date with time ("Jan 15, 14:30")
+ * @param {string|Date} date - Date to format
+ * @returns {string} Formatted date string with time
+ */
+export function formatDateTime(date) {
+  const d = new Date(date);
+  return d3.timeFormat('%b %d, %H:%M')(d);
+}
+
+/**
+ * Format date with time long ("January 15, 2024 14:30")
+ * @param {string|Date} date - Date to format
+ * @returns {string} Formatted date string with full month, year and time
+ */
+export function formatDateTimeLong(date) {
+  const d = new Date(date);
+  return d3.timeFormat('%B %d, %Y %H:%M')(d);
+}
+
+/**
+ * Format date with full details (uses native JS for localized output)
  * @param {string|Date} date - Date to format
  * @returns {string} Formatted date string with time
  */
@@ -164,6 +191,16 @@ export function formatDateFull(date) {
     hour: '2-digit',
     minute: '2-digit'
   });
+}
+
+/**
+ * Get d3 time format function for axis ticks
+ * Use this when you need the formatter function itself (not the formatted string)
+ * @param {string} format - d3 time format string (default: '%b %d')
+ * @returns {Function} d3 time format function
+ */
+export function getTimeFormatter(format = '%b %d') {
+  return d3.timeFormat(format);
 }
 
 /**

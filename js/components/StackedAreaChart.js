@@ -4,6 +4,7 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
+import { formatDateLong, getTimeFormatter } from '../utils/formatters.js';
 
 export class StackedAreaChart extends BaseComponent {
   constructor(containerId, options = {}) {
@@ -106,7 +107,7 @@ export class StackedAreaChart extends BaseComponent {
       .attr('transform', `translate(0,${innerHeight})`)
       .call(d3.axisBottom(x)
         .ticks(Math.min(dates.length, 7))
-        .tickFormat(d3.timeFormat('%b %d')))
+        .tickFormat(getTimeFormatter('%b %d')))
       .selectAll('text')
       .attr('fill', 'var(--text-muted)')
       .attr('font-size', '10px');
@@ -214,7 +215,7 @@ export class StackedAreaChart extends BaseComponent {
         // Build tooltip content
         const tooltipContent = `
           <div class="tooltip-header">
-            <span class="tooltip-date">${d3.timeFormat('%B %d, %Y')(d.date)}</span>
+            <span class="tooltip-date">${formatDateLong(d.date)}</span>
             <span class="tooltip-total">${this.formatNumber(total)} total</span>
           </div>
           <div class="tooltip-body">

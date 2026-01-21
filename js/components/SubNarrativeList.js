@@ -111,7 +111,8 @@ export class SubNarrativeList extends BaseComponent {
             const sparkline = new Sparkline(container, {
               width: 80,
               height: 24,
-              color: this.getSentimentColor(subNarrative.sentiment)
+              color: this.getSentimentColor(subNarrative.sentiment),
+              sentiment: subNarrative.sentiment
             });
             const values = subNarrative.volumeOverTime.map(d =>
               Object.values(d.factionVolumes || {}).reduce((a, b) => a + b, 0)
@@ -130,18 +131,12 @@ export class SubNarrativeList extends BaseComponent {
   }
 
   formatSentiment(sentiment) {
-    // Handle numeric sentiment values
-    if (typeof sentiment === 'number' || (typeof sentiment === 'string' && !isNaN(parseFloat(sentiment)))) {
-      const value = typeof sentiment === 'number' ? sentiment : parseFloat(sentiment);
-      if (value <= -0.6) return 'Very Negative';
-      if (value <= -0.2) return 'Negative';
-      if (value < 0.2) return 'Neutral';
-      if (value < 0.6) return 'Positive';
-      return 'Very Positive';
-    }
-    // Handle legacy string values
-    const s = sentiment || 'neutral';
-    return s.charAt(0).toUpperCase() + s.slice(1);
+    const value = typeof sentiment === 'number' ? sentiment : 0;
+    if (value <= -0.6) return 'Very Negative';
+    if (value <= -0.2) return 'Negative';
+    if (value < 0.2) return 'Neutral';
+    if (value < 0.6) return 'Positive';
+    return 'Very Positive';
   }
 
   destroy() {

@@ -15,22 +15,26 @@ export class Sparkline extends BaseComponent {
       strokeWidth: 1.5,
       showDot: true,
       showArea: false,
+      sentiment: null,
       ...options
     });
+    this.tooltip = null;
   }
 
   render() {
     if (!this.data || !this.data.length || !this.container) return;
 
-    const { width, height, margin, color, strokeWidth, showDot, showArea } = this.options;
+    const { width, height, margin, color, strokeWidth, showDot, showArea, sentiment } = this.options;
 
     this.clear();
+    this.removeTooltip();
 
     const svg = d3.select(this.container)
       .append('svg')
       .attr('width', width)
       .attr('height', height)
-      .attr('class', 'sparkline');
+      .attr('class', 'sparkline')
+      .style('cursor', sentiment !== null ? 'pointer' : 'default');
 
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
@@ -81,6 +85,75 @@ export class Sparkline extends BaseComponent {
         .attr('r', 2.5)
         .attr('fill', color);
     }
+
+    // Add tooltip for sentiment if provided
+    if (sentiment !== null) {
+      this.addSentimentTooltip(svg, sentiment);
+    }
+  }
+
+  addSentimentTooltip(svg, sentiment) {
+    const sentimentValue = typeof sentiment === 'number' ? sentiment : 0;
+    const sign = sentimentValue > 0 ? '+' : '';
+    const label = this.getSentimentLabel(sentimentValue);
+    const tooltipText = `Sentiment: ${sign}${sentimentValue.toFixed(2)} (${label})`;
+
+    svg
+      .on('mouseenter', (event) => {
+        this.showTooltip(event, tooltipText);
+      })
+      .on('mousemove', (event) => {
+        this.updateTooltipPosition(event);
+      })
+      .on('mouseleave', () => {
+        this.hideTooltip();
+      });
+  }
+
+  getSentimentLabel(value) {
+    if (value <= -0.6) return 'Very Negative';
+    if (value <= -0.2) return 'Negative';
+    if (value < 0.2) return 'Neutral';
+    if (value < 0.6) return 'Positive';
+    return 'Very Positive';
+  }
+
+  showTooltip(event, text) {
+    this.removeTooltip();
+    
+    this.tooltip = document.createElement('div');
+    this.tooltip.className = 'sparkline-tooltip';
+    this.tooltip.textContent = text;
+    document.body.appendChild(this.tooltip);
+    
+    this.updateTooltipPosition(event);
+  }
+
+  updateTooltipPosition(event) {
+    if (!this.tooltip) return;
+    
+    const offset = 10;
+    this.tooltip.style.left = `${event.pageX + offset}px`;
+    this.tooltip.style.top = `${event.pageY - offset - this.tooltip.offsetHeight}px`;
+  }
+
+  hideTooltip() {
+    if (this.tooltip) {
+      this.tooltip.style.opacity = '0';
+      setTimeout(() => this.removeTooltip(), 150);
+    }
+  }
+
+  removeTooltip() {
+    if (this.tooltip && this.tooltip.parentNode) {
+      this.tooltip.parentNode.removeChild(this.tooltip);
+      this.tooltip = null;
+    }
+  }
+
+  destroy() {
+    this.removeTooltip();
+    super.destroy();
   }
 }
 

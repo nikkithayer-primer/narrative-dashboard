@@ -8,7 +8,6 @@ import { DataService } from '../data/DataService.js';
 import { VennDiagram } from '../components/VennDiagram.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
 import { NarrativeList } from '../components/NarrativeList.js';
-import { SubNarrativeList } from '../components/SubNarrativeList.js';
 import { SentimentChart } from '../components/SentimentChart.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
@@ -36,7 +35,6 @@ export class FactionView extends BaseView {
     const relatedFactions = DataService.getRelatedFactions(this.factionId);
     const factionOverlaps = DataService.getFactionOverlapsFor(this.factionId);
     const narratives = DataService.getNarrativesForFaction(this.factionId);
-    const subNarratives = DataService.getSubNarrativesForFaction(this.factionId);
     const affiliatedPersons = DataService.getAffiliatedPersonsForFaction(this.factionId);
     const affiliatedOrgs = DataService.getAffiliatedOrganizationsForFaction(this.factionId);
 
@@ -99,18 +97,6 @@ export class FactionView extends BaseView {
       `);
     }
 
-    if (subNarratives.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Sub-Narratives (${subNarratives.length})</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body no-padding" id="faction-subnarratives"></div>
-        </div>
-      `);
-    }
-
     if (personsWithSentiment.length > 0) {
       cards.push(`
         <div class="card">
@@ -169,7 +155,7 @@ export class FactionView extends BaseView {
 
     // Store pre-fetched data for component initialization
     this._prefetchedData = {
-      faction, relatedFactions, factionOverlaps, narratives, subNarratives,
+      faction, relatedFactions, factionOverlaps, narratives,
       affiliatedPersons, affiliatedOrgs, personsWithSentiment, orgsWithSentiment, allFactions
     };
 
@@ -178,7 +164,7 @@ export class FactionView extends BaseView {
 
   async initializeComponents() {
     const {
-      faction, factionOverlaps, narratives, subNarratives,
+      faction, factionOverlaps, narratives,
       affiliatedPersons, affiliatedOrgs, personsWithSentiment, orgsWithSentiment, allFactions
     } = this._prefetchedData;
 
@@ -235,17 +221,6 @@ export class FactionView extends BaseView {
         }
       });
       this.components.narrativeList.update({ narratives });
-    }
-
-    // Sub-Narratives List
-    if (subNarratives.length > 0) {
-      this.components.subNarrativeList = new SubNarrativeList('faction-subnarratives', {
-        maxItems: 8,
-        onSubNarrativeClick: (s) => {
-          window.location.hash = `#/subnarrative/${s.id}`;
-        }
-      });
-      this.components.subNarrativeList.update({ subNarratives });
     }
 
     // Person Sentiment Chart

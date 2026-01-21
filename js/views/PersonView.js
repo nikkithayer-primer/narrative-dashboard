@@ -11,7 +11,7 @@ import { SentimentChart } from '../components/SentimentChart.js';
 import { MapView } from '../components/MapView.js';
 import { Timeline } from '../components/Timeline.js';
 import { NarrativeList } from '../components/NarrativeList.js';
-import { SubNarrativeList } from '../components/SubNarrativeList.js';
+import { DocumentList } from '../components/DocumentList.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
 export class PersonView extends BaseView {
@@ -41,7 +41,7 @@ export class PersonView extends BaseView {
     const locations = DataService.getLocationsForPerson(this.personId);
     const events = DataService.getEventsForPerson(this.personId);
     const narratives = DataService.getNarrativesForPerson(this.personId);
-    const subNarratives = DataService.getSubNarrativesForPerson(this.personId);
+    const documents = DataService.getDocumentsForPerson(this.personId);
 
     // Build sentiment data - how factions feel about this person
     const factionSentimentData = Object.entries(person.factionSentiment || {})
@@ -56,6 +56,7 @@ export class PersonView extends BaseView {
     // Build cards HTML conditionally
     const cards = [];
 
+    // Row 1: Related People & Orgs + Faction Sentiment (both half-width)
     if (hasNetwork) {
       cards.push(`
         <div class="card">
@@ -68,18 +69,6 @@ export class PersonView extends BaseView {
       `);
     }
 
-    if (affiliatedFactions.length > 0) {
-      cards.push(`
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Affiliated Factions</h2>
-            <div class="card-header-actions"></div>
-          </div>
-          <div class="card-body" id="person-factions"></div>
-        </div>
-      `);
-    }
-
     if (factionSentimentData.length > 0) {
       cards.push(`
         <div class="card">
@@ -88,6 +77,19 @@ export class PersonView extends BaseView {
             <div class="card-header-actions"></div>
           </div>
           <div class="card-body" id="person-sentiment"></div>
+        </div>
+      `);
+    }
+
+    // Row 2: Affiliated Factions + Map (both half-width)
+    if (affiliatedFactions.length > 0) {
+      cards.push(`
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Affiliated Factions</h2>
+            <div class="card-header-actions"></div>
+          </div>
+          <div class="card-body" id="person-factions"></div>
         </div>
       `);
     }
@@ -128,14 +130,14 @@ export class PersonView extends BaseView {
       `);
     }
 
-    if (subNarratives.length > 0) {
+    if (documents.length > 0) {
       cards.push(`
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title">Related Sub-Narratives (${subNarratives.length})</h2>
+            <h2 class="card-title">Source Documents (${documents.length})</h2>
             <div class="card-header-actions"></div>
           </div>
-          <div class="card-body no-padding" id="person-subnarratives"></div>
+          <div class="card-body no-padding" id="person-documents"></div>
         </div>
       `);
     }
@@ -166,15 +168,17 @@ export class PersonView extends BaseView {
     `;
 
     // Initialize card width toggles
+    // Row 1: Network (0) + Sentiment (1) as half-width
+    // Row 2: Factions (2) + Map (3) as half-width
     if (cards.length > 0) {
       const contentGrid = this.container.querySelector('.content-grid');
-      initAllCardToggles(contentGrid, `person-${this.personId}`);
+      initAllCardToggles(contentGrid, `person-${this.personId}`, { 0: 'half', 1: 'half', 2: 'half', 3: 'half' });
     }
 
     // Store pre-fetched data for component initialization
     this._prefetchedData = {
       person, relatedPersons, relatedOrgs, affiliatedFactions,
-      locations, events, narratives, subNarratives, factionSentimentData
+      locations, events, narratives, documents, factionSentimentData
     };
 
     await this.initializeComponents();
@@ -183,7 +187,7 @@ export class PersonView extends BaseView {
   async initializeComponents() {
     const {
       relatedPersons, relatedOrgs, affiliatedFactions,
-      locations, events, narratives, subNarratives, factionSentimentData
+      locations, events, narratives, documents, factionSentimentData
     } = this._prefetchedData;
 
     // Network Graph
@@ -258,15 +262,15 @@ export class PersonView extends BaseView {
       this.components.narrativeList.update({ narratives });
     }
 
-    // Sub-Narratives List
-    if (subNarratives.length > 0) {
-      this.components.subNarrativeList = new SubNarrativeList('person-subnarratives', {
-        maxItems: 8,
-        onSubNarrativeClick: (s) => {
-          window.location.hash = `#/subnarrative/${s.id}`;
+    // Document List
+    if (documents.length > 0) {
+      this.components.documentList = new DocumentList('person-documents', {
+        maxItems: 10,
+        onDocumentClick: (doc) => {
+          window.location.hash = `#/document/${doc.id}`;
         }
       });
-      this.components.subNarrativeList.update({ subNarratives });
+      this.components.documentList.update({ documents });
     }
   }
 

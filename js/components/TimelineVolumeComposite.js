@@ -5,6 +5,7 @@
  */
 
 import { BaseComponent } from './BaseComponent.js';
+import { formatDate, formatDateLong, formatDateTimeLong, getTimeFormatter } from '../utils/formatters.js';
 
 export class TimelineVolumeComposite extends BaseComponent {
   constructor(containerId, options = {}) {
@@ -387,7 +388,7 @@ export class TimelineVolumeComposite extends BaseComponent {
 
       // Truncate text
       const displayText = d.text.length > 25 ? d.text.slice(0, 22) + '...' : d.text;
-      const dateText = d3.timeFormat('%b %d')(new Date(d.date));
+      const dateText = formatDate(d.date);
 
       // Calculate approximate text width for background
       const textWidth = Math.max(displayText.length * 5.5, 60);
@@ -528,7 +529,7 @@ export class TimelineVolumeComposite extends BaseComponent {
     
     this.axisGroup.call(d3.axisBottom(this.xScale)
       .ticks(Math.min(10, Math.max(5, this.innerWidth / 80)))
-      .tickFormat(d3.timeFormat('%b %d')))
+      .tickFormat(getTimeFormatter('%b %d')))
       .selectAll('text')
       .attr('fill', 'var(--text-muted)')
       .attr('font-size', '10px');
@@ -736,7 +737,7 @@ export class TimelineVolumeComposite extends BaseComponent {
     // Build tooltip content
     let tooltipContent = `
       <div class="tooltip-header">
-        <span class="tooltip-date">${d3.timeFormat('%B %d, %Y')(d.date)}</span>
+        <span class="tooltip-date">${formatDateLong(d.date)}</span>
         <span class="tooltip-total">${this.formatNumber(total)} total</span>
       </div>
       <div class="tooltip-body">
@@ -792,7 +793,7 @@ export class TimelineVolumeComposite extends BaseComponent {
       <div class="tooltip-body">
         <div class="tooltip-row">
           <span class="tooltip-label">Date:</span>
-          <span class="tooltip-value">${d3.timeFormat('%B %d, %Y %H:%M')(new Date(d.date))}</span>
+          <span class="tooltip-value">${formatDateTimeLong(d.date)}</span>
         </div>
         ${d.parentEventId ? '<div class="tooltip-row"><span class="tooltip-label">Type:</span><span class="tooltip-value">Sub-event</span></div>' : ''}
       </div>

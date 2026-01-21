@@ -99,6 +99,7 @@ export const mockData = {
         { date: '2026-01-15', factionVolumes: { 'faction-005': 75, 'faction-006': 32 }, sourceVolumes: { 'src-tiktok': 44, 'src-instagram': 25, 'src-facebook': 19, 'src-x': 14, 'src-reddit': 7 } },
         { date: '2026-01-16', factionVolumes: { 'faction-005': 70, 'faction-006': 28 }, sourceVolumes: { 'src-tiktok': 40, 'src-instagram': 22, 'src-facebook': 18, 'src-x': 12, 'src-reddit': 6 } }
       ],
+      documentIds: ['doc-021', 'doc-022', 'doc-023'],
       createdAt: '2026-01-07T00:00:00Z'
     },
     {
@@ -134,6 +135,7 @@ export const mockData = {
       volumeOverTime: [
         { date: '2026-01-20', factionVolumes: { 'faction-001': 180, 'faction-002': 120 }, sourceVolumes: { 'src-x': 145, 'src-facebook': 85, 'src-tiktok': 40, 'src-nat-cnn': 28, 'src-nat-fox': 32, 'src-int-bbc': 45, 'src-int-reuters': 38, 'src-int-guardian': 22 } }
       ],
+      documentIds: ['doc-001', 'doc-002', 'doc-003', 'doc-004'],
       createdAt: '2026-01-20T00:00:00Z'
     },
     {
@@ -180,6 +182,7 @@ export const mockData = {
         { date: '2026-01-19', factionVolumes: { 'faction-001': 120, 'faction-002': 100, 'faction-003': 150, 'faction-004': 70 }, sourceVolumes: { 'src-x': 165, 'src-facebook': 110, 'src-tiktok': 80, 'src-instagram': 55, 'src-reddit': 45, 'src-nat-cnn': 35, 'src-nat-fox': 32, 'src-nat-msnbc': 28 } },
         { date: '2026-01-20', factionVolumes: { 'faction-001': 160, 'faction-002': 140, 'faction-003': 185, 'faction-004': 95 }, sourceVolumes: { 'src-x': 220, 'src-facebook': 145, 'src-tiktok': 95, 'src-instagram': 65, 'src-reddit': 55, 'src-nat-cnn': 42, 'src-nat-fox': 38, 'src-nat-msnbc': 35, 'src-int-bbc': 18, 'src-int-reuters': 15 } }
       ],
+      documentIds: ['doc-005', 'doc-006', 'doc-007', 'doc-025'],
       createdAt: '2026-01-15T00:00:00Z'
     },
     {
@@ -218,6 +221,7 @@ export const mockData = {
         { date: '2026-01-19', factionVolumes: { 'faction-001': 25, 'faction-002': 20, 'faction-004': 55 }, sourceVolumes: { 'src-x': 55, 'src-facebook': 40, 'src-reddit': 15, 'src-nat-cnn': 10, 'src-nat-fox': 12 } },
         { date: '2026-01-20', factionVolumes: { 'faction-001': 45, 'faction-002': 38, 'faction-004': 85 }, sourceVolumes: { 'src-x': 95, 'src-facebook': 72, 'src-reddit': 28, 'src-nat-cnn': 18, 'src-nat-fox': 22, 'src-nat-nyt': 12, 'src-int-bbc': 8, 'src-int-reuters': 10 } }
       ],
+      documentIds: ['doc-013', 'doc-014'],
       createdAt: '2026-01-19T00:00:00Z'
     },
     {
@@ -262,6 +266,7 @@ export const mockData = {
         { date: '2026-01-20', factionVolumes: { 'faction-001': 185, 'faction-002': 125, 'faction-003': 165, 'faction-004': 85 }, sourceVolumes: { 'src-x': 280, 'src-facebook': 155, 'src-tiktok': 120, 'src-instagram': 72, 'src-reddit': 58, 'src-nat-cnn': 42, 'src-nat-fox': 55, 'src-nat-msnbc': 35 } },
         { date: '2026-01-21', factionVolumes: { 'faction-001': 280, 'faction-002': 195, 'faction-003': 245, 'faction-004': 125 }, sourceVolumes: { 'src-x': 385, 'src-facebook': 210, 'src-tiktok': 165, 'src-instagram': 95, 'src-reddit': 78, 'src-nat-cnn': 55, 'src-nat-fox': 72, 'src-nat-msnbc': 48, 'src-nat-nyt': 28, 'src-int-bbc': 22, 'src-int-reuters': 18 } }
       ],
+      documentIds: ['doc-008', 'doc-009', 'doc-010', 'doc-011', 'doc-012', 'doc-024'],
       createdAt: '2026-01-19T00:00:00Z'
     },
     {
@@ -303,6 +308,7 @@ export const mockData = {
       volumeOverTime: [
         { date: '2026-01-20', factionVolumes: { 'faction-001': 145, 'faction-002': 165, 'faction-003': 125, 'faction-004': 85 }, sourceVolumes: { 'src-x': 185, 'src-facebook': 125, 'src-reddit': 55, 'src-nat-cnn': 38, 'src-nat-fox': 45, 'src-nat-nyt': 32, 'src-nat-wapo': 28, 'src-int-guardian': 22, 'src-int-bbc': 18, 'src-int-reuters': 15 } }
       ],
+      documentIds: ['doc-006', 'doc-015', 'doc-016', 'doc-017'],
       createdAt: '2026-01-20T00:00:00Z'
     },
     {
@@ -344,6 +350,7 @@ export const mockData = {
         { date: '2026-01-19', factionVolumes: { 'faction-001': 85, 'faction-005': 135, 'faction-006': 115 }, sourceVolumes: { 'src-x': 120, 'src-facebook': 92, 'src-tiktok': 105, 'src-instagram': 68, 'src-reddit': 48, 'src-nat-cnn': 18, 'src-nat-fox': 22 } },
         { date: '2026-01-20', factionVolumes: { 'faction-001': 125, 'faction-005': 195, 'faction-006': 165 }, sourceVolumes: { 'src-x': 175, 'src-facebook': 135, 'src-tiktok': 145, 'src-instagram': 95, 'src-reddit': 68, 'src-nat-cnn': 28, 'src-nat-fox': 35, 'src-nat-nyt': 22, 'src-int-guardian': 32, 'src-int-bbc': 18 } }
       ],
+      documentIds: ['doc-018', 'doc-019', 'doc-020'],
       createdAt: '2026-01-18T00:00:00Z'
     }
   ],
@@ -1122,6 +1129,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-001'],
       relatedLocationIds: ['loc-001', 'loc-004', 'loc-006'],
       relatedEventIds: ['event-006', 'event-007', 'event-008'],
+      documentIds: ['doc-001', 'doc-002', 'doc-004', 'doc-011'],
       factionSentiment: {
         'faction-001': 0.67,
         'faction-002': -0.78,
@@ -1136,6 +1144,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-005'],
       relatedEventIds: ['event-006', 'event-007'],
+      documentIds: ['doc-001', 'doc-002'],
       factionSentiment: {
         'faction-001': -0.45,
         'faction-002': 0.32
@@ -1149,6 +1158,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-005'],
       relatedEventIds: ['event-009'],
+      documentIds: ['doc-003'],
       factionSentiment: {
         'faction-001': -0.38,
         'faction-002': 0.25
@@ -1162,6 +1172,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-006'],
       relatedEventIds: ['event-008'],
+      documentIds: ['doc-004'],
       factionSentiment: {
         'faction-001': -0.22,
         'faction-002': 0.41
@@ -1175,6 +1186,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-002'],
       relatedLocationIds: ['loc-002'],
       relatedEventIds: ['event-010'],
+      documentIds: ['doc-005', 'doc-016'],
       factionSentiment: {
         'faction-001': -0.72,
         'faction-002': 0.65,
@@ -1189,6 +1201,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-003'],
       relatedLocationIds: ['loc-002'],
       relatedEventIds: ['event-013'],
+      documentIds: ['doc-007'],
       factionSentiment: {
         'faction-001': -0.45,
         'faction-002': 0.72,
@@ -1203,6 +1216,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-007'],
       relatedEventIds: ['event-015'],
+      documentIds: ['doc-013'],
       factionSentiment: {
         'faction-001': 0.15,
         'faction-002': 0.12,
@@ -1217,6 +1231,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-007'],
       relatedEventIds: ['event-015'],
+      documentIds: ['doc-013'],
       factionSentiment: {}
     },
     {
@@ -1227,6 +1242,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-007'],
       relatedEventIds: ['event-016'],
+      documentIds: ['doc-014'],
       factionSentiment: {
         'faction-004': 0.52
       }
@@ -1239,6 +1255,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-001'],
       relatedLocationIds: ['loc-001', 'loc-008'],
       relatedEventIds: ['event-017', 'event-019'],
+      documentIds: ['doc-009', 'doc-010'],
       factionSentiment: {
         'faction-001': 0.72,
         'faction-002': -0.68,
@@ -1253,6 +1270,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-001'],
       relatedLocationIds: ['loc-001'],
       relatedEventIds: ['event-017'],
+      documentIds: ['doc-009'],
       factionSentiment: {
         'faction-001': 0.68,
         'faction-002': -0.72,
@@ -1267,6 +1285,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-004'],
       relatedLocationIds: ['loc-008'],
       relatedEventIds: ['event-017'],
+      documentIds: ['doc-008', 'doc-012', 'doc-024'],
       factionSentiment: {
         'faction-001': 0.55,
         'faction-002': -0.82,
@@ -1282,6 +1301,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-003'],
       relatedLocationIds: ['loc-002', 'loc-008'],
       relatedEventIds: ['event-017'],
+      documentIds: ['doc-008', 'doc-012'],
       factionSentiment: {
         'faction-001': -0.72,
         'faction-002': 0.58,
@@ -1296,6 +1316,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-008'],
       relatedEventIds: ['event-017', 'event-019'],
+      documentIds: ['doc-010'],
       factionSentiment: {
         'faction-001': -0.78,
         'faction-002': 0.52,
@@ -1310,6 +1331,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-002'],
       relatedEventIds: ['event-011'],
+      documentIds: ['doc-006', 'doc-016'],
       factionSentiment: {
         'faction-001': -0.45,
         'faction-002': 0.38,
@@ -1324,6 +1346,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-001'],
       relatedLocationIds: ['loc-001', 'loc-002'],
       relatedEventIds: [],
+      documentIds: ['doc-017'],
       factionSentiment: {
         'faction-001': 0.75,
         'faction-002': -0.72,
@@ -1366,6 +1389,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-002', 'faction-003'],
       relatedLocationIds: ['loc-002', 'loc-009'],
       relatedEventIds: ['event-021'],
+      documentIds: ['doc-015'],
       factionSentiment: {
         'faction-001': -0.85,
         'faction-002': 0.72,
@@ -1380,6 +1404,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-002'],
       relatedLocationIds: ['loc-002', 'loc-009'],
       relatedEventIds: ['event-021'],
+      documentIds: ['doc-015'],
       factionSentiment: {
         'faction-001': -0.52,
         'faction-002': 0.58
@@ -1393,6 +1418,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-002'],
       relatedLocationIds: ['loc-002', 'loc-009'],
       relatedEventIds: ['event-021'],
+      documentIds: ['doc-015'],
       factionSentiment: {
         'faction-001': -0.48,
         'faction-002': 0.55
@@ -1406,6 +1432,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-002'],
       relatedLocationIds: ['loc-009'],
       relatedEventIds: ['event-022'],
+      documentIds: ['doc-015'],
       factionSentiment: {
         'faction-001': -0.55,
         'faction-002': 0.62
@@ -1419,6 +1446,7 @@ export const mockData = {
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-009'],
       relatedEventIds: ['event-022'],
+      documentIds: ['doc-015'],
       factionSentiment: {
         'faction-001': -0.35,
         'faction-002': 0.28
@@ -1432,6 +1460,7 @@ export const mockData = {
       affiliatedFactionIds: ['faction-001', 'faction-005'],
       relatedLocationIds: ['loc-001'],
       relatedEventIds: ['event-026'],
+      documentIds: ['doc-018', 'doc-020'],
       factionSentiment: {
         'faction-001': 0.58,
         'faction-002': -0.65,
@@ -1470,6 +1499,7 @@ export const mockData = {
       type: 'government',
       affiliatedFactionIds: [],
       relatedLocationIds: [],
+      documentIds: ['doc-021'],
       factionSentiment: {
         'faction-005': -0.67,
         'faction-006': -0.52
@@ -1481,6 +1511,7 @@ export const mockData = {
       type: 'platform',
       affiliatedFactionIds: [],
       relatedLocationIds: [],
+      documentIds: ['doc-023'],
       factionSentiment: {
         'faction-006': 0.58
       }
@@ -1513,6 +1544,7 @@ export const mockData = {
       type: 'government',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-005'],
+      documentIds: ['doc-003'],
       factionSentiment: {
         'faction-001': -0.35,
         'faction-002': 0.28
@@ -1524,6 +1556,7 @@ export const mockData = {
       type: 'organization',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-005'],
+      documentIds: ['doc-001'],
       factionSentiment: {
         'faction-001': -0.42,
         'faction-002': 0.15
@@ -1535,6 +1568,7 @@ export const mockData = {
       type: 'government',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-001', 'loc-002'],
+      documentIds: ['doc-005', 'doc-006', 'doc-009', 'doc-010', 'doc-016'],
       factionSentiment: {
         'faction-001': 0.58,
         'faction-002': -0.65,
@@ -1547,6 +1581,7 @@ export const mockData = {
       type: 'government',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-002'],
+      documentIds: ['doc-006', 'doc-007', 'doc-008', 'doc-024', 'doc-025'],
       factionSentiment: {
         'faction-001': 0.68,
         'faction-002': -0.78,
@@ -1559,6 +1594,7 @@ export const mockData = {
       type: 'government',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-001', 'loc-002'],
+      documentIds: ['doc-007'],
       factionSentiment: {
         'faction-001': 0.25,
         'faction-002': -0.35,
@@ -1571,6 +1607,7 @@ export const mockData = {
       type: 'judicial',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-007'],
+      documentIds: ['doc-013'],
       factionSentiment: {
         'faction-004': 0.48
       }
@@ -1581,6 +1618,7 @@ export const mockData = {
       type: 'judicial',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-007'],
+      documentIds: ['doc-014'],
       factionSentiment: {
         'faction-004': 0.55
       }
@@ -1591,6 +1629,7 @@ export const mockData = {
       type: 'law_enforcement',
       affiliatedFactionIds: ['faction-004'],
       relatedLocationIds: ['loc-007'],
+      documentIds: ['doc-013'],
       factionSentiment: {
         'faction-004': 0.62
       }
@@ -1601,6 +1640,7 @@ export const mockData = {
       type: 'religious',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-008'],
+      documentIds: ['doc-008', 'doc-012', 'doc-024'],
       factionSentiment: {
         'faction-001': 0.45,
         'faction-002': -0.25,
@@ -1613,6 +1653,7 @@ export const mockData = {
       type: 'government',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-001', 'loc-002', 'loc-008'],
+      documentIds: ['doc-015', 'doc-017'],
       factionSentiment: {
         'faction-001': 0.72,
         'faction-002': -0.68,
@@ -1625,6 +1666,7 @@ export const mockData = {
       type: 'advocacy',
       affiliatedFactionIds: ['faction-003'],
       relatedLocationIds: ['loc-002'],
+      documentIds: ['doc-012'],
       factionSentiment: {
         'faction-001': -0.55,
         'faction-002': 0.62,
@@ -1648,6 +1690,7 @@ export const mockData = {
       type: 'government',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-009', 'loc-004'],
+      documentIds: ['doc-015'],
       factionSentiment: {
         'faction-001': 0.15,
         'faction-002': 0.18
@@ -1667,6 +1710,7 @@ export const mockData = {
       type: 'government',
       affiliatedFactionIds: [],
       relatedLocationIds: ['loc-001'],
+      documentIds: ['doc-018', 'doc-020'],
       factionSentiment: {
         'faction-001': 0.52,
         'faction-005': 0.35,
@@ -1679,6 +1723,7 @@ export const mockData = {
       type: 'research',
       affiliatedFactionIds: ['faction-005'],
       relatedLocationIds: [],
+      documentIds: ['doc-019'],
       factionSentiment: {
         'faction-001': -0.42,
         'faction-005': 0.68,
@@ -1687,7 +1732,373 @@ export const mockData = {
     }
   ],
 
-  documents: []
+  documents: [
+    // Greenland/Trump narrative documents (narr-005)
+    {
+      id: 'doc-001',
+      title: 'Macron warns of world where "international law is trampled" in Davos speech',
+      url: 'https://reuters.com/world/macron-davos-trump-greenland-2026',
+      publishedDate: '2026-01-20T10:30:00Z',
+      sourceId: 'src-int-reuters',
+      excerpt: 'French President Emmanuel Macron delivered a thinly veiled critique of President Trump\'s foreign policy at the World Economic Forum, warning of dangerous precedents being set.',
+      narrativeIds: ['narr-005'],
+      subNarrativeIds: ['sub-009'],
+      personIds: ['person-003', 'person-004'],
+      organizationIds: ['org-009'],
+      locationIds: ['loc-005'],
+      eventIds: ['event-006']
+    },
+    {
+      id: 'doc-002',
+      title: 'Trump posts private Macron message on social media: "I do not understand what you are doing"',
+      url: 'https://cnn.com/politics/trump-macron-greenland-message',
+      publishedDate: '2026-01-20T12:15:00Z',
+      sourceId: 'src-nat-cnn',
+      excerpt: 'President Trump shared what appeared to be a private diplomatic message from French President Macron questioning his Greenland acquisition strategy.',
+      narrativeIds: ['narr-005'],
+      subNarrativeIds: ['sub-010'],
+      personIds: ['person-003', 'person-004'],
+      organizationIds: [],
+      locationIds: ['loc-001'],
+      eventIds: ['event-007']
+    },
+    {
+      id: 'doc-003',
+      title: 'Von der Leyen calls for "new form of European independence" amid Trump tensions',
+      url: 'https://bbc.com/news/world-europe-von-der-leyen-independence',
+      publishedDate: '2026-01-20T14:00:00Z',
+      sourceId: 'src-int-bbc',
+      excerpt: 'European Commission President Ursula von der Leyen said the EU must develop greater autonomy in response to "geopolitical shocks" from across the Atlantic.',
+      narrativeIds: ['narr-005'],
+      subNarrativeIds: ['sub-011'],
+      personIds: ['person-005'],
+      organizationIds: ['org-008'],
+      locationIds: ['loc-005'],
+      eventIds: ['event-009']
+    },
+    {
+      id: 'doc-004',
+      title: 'Greenland PM: "We demand respect for the world order"',
+      url: 'https://guardian.com/world/greenland-pm-trump-response',
+      publishedDate: '2026-01-20T13:30:00Z',
+      sourceId: 'src-int-guardian',
+      excerpt: 'Greenland\'s Prime Minister Múte Bourup Egede responded forcefully to Trump\'s acquisition threats, calling for respect of international norms.',
+      narrativeIds: ['narr-005'],
+      subNarrativeIds: ['sub-011'],
+      personIds: ['person-006', 'person-003'],
+      organizationIds: [],
+      locationIds: ['loc-006'],
+      eventIds: ['event-008']
+    },
+
+    // Minnesota immigration documents (narr-006)
+    {
+      id: 'doc-005',
+      title: 'DOJ plans subpoenas for Minnesota AG, governor over ICE protest "obstruction"',
+      url: 'https://nytimes.com/2026/01/20/us/politics/doj-minnesota-subpoenas',
+      publishedDate: '2026-01-20T11:00:00Z',
+      sourceId: 'src-nat-nyt',
+      excerpt: 'The Department of Justice announced plans to subpoena Minnesota\'s top officials in an escalating confrontation over immigration enforcement.',
+      narrativeIds: ['narr-006'],
+      subNarrativeIds: ['sub-012'],
+      personIds: ['person-007'],
+      organizationIds: ['org-010'],
+      locationIds: ['loc-002'],
+      eventIds: ['event-010']
+    },
+    {
+      id: 'doc-006',
+      title: 'Federal judge rules protesters cannot be arrested without cause, DOJ appeals',
+      url: 'https://washingtonpost.com/national/minnesota-ice-ruling-appeal',
+      publishedDate: '2026-01-20T09:45:00Z',
+      sourceId: 'src-nat-wapo',
+      excerpt: 'A federal judge issued an injunction protecting peaceful protesters from arrest by federal agents, but the DOJ immediately filed an appeal.',
+      narrativeIds: ['narr-006', 'narr-009'],
+      subNarrativeIds: ['sub-013'],
+      personIds: ['person-017'],
+      organizationIds: ['org-010', 'org-011'],
+      locationIds: ['loc-002'],
+      eventIds: ['event-011']
+    },
+    {
+      id: 'doc-007',
+      title: 'FBI pivots civil rights probe from ICE agent to slain protester Renee Good',
+      url: 'https://msnbc.com/news/fbi-renee-good-investigation-pivot',
+      publishedDate: '2026-01-18T16:00:00Z',
+      sourceId: 'src-nat-msnbc',
+      excerpt: 'Critics are outraged after learning the FBI\'s investigation into the fatal shooting has shifted focus from the agent to the victim and her widow.',
+      narrativeIds: ['narr-006'],
+      subNarrativeIds: ['sub-015'],
+      personIds: ['person-008'],
+      organizationIds: ['org-011', 'org-012'],
+      locationIds: ['loc-002'],
+      eventIds: ['event-013', 'event-014']
+    },
+
+    // Church protest documents (narr-008)
+    {
+      id: 'doc-008',
+      title: 'Protesters disrupt service at church where ICE official serves as pastor',
+      url: 'https://cnn.com/us/minnesota-church-ice-protest',
+      publishedDate: '2026-01-19T14:30:00Z',
+      sourceId: 'src-nat-cnn',
+      excerpt: 'Anti-ICE demonstrators interrupted Sunday worship at Cities Church in St. Paul, targeting David Easterwood who serves dual roles as ICE official and pastor.',
+      narrativeIds: ['narr-008'],
+      subNarrativeIds: ['sub-021'],
+      personIds: ['person-014', 'person-015'],
+      organizationIds: ['org-016', 'org-011'],
+      locationIds: ['loc-008'],
+      eventIds: ['event-017']
+    },
+    {
+      id: 'doc-009',
+      title: 'AG Bondi announces FACE Act investigation: "Full force of federal law"',
+      url: 'https://foxnews.com/politics/bondi-face-act-church-protest',
+      publishedDate: '2026-01-19T19:00:00Z',
+      sourceId: 'src-nat-fox',
+      excerpt: 'Attorney General Pam Bondi declared that attacks against law enforcement and intimidation of Christians will be prosecuted to the fullest extent.',
+      narrativeIds: ['narr-008'],
+      subNarrativeIds: ['sub-018'],
+      personIds: ['person-013', 'person-012'],
+      organizationIds: ['org-010'],
+      locationIds: ['loc-001'],
+      eventIds: ['event-018']
+    },
+    {
+      id: 'doc-010',
+      title: 'DOJ threatens charges against journalist Don Lemon for covering protest',
+      url: 'https://guardian.com/media/don-lemon-doj-threat-minnesota',
+      publishedDate: '2026-01-20T13:00:00Z',
+      sourceId: 'src-int-guardian',
+      excerpt: 'Assistant AG Harmeet Dhillon said Lemon is "on notice" and cannot use journalism as a shield, prompting press freedom concerns.',
+      narrativeIds: ['narr-008'],
+      subNarrativeIds: ['sub-019'],
+      personIds: ['person-012', 'person-016'],
+      organizationIds: ['org-010'],
+      locationIds: ['loc-008'],
+      eventIds: ['event-019']
+    },
+    {
+      id: 'doc-011',
+      title: 'Trump: Church protesters are "agitators and insurrectionists" who are "highly trained"',
+      url: 'https://truthsocial.com/@realDonaldTrump/posts/123456789',
+      publishedDate: '2026-01-21T06:30:00Z',
+      sourceId: 'src-x',
+      excerpt: 'The President posted that protesters "should be thrown in jail, or thrown out of the Country" calling them professional agitators.',
+      narrativeIds: ['narr-008'],
+      subNarrativeIds: ['sub-020'],
+      personIds: ['person-003'],
+      organizationIds: [],
+      locationIds: ['loc-001'],
+      eventIds: ['event-020']
+    },
+    {
+      id: 'doc-012',
+      title: 'Former NAACP president: "How can anyone who claims to be Christian condone this?"',
+      url: 'https://cnn.com/us/nekima-levy-armstrong-ice-pastor-interview',
+      publishedDate: '2026-01-20T10:00:00Z',
+      sourceId: 'src-nat-cnn',
+      excerpt: 'Nekima Levy Armstrong questioned the moral standing of an ICE official serving as a pastor while overseeing immigration enforcement.',
+      narrativeIds: ['narr-008'],
+      subNarrativeIds: ['sub-021'],
+      personIds: ['person-015', 'person-014'],
+      organizationIds: ['org-018', 'org-016'],
+      locationIds: ['loc-008'],
+      eventIds: ['event-017']
+    },
+
+    // Indiana judge shooting documents (narr-007)
+    {
+      id: 'doc-013',
+      title: 'Indiana judge and wife shot at home; suspect at large',
+      url: 'https://cnn.com/us/indiana-judge-steven-meyer-shooting',
+      publishedDate: '2026-01-19T18:00:00Z',
+      sourceId: 'src-nat-cnn',
+      excerpt: 'Tippecanoe Superior Court Judge Steven Meyer and his wife Kimberly were shot Sunday afternoon. Both are in stable condition as agencies search for the suspect.',
+      narrativeIds: ['narr-007'],
+      subNarrativeIds: ['sub-016'],
+      personIds: ['person-009', 'person-010'],
+      organizationIds: ['org-013', 'org-015'],
+      locationIds: ['loc-007'],
+      eventIds: ['event-015']
+    },
+    {
+      id: 'doc-014',
+      title: 'Indiana Chief Justice to judges: "Please remain vigilant in your own security"',
+      url: 'https://indystar.com/news/indiana-chief-justice-judges-security-warning',
+      publishedDate: '2026-01-20T11:30:00Z',
+      sourceId: 'src-nat-nyt',
+      excerpt: 'Chief Justice Loretta H. Rush sent an urgent letter to all state judges expressing concern about violence targeting the judiciary.',
+      narrativeIds: ['narr-007'],
+      subNarrativeIds: ['sub-017'],
+      personIds: ['person-011'],
+      organizationIds: ['org-014'],
+      locationIds: ['loc-007'],
+      eventIds: ['event-016']
+    },
+
+    // Legal battles documents (narr-009)
+    {
+      id: 'doc-015',
+      title: 'Judge allows DHS to require week notice for congressional facility inspections',
+      url: 'https://politico.com/news/dhs-congressional-inspection-notice-ruling',
+      publishedDate: '2026-01-20T14:30:00Z',
+      sourceId: 'src-nat-nyt',
+      excerpt: 'Federal judge Jia Cobb ruled DHS can continue blocking no-notice inspections despite blocking a similar policy last month.',
+      narrativeIds: ['narr-009'],
+      subNarrativeIds: ['sub-022'],
+      personIds: ['person-025', 'person-021', 'person-022', 'person-023'],
+      organizationIds: ['org-017', 'org-020'],
+      locationIds: ['loc-009'],
+      eventIds: ['event-021', 'event-022']
+    },
+    {
+      id: 'doc-016',
+      title: 'DOJ calls Minnesota lawsuit an "absurdity" that undermines federal supremacy',
+      url: 'https://reuters.com/legal/doj-minnesota-lawsuit-response',
+      publishedDate: '2026-01-20T16:00:00Z',
+      sourceId: 'src-int-reuters',
+      excerpt: 'Federal lawyers argued the state\'s attempt to end ICE activities would be unprecedented judicial overreach.',
+      narrativeIds: ['narr-009'],
+      subNarrativeIds: ['sub-023'],
+      personIds: ['person-007', 'person-017'],
+      organizationIds: ['org-010'],
+      locationIds: ['loc-002'],
+      eventIds: ['event-023']
+    },
+    {
+      id: 'doc-017',
+      title: 'DHS Secretary Noem backtracks: Pepper spray was needed for "law and order"',
+      url: 'https://cnn.com/politics/noem-pepper-spray-reversal',
+      publishedDate: '2026-01-19T19:30:00Z',
+      sourceId: 'src-nat-cnn',
+      excerpt: 'After initially denying federal agents used chemical agents, Secretary Noem now says pepper spray was necessary to establish order.',
+      narrativeIds: ['narr-009'],
+      subNarrativeIds: ['sub-024'],
+      personIds: ['person-018'],
+      organizationIds: ['org-017'],
+      locationIds: ['loc-001'],
+      eventIds: ['event-025']
+    },
+
+    // RFK dietary guidelines documents (narr-010)
+    {
+      id: 'doc-018',
+      title: 'RFK Jr unveils meat-heavy dietary guidelines: "We are ending the war on saturated fats"',
+      url: 'https://nytimes.com/2026/01/18/health/rfk-dietary-guidelines-meat',
+      publishedDate: '2026-01-18T09:00:00Z',
+      sourceId: 'src-nat-nyt',
+      excerpt: 'The new guidelines feature an inverted food pyramid emphasizing steak, poultry, and whole milk, urging Americans to nearly double protein consumption.',
+      narrativeIds: ['narr-010'],
+      subNarrativeIds: ['sub-025'],
+      personIds: ['person-026'],
+      organizationIds: ['org-022'],
+      locationIds: ['loc-001'],
+      eventIds: ['event-026']
+    },
+    {
+      id: 'doc-019',
+      title: 'Scientists warn: New meat guidelines would require 100 million acres of farmland',
+      url: 'https://guardian.com/environment/meat-guidelines-environmental-impact',
+      publishedDate: '2026-01-19T12:00:00Z',
+      sourceId: 'src-int-guardian',
+      excerpt: 'World Resources Institute estimates the guidelines would add hundreds of millions of tons of emissions and require an area the size of California.',
+      narrativeIds: ['narr-010'],
+      subNarrativeIds: ['sub-026'],
+      personIds: [],
+      organizationIds: ['org-023'],
+      locationIds: [],
+      eventIds: []
+    },
+    {
+      id: 'doc-020',
+      title: 'RFK Jr in 2004: Factory meat industry is "bigger threat than Osama bin Laden"',
+      url: 'https://msnbc.com/opinion/rfk-jr-meat-industry-past-quotes',
+      publishedDate: '2026-01-20T08:00:00Z',
+      sourceId: 'src-nat-msnbc',
+      excerpt: 'Critics highlight Kennedy\'s past environmental activism that sharply contradicts his new pro-meat dietary guidelines.',
+      narrativeIds: ['narr-010'],
+      subNarrativeIds: ['sub-027'],
+      personIds: ['person-026'],
+      organizationIds: ['org-022'],
+      locationIds: [],
+      eventIds: []
+    },
+
+    // Food preservatives documents (narr-003)
+    {
+      id: 'doc-021',
+      title: 'NutriNet-Santé study links sodium nitrite to 32% increased cancer risk',
+      url: 'https://bbc.com/news/health-food-preservatives-cancer-study',
+      publishedDate: '2026-01-08T10:00:00Z',
+      sourceId: 'src-int-bbc',
+      excerpt: 'A major French study found sodium nitrite—common in deli meats—is associated with significantly higher prostate cancer risk.',
+      narrativeIds: ['narr-003'],
+      subNarrativeIds: ['sub-007'],
+      personIds: [],
+      organizationIds: ['org-003'],
+      locationIds: [],
+      eventIds: []
+    },
+    {
+      id: 'doc-022',
+      title: 'Harvard: Ultra-processed foods linked to 45% higher colorectal cancer risk',
+      url: 'https://cnn.com/health/harvard-processed-food-cancer-study',
+      publishedDate: '2026-01-10T14:00:00Z',
+      sourceId: 'src-nat-cnn',
+      excerpt: 'Researchers found high consumption of ultra-processed foods correlates with significantly increased risk of precancerous colorectal adenomas.',
+      narrativeIds: ['narr-003'],
+      subNarrativeIds: [],
+      personIds: [],
+      organizationIds: [],
+      locationIds: [],
+      eventIds: []
+    },
+    {
+      id: 'doc-023',
+      title: 'TikTok: Vegan influencers see surge as cancer study goes viral',
+      url: 'https://tiktok.com/@healthnews/video/123456',
+      publishedDate: '2026-01-12T18:00:00Z',
+      sourceId: 'src-tiktok',
+      excerpt: 'Plant-based diet content has exploded on the platform as younger users seek alternatives to processed foods.',
+      narrativeIds: ['narr-003'],
+      subNarrativeIds: ['sub-006'],
+      personIds: [],
+      organizationIds: ['org-004'],
+      locationIds: [],
+      eventIds: []
+    },
+
+    // Social media posts as documents
+    {
+      id: 'doc-024',
+      title: 'Viral thread: ICE agent preaching at church while families are separated',
+      url: 'https://x.com/user/status/123456789',
+      publishedDate: '2026-01-19T16:00:00Z',
+      sourceId: 'src-x',
+      excerpt: 'A thread detailing David Easterwood\'s dual role has been shared over 50,000 times, sparking fierce debate.',
+      narrativeIds: ['narr-008'],
+      subNarrativeIds: ['sub-021'],
+      personIds: ['person-014'],
+      organizationIds: ['org-011', 'org-016'],
+      locationIds: ['loc-008'],
+      eventIds: ['event-017']
+    },
+    {
+      id: 'doc-025',
+      title: 'Reddit AMA: Minneapolis protester describes "terrifying" federal response',
+      url: 'https://reddit.com/r/minnesota/comments/abc123',
+      publishedDate: '2026-01-17T20:00:00Z',
+      sourceId: 'src-reddit',
+      excerpt: 'An eyewitness account of the protests has generated thousands of comments and sparked calls for federal accountability.',
+      narrativeIds: ['narr-006'],
+      subNarrativeIds: ['sub-013'],
+      personIds: [],
+      organizationIds: ['org-011'],
+      locationIds: ['loc-002'],
+      eventIds: []
+    }
+  ]
 };
 
 /**

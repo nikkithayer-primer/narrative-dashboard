@@ -72,18 +72,19 @@ function createToggleButton(isHalf) {
  * @param {string} cardId - Unique identifier for storage
  */
 function toggleCardWidth(card, button, cardId) {
-  const isCurrentlyHalf = card.classList.contains('card-half');
+  const isCurrentlyHalf = card.classList.contains('card-half') || card.classList.contains('card-half-width');
+  
+  // Remove all width classes to prevent conflicts
+  card.classList.remove('card-half', 'card-half-width', 'card-full', 'card-full-width');
   
   if (isCurrentlyHalf) {
     // Expand to full
-    card.classList.remove('card-half');
     card.classList.add('card-full');
     button.innerHTML = ICONS.collapse;
     button.title = 'Collapse to half width';
     storeWidth(cardId, false);
   } else {
     // Collapse to half
-    card.classList.remove('card-full');
     card.classList.add('card-half');
     button.innerHTML = ICONS.expand;
     button.title = 'Expand to full width';
@@ -106,12 +107,21 @@ export function initCardWidthToggle(card, cardId, defaultWidth = 'full') {
   const header = card.querySelector('.card-header');
   if (!header) return;
   
-  // Get initial width preference
-  const initialWidth = getInitialWidth(cardId, defaultWidth);
+  // Check if card has a pre-set width class (e.g., card-half-width from HTML)
+  const hasPresetHalf = card.classList.contains('card-half-width');
+  const hasPresetFull = card.classList.contains('card-full-width');
+  
+  // Determine the actual default based on preset classes or provided default
+  let actualDefault = defaultWidth;
+  if (hasPresetHalf) actualDefault = 'half';
+  else if (hasPresetFull) actualDefault = 'full';
+  
+  // Get initial width preference (stored preference takes precedence)
+  const initialWidth = getInitialWidth(cardId, actualDefault);
   const isHalf = initialWidth === 'half';
   
-  // Set initial class
-  card.classList.remove('card-half', 'card-full');
+  // Remove all width classes to prevent conflicts
+  card.classList.remove('card-half', 'card-half-width', 'card-full', 'card-full-width');
   card.classList.add(isHalf ? 'card-half' : 'card-full');
   
   // Create toggle button

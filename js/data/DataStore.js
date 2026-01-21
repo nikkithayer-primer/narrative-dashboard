@@ -46,41 +46,132 @@ class DataStore {
   }
 
   // ============================================
-  // Mission CRUD
+  // Generic CRUD Operations
   // ============================================
 
-  createMission(mission) {
-    const id = this.generateId('mission');
-    this.data.missions.push({
+  /**
+   * Generic create operation for any entity type
+   * @param {string} collection - Name of the collection (e.g., 'missions', 'narratives')
+   * @param {string} prefix - ID prefix (e.g., 'mission', 'narr')
+   * @param {Object} data - Entity data
+   * @param {Object} defaults - Default values to merge
+   * @returns {string} The generated ID
+   */
+  createEntity(collection, prefix, data, defaults = {}) {
+    const id = this.generateId(prefix);
+    this.data[collection].push({
       id,
-      name: mission.name,
-      description: mission.description || '',
-      color: mission.color || this.generateColor(),
+      ...defaults,
+      ...data,
       createdAt: new Date().toISOString()
     });
     this.save();
     return id;
   }
 
-  updateMission(id, updates) {
-    const idx = this.data.missions.findIndex(m => m.id === id);
+  /**
+   * Generic update operation for any entity type
+   * @param {string} collection - Name of the collection
+   * @param {string} id - Entity ID to update
+   * @param {Object} updates - Fields to update
+   * @returns {boolean} Whether the update was successful
+   */
+  updateEntity(collection, id, updates) {
+    const idx = this.data[collection].findIndex(item => item.id === id);
     if (idx !== -1) {
-      this.data.missions[idx] = {
-        ...this.data.missions[idx],
+      this.data[collection][idx] = {
+        ...this.data[collection][idx],
         ...updates,
         updatedAt: new Date().toISOString()
       };
       this.save();
+      return true;
     }
+    return false;
+  }
+
+  /**
+   * Generic delete operation for any entity type
+   * @param {string} collection - Name of the collection
+   * @param {string} id - Entity ID to delete
+   * @param {Function} cleanupFn - Optional cleanup function for related data
+   * @returns {boolean} Whether the delete was successful
+   */
+  deleteEntity(collection, id, cleanupFn = null) {
+    const initialLength = this.data[collection].length;
+    this.data[collection] = this.data[collection].filter(item => item.id !== id);
+    
+    if (this.data[collection].length < initialLength) {
+      if (cleanupFn) {
+        cleanupFn(id);
+      }
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Generic find operation
+   * @param {string} collection - Name of the collection
+   * @param {string} id - Entity ID to find
+   * @returns {Object|undefined} The found entity or undefined
+   */
+  findEntity(collection, id) {
+    return this.data[collection]?.find(item => item.id === id);
+  }
+
+  /**
+   * Remove an ID from an array field across all items in a collection
+   * @param {string} collection - Name of the collection
+   * @param {string} field - Array field name
+   * @param {string} idToRemove - ID to remove from the arrays
+   */
+  removeIdFromArrayField(collection, field, idToRemove) {
+    this.data[collection].forEach(item => {
+      if (item[field]) {
+        item[field] = item[field].filter(id => id !== idToRemove);
+      }
+    });
+  }
+
+  /**
+   * Remove a key from an object field across all items in a collection
+   * @param {string} collection - Name of the collection
+   * @param {string} field - Object field name
+   * @param {string} keyToRemove - Key to remove from the objects
+   */
+  removeKeyFromObjectField(collection, field, keyToRemove) {
+    this.data[collection].forEach(item => {
+      if (item[field]) {
+        delete item[field][keyToRemove];
+      }
+    });
+  }
+
+  // ============================================
+  // Mission CRUD
+  // ============================================
+
+  createMission(mission) {
+    return this.createEntity('missions', 'mission', {
+      name: mission.name,
+      description: mission.description || '',
+      color: mission.color || this.generateColor()
+    });
+  }
+
+  updateMission(id, updates) {
+    this.updateEntity('missions', id, updates);
   }
 
   deleteMission(id) {
-    this.data.missions = this.data.missions.filter(m => m.id !== id);
-    // Remove mission reference from narratives
-    this.data.narratives.forEach(n => {
-      if (n.missionId === id) n.missionId = null;
+    this.deleteEntity('missions', id, () => {
+      // Remove mission reference from narratives
+      this.data.narratives.forEach(n => {
+        if (n.missionId === id) n.missionId = null;
+      });
     });
-    this.save();
   }
 
   // ============================================
@@ -187,50 +278,33 @@ class DataStore {
   // ============================================
 
   createFaction(faction) {
-    const id = this.generateId('faction');
-    this.data.factions.push({
-      id,
+    return this.createEntity('factions', 'faction', {
       name: faction.name,
       color: faction.color || this.generateColor(),
       relatedFactionIds: faction.relatedFactionIds || [],
       memberCount: faction.memberCount || 0,
       affiliatedPersonIds: faction.affiliatedPersonIds || [],
-      affiliatedOrganizationIds: faction.affiliatedOrganizationIds || [],
-      createdAt: new Date().toISOString()
+      affiliatedOrganizationIds: faction.affiliatedOrganizationIds || []
     });
-    this.save();
-    return id;
   }
 
   updateFaction(id, updates) {
-    const idx = this.data.factions.findIndex(f => f.id === id);
-    if (idx !== -1) {
-      this.data.factions[idx] = {
-        ...this.data.factions[idx],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      this.save();
-    }
+    this.updateEntity('factions', id, updates);
   }
 
   deleteFaction(id) {
-    this.data.factions = this.data.factions.filter(f => f.id !== id);
-    // Clean up references
-    this.data.narratives.forEach(n => delete n.factionMentions[id]);
-    this.data.subNarratives.forEach(s => delete s.factionMentions[id]);
-    this.data.factionOverlaps = this.data.factionOverlaps.filter(
-      o => !o.factionIds.includes(id)
-    );
-    this.data.persons.forEach(p => {
-      p.affiliatedFactionIds = (p.affiliatedFactionIds || []).filter(fid => fid !== id);
-      delete p.factionSentiment[id];
+    this.deleteEntity('factions', id, () => {
+      // Clean up references
+      this.removeKeyFromObjectField('narratives', 'factionMentions', id);
+      this.removeKeyFromObjectField('subNarratives', 'factionMentions', id);
+      this.data.factionOverlaps = this.data.factionOverlaps.filter(
+        o => !o.factionIds.includes(id)
+      );
+      this.removeIdFromArrayField('persons', 'affiliatedFactionIds', id);
+      this.removeKeyFromObjectField('persons', 'factionSentiment', id);
+      this.removeIdFromArrayField('organizations', 'affiliatedFactionIds', id);
+      this.removeKeyFromObjectField('organizations', 'factionSentiment', id);
     });
-    this.data.organizations.forEach(o => {
-      o.affiliatedFactionIds = (o.affiliatedFactionIds || []).filter(fid => fid !== id);
-      delete o.factionSentiment[id];
-    });
-    this.save();
   }
 
   // ============================================
@@ -238,49 +312,28 @@ class DataStore {
   // ============================================
 
   createLocation(location) {
-    const id = this.generateId('loc');
-    this.data.locations.push({
-      id,
+    return this.createEntity('locations', 'loc', {
       name: location.name,
       coordinates: location.coordinates || { lat: 0, lng: 0 },
-      type: location.type || 'general',
-      createdAt: new Date().toISOString()
+      type: location.type || 'general'
     });
-    this.save();
-    return id;
   }
 
   updateLocation(id, updates) {
-    const idx = this.data.locations.findIndex(l => l.id === id);
-    if (idx !== -1) {
-      this.data.locations[idx] = {
-        ...this.data.locations[idx],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      this.save();
-    }
+    this.updateEntity('locations', id, updates);
   }
 
   deleteLocation(id) {
-    this.data.locations = this.data.locations.filter(l => l.id !== id);
-    // Clean up references
-    this.data.narratives.forEach(n => {
-      n.locationIds = n.locationIds.filter(lid => lid !== id);
+    this.deleteEntity('locations', id, () => {
+      // Clean up references
+      this.removeIdFromArrayField('narratives', 'locationIds', id);
+      this.removeIdFromArrayField('subNarratives', 'locationIds', id);
+      this.data.events.forEach(e => {
+        if (e.locationId === id) e.locationId = null;
+      });
+      this.removeIdFromArrayField('persons', 'relatedLocationIds', id);
+      this.removeIdFromArrayField('organizations', 'relatedLocationIds', id);
     });
-    this.data.subNarratives.forEach(s => {
-      s.locationIds = s.locationIds.filter(lid => lid !== id);
-    });
-    this.data.events.forEach(e => {
-      if (e.locationId === id) e.locationId = null;
-    });
-    this.data.persons.forEach(p => {
-      p.relatedLocationIds = (p.relatedLocationIds || []).filter(lid => lid !== id);
-    });
-    this.data.organizations.forEach(o => {
-      o.relatedLocationIds = (o.relatedLocationIds || []).filter(lid => lid !== id);
-    });
-    this.save();
   }
 
   // ============================================
@@ -358,50 +411,29 @@ class DataStore {
   // ============================================
 
   createPerson(person) {
-    const id = this.generateId('person');
-    this.data.persons.push({
-      id,
+    return this.createEntity('persons', 'person', {
       name: person.name,
       type: person.type || 'general',
       imageUrl: person.imageUrl || null,
       affiliatedFactionIds: person.affiliatedFactionIds || [],
       relatedLocationIds: person.relatedLocationIds || [],
       relatedEventIds: person.relatedEventIds || [],
-      factionSentiment: person.factionSentiment || {},
-      createdAt: new Date().toISOString()
+      factionSentiment: person.factionSentiment || {}
     });
-    this.save();
-    return id;
   }
 
   updatePerson(id, updates) {
-    const idx = this.data.persons.findIndex(p => p.id === id);
-    if (idx !== -1) {
-      this.data.persons[idx] = {
-        ...this.data.persons[idx],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      this.save();
-    }
+    this.updateEntity('persons', id, updates);
   }
 
   deletePerson(id) {
-    this.data.persons = this.data.persons.filter(p => p.id !== id);
-    // Clean up references in narratives, sub-narratives, events, and factions
-    this.data.narratives.forEach(n => {
-      n.personIds = n.personIds.filter(pid => pid !== id);
+    this.deleteEntity('persons', id, () => {
+      // Clean up references in narratives, sub-narratives, events, and factions
+      this.removeIdFromArrayField('narratives', 'personIds', id);
+      this.removeIdFromArrayField('subNarratives', 'personIds', id);
+      this.removeIdFromArrayField('events', 'personIds', id);
+      this.removeIdFromArrayField('factions', 'affiliatedPersonIds', id);
     });
-    this.data.subNarratives.forEach(s => {
-      s.personIds = s.personIds.filter(pid => pid !== id);
-    });
-    this.data.events.forEach(e => {
-      e.personIds = e.personIds.filter(pid => pid !== id);
-    });
-    this.data.factions.forEach(f => {
-      f.affiliatedPersonIds = (f.affiliatedPersonIds || []).filter(pid => pid !== id);
-    });
-    this.save();
   }
 
   // ============================================
@@ -409,48 +441,27 @@ class DataStore {
   // ============================================
 
   createOrganization(org) {
-    const id = this.generateId('org');
-    this.data.organizations.push({
-      id,
+    return this.createEntity('organizations', 'org', {
       name: org.name,
       type: org.type || 'general',
       affiliatedFactionIds: org.affiliatedFactionIds || [],
       relatedLocationIds: org.relatedLocationIds || [],
-      factionSentiment: org.factionSentiment || {},
-      createdAt: new Date().toISOString()
+      factionSentiment: org.factionSentiment || {}
     });
-    this.save();
-    return id;
   }
 
   updateOrganization(id, updates) {
-    const idx = this.data.organizations.findIndex(o => o.id === id);
-    if (idx !== -1) {
-      this.data.organizations[idx] = {
-        ...this.data.organizations[idx],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      this.save();
-    }
+    this.updateEntity('organizations', id, updates);
   }
 
   deleteOrganization(id) {
-    this.data.organizations = this.data.organizations.filter(o => o.id !== id);
-    // Clean up references in narratives, sub-narratives, events, and factions
-    this.data.narratives.forEach(n => {
-      n.organizationIds = n.organizationIds.filter(oid => oid !== id);
+    this.deleteEntity('organizations', id, () => {
+      // Clean up references in narratives, sub-narratives, events, and factions
+      this.removeIdFromArrayField('narratives', 'organizationIds', id);
+      this.removeIdFromArrayField('subNarratives', 'organizationIds', id);
+      this.removeIdFromArrayField('events', 'organizationIds', id);
+      this.removeIdFromArrayField('factions', 'affiliatedOrganizationIds', id);
     });
-    this.data.subNarratives.forEach(s => {
-      s.organizationIds = s.organizationIds.filter(oid => oid !== id);
-    });
-    this.data.events.forEach(e => {
-      e.organizationIds = e.organizationIds.filter(oid => oid !== id);
-    });
-    this.data.factions.forEach(f => {
-      f.affiliatedOrganizationIds = (f.affiliatedOrganizationIds || []).filter(oid => oid !== id);
-    });
-    this.save();
   }
 
   // ============================================

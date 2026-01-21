@@ -7,6 +7,54 @@
 
 import { dataStore } from './DataStore.js';
 
+// ============================================
+// Helper Functions
+// ============================================
+
+/**
+ * Generic helper to find an entity by ID in a collection
+ * @param {string} collection - Name of the collection in dataStore.data
+ * @param {string} id - Entity ID to find
+ * @returns {Object|undefined} The found entity or undefined
+ */
+const findById = (collection, id) => {
+  const data = dataStore.data[collection];
+  return data ? data.find(item => item.id === id) : undefined;
+};
+
+/**
+ * Generic helper to resolve related entities from an ID array
+ * @param {string} sourceCollection - Name of the source collection
+ * @param {string} sourceId - ID of the source entity
+ * @param {string} relationField - Field name containing the array of related IDs
+ * @param {string} targetCollection - Name of the target collection to resolve IDs from
+ * @returns {Array} Array of resolved entities (nulls filtered out)
+ */
+const resolveRelatedEntities = (sourceCollection, sourceId, relationField, targetCollection) => {
+  const source = findById(sourceCollection, sourceId);
+  if (!source) return [];
+  const ids = source[relationField] || [];
+  return ids
+    .map(id => findById(targetCollection, id))
+    .filter(Boolean);
+};
+
+/**
+ * Generic helper to find entities that reference a given ID in a specific field
+ * @param {string} collection - Name of the collection to search
+ * @param {string} field - Field name to check (can be array field or direct field)
+ * @param {string} targetId - ID to search for
+ * @param {boolean} isArrayField - Whether the field is an array (default: true)
+ * @returns {Array} Array of matching entities
+ */
+const findEntitiesReferencing = (collection, field, targetId, isArrayField = true) => {
+  const data = dataStore.data[collection] || [];
+  if (isArrayField) {
+    return data.filter(item => (item[field] || []).includes(targetId));
+  }
+  return data.filter(item => item[field] === targetId);
+};
+
 export const DataService = {
   // ============================================
   // Time Range Filtering Utilities
@@ -56,7 +104,7 @@ export const DataService = {
 
   // Missions
   getMissions: () => dataStore.data.missions,
-  getMission: (id) => dataStore.data.missions.find(m => m.id === id),
+  getMission: (id) => findById('missions', id),
 
   // Narratives - now supports time range filtering
   getNarratives: (missionId = null, timeRange = null) => {
@@ -74,7 +122,7 @@ export const DataService = {
     
     return narratives;
   },
-  getNarrative: (id) => dataStore.data.narratives.find(n => n.id === id),
+  getNarrative: (id) => findById('narratives', id),
   
   // Get narratives by status (with optional time range)
   getNarrativesByStatus: (status, timeRange = null) => {
@@ -103,36 +151,36 @@ export const DataService = {
 
   // Sub-Narratives
   getSubNarratives: () => dataStore.data.subNarratives,
-  getSubNarrative: (id) => dataStore.data.subNarratives.find(s => s.id === id),
+  getSubNarrative: (id) => findById('subNarratives', id),
 
   // Factions
   getFactions: () => dataStore.data.factions,
-  getFaction: (id) => dataStore.data.factions.find(f => f.id === id),
+  getFaction: (id) => findById('factions', id),
   getFactionOverlaps: () => dataStore.data.factionOverlaps,
 
   // Locations
   getLocations: () => dataStore.data.locations,
-  getLocation: (id) => dataStore.data.locations.find(l => l.id === id),
+  getLocation: (id) => findById('locations', id),
 
   // Events
   getEvents: () => dataStore.data.events,
-  getEvent: (id) => dataStore.data.events.find(e => e.id === id),
+  getEvent: (id) => findById('events', id),
 
   // Persons
   getPersons: () => dataStore.data.persons,
-  getPerson: (id) => dataStore.data.persons.find(p => p.id === id),
+  getPerson: (id) => findById('persons', id),
 
   // Organizations
   getOrganizations: () => dataStore.data.organizations,
-  getOrganization: (id) => dataStore.data.organizations.find(o => o.id === id),
+  getOrganization: (id) => findById('organizations', id),
 
   // Documents
   getDocuments: () => dataStore.data.documents || [],
-  getDocument: (id) => (dataStore.data.documents || []).find(d => d.id === id),
+  getDocument: (id) => findById('documents', id),
 
   // Sources
   getSources: () => dataStore.data.sources || [],
-  getSource: (id) => (dataStore.data.sources || []).find(s => s.id === id),
+  getSource: (id) => findById('sources', id),
   getSourceCategories: () => dataStore.data.sourceCategories || [],
   
   getSourcesByType: (type) => {
@@ -173,37 +221,17 @@ export const DataService = {
     })).filter(f => f.faction);
   },
 
-  getPersonsForNarrative: (narrativeId) => {
-    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
-    if (!narrative) return [];
-    return (narrative.personIds || [])
-      .map(pid => dataStore.data.persons.find(p => p.id === pid))
-      .filter(Boolean);
-  },
+  getPersonsForNarrative: (narrativeId) => 
+    resolveRelatedEntities('narratives', narrativeId, 'personIds', 'persons'),
 
-  getOrganizationsForNarrative: (narrativeId) => {
-    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
-    if (!narrative) return [];
-    return (narrative.organizationIds || [])
-      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
-      .filter(Boolean);
-  },
+  getOrganizationsForNarrative: (narrativeId) => 
+    resolveRelatedEntities('narratives', narrativeId, 'organizationIds', 'organizations'),
 
-  getLocationsForNarrative: (narrativeId) => {
-    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
-    if (!narrative) return [];
-    return (narrative.locationIds || [])
-      .map(lid => dataStore.data.locations.find(l => l.id === lid))
-      .filter(Boolean);
-  },
+  getLocationsForNarrative: (narrativeId) => 
+    resolveRelatedEntities('narratives', narrativeId, 'locationIds', 'locations'),
 
-  getEventsForNarrative: (narrativeId) => {
-    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
-    if (!narrative) return [];
-    return (narrative.eventIds || [])
-      .map(eid => dataStore.data.events.find(e => e.id === eid))
-      .filter(Boolean);
-  },
+  getEventsForNarrative: (narrativeId) => 
+    resolveRelatedEntities('narratives', narrativeId, 'eventIds', 'events'),
 
   // ============================================
   // SubNarrative Relationships (same as Narrative)
@@ -219,9 +247,9 @@ export const DataService = {
   },
 
   getParentNarrative: (subNarrativeId) => {
-    const sub = dataStore.data.subNarratives.find(s => s.id === subNarrativeId);
+    const sub = findById('subNarratives', subNarrativeId);
     if (!sub) return null;
-    return dataStore.data.narratives.find(n => n.id === sub.parentNarrativeId);
+    return findById('narratives', sub.parentNarrativeId);
   },
 
   // ============================================
@@ -240,13 +268,8 @@ export const DataService = {
     );
   },
 
-  getRelatedFactions: (factionId) => {
-    const faction = dataStore.data.factions.find(f => f.id === factionId);
-    if (!faction) return [];
-    return (faction.relatedFactionIds || [])
-      .map(fid => dataStore.data.factions.find(f => f.id === fid))
-      .filter(Boolean);
-  },
+  getRelatedFactions: (factionId) => 
+    resolveRelatedEntities('factions', factionId, 'relatedFactionIds', 'factions'),
 
   getFactionOverlapsFor: (factionId) => {
     return dataStore.data.factionOverlaps.filter(o =>
@@ -254,121 +277,71 @@ export const DataService = {
     );
   },
 
-  getAffiliatedPersonsForFaction: (factionId) => {
-    const faction = dataStore.data.factions.find(f => f.id === factionId);
-    if (!faction) return [];
-    return (faction.affiliatedPersonIds || [])
-      .map(pid => dataStore.data.persons.find(p => p.id === pid))
-      .filter(Boolean);
-  },
+  getAffiliatedPersonsForFaction: (factionId) => 
+    resolveRelatedEntities('factions', factionId, 'affiliatedPersonIds', 'persons'),
 
-  getAffiliatedOrganizationsForFaction: (factionId) => {
-    const faction = dataStore.data.factions.find(f => f.id === factionId);
-    if (!faction) return [];
-    return (faction.affiliatedOrganizationIds || [])
-      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
-      .filter(Boolean);
-  },
+  getAffiliatedOrganizationsForFaction: (factionId) => 
+    resolveRelatedEntities('factions', factionId, 'affiliatedOrganizationIds', 'organizations'),
 
   // ============================================
   // Location Relationships
   // ============================================
 
-  getNarrativesForLocation: (locationId) => {
-    return dataStore.data.narratives.filter(n =>
-      (n.locationIds || []).includes(locationId)
-    );
-  },
+  getNarrativesForLocation: (locationId) => 
+    findEntitiesReferencing('narratives', 'locationIds', locationId),
 
-  getSubNarrativesForLocation: (locationId) => {
-    return dataStore.data.subNarratives.filter(s =>
-      (s.locationIds || []).includes(locationId)
-    );
-  },
+  getSubNarrativesForLocation: (locationId) => 
+    findEntitiesReferencing('subNarratives', 'locationIds', locationId),
 
-  getEventsForLocation: (locationId) => {
-    return dataStore.data.events.filter(e => e.locationId === locationId);
-  },
+  getEventsForLocation: (locationId) => 
+    findEntitiesReferencing('events', 'locationId', locationId, false),
 
-  getPersonsForLocation: (locationId) => {
-    return dataStore.data.persons.filter(p =>
-      (p.relatedLocationIds || []).includes(locationId)
-    );
-  },
+  getPersonsForLocation: (locationId) => 
+    findEntitiesReferencing('persons', 'relatedLocationIds', locationId),
 
-  getOrganizationsForLocation: (locationId) => {
-    return dataStore.data.organizations.filter(o =>
-      (o.relatedLocationIds || []).includes(locationId)
-    );
-  },
+  getOrganizationsForLocation: (locationId) => 
+    findEntitiesReferencing('organizations', 'relatedLocationIds', locationId),
 
   // ============================================
   // Event Relationships
   // ============================================
 
-  getSubEventsForEvent: (eventId) => {
-    const event = dataStore.data.events.find(e => e.id === eventId);
-    if (!event) return [];
-    return (event.subEventIds || [])
-      .map(eid => dataStore.data.events.find(e => e.id === eid))
-      .filter(Boolean);
-  },
+  getSubEventsForEvent: (eventId) => 
+    resolveRelatedEntities('events', eventId, 'subEventIds', 'events'),
 
   getParentEvent: (eventId) => {
-    const event = dataStore.data.events.find(e => e.id === eventId);
+    const event = findById('events', eventId);
     if (!event || !event.parentEventId) return null;
-    return dataStore.data.events.find(e => e.id === event.parentEventId);
+    return findById('events', event.parentEventId);
   },
 
   getLocationForEvent: (eventId) => {
-    const event = dataStore.data.events.find(e => e.id === eventId);
+    const event = findById('events', eventId);
     if (!event || !event.locationId) return null;
-    return dataStore.data.locations.find(l => l.id === event.locationId);
+    return findById('locations', event.locationId);
   },
 
-  getPersonsForEvent: (eventId) => {
-    const event = dataStore.data.events.find(e => e.id === eventId);
-    if (!event) return [];
-    return (event.personIds || [])
-      .map(pid => dataStore.data.persons.find(p => p.id === pid))
-      .filter(Boolean);
-  },
+  getPersonsForEvent: (eventId) => 
+    resolveRelatedEntities('events', eventId, 'personIds', 'persons'),
 
-  getOrganizationsForEvent: (eventId) => {
-    const event = dataStore.data.events.find(e => e.id === eventId);
-    if (!event) return [];
-    return (event.organizationIds || [])
-      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
-      .filter(Boolean);
-  },
+  getOrganizationsForEvent: (eventId) => 
+    resolveRelatedEntities('events', eventId, 'organizationIds', 'organizations'),
 
-  getNarrativesForEvent: (eventId) => {
-    return dataStore.data.narratives.filter(n =>
-      (n.eventIds || []).includes(eventId)
-    );
-  },
+  getNarrativesForEvent: (eventId) => 
+    findEntitiesReferencing('narratives', 'eventIds', eventId),
 
-  getSubNarrativesForEvent: (eventId) => {
-    return dataStore.data.subNarratives.filter(s =>
-      (s.eventIds || []).includes(eventId)
-    );
-  },
+  getSubNarrativesForEvent: (eventId) => 
+    findEntitiesReferencing('subNarratives', 'eventIds', eventId),
 
   // ============================================
   // Person Relationships
   // ============================================
 
-  getNarrativesForPerson: (personId) => {
-    return dataStore.data.narratives.filter(n =>
-      (n.personIds || []).includes(personId)
-    );
-  },
+  getNarrativesForPerson: (personId) => 
+    findEntitiesReferencing('narratives', 'personIds', personId),
 
-  getSubNarrativesForPerson: (personId) => {
-    return dataStore.data.subNarratives.filter(s =>
-      (s.personIds || []).includes(personId)
-    );
-  },
+  getSubNarrativesForPerson: (personId) => 
+    findEntitiesReferencing('subNarratives', 'personIds', personId),
 
   /**
    * Get related persons by finding other people who appear in the same narratives.
@@ -411,45 +384,24 @@ export const DataService = {
       .filter(Boolean);
   },
 
-  getAffiliatedFactionsForPerson: (personId) => {
-    const person = dataStore.data.persons.find(p => p.id === personId);
-    if (!person) return [];
-    return (person.affiliatedFactionIds || [])
-      .map(fid => dataStore.data.factions.find(f => f.id === fid))
-      .filter(Boolean);
-  },
+  getAffiliatedFactionsForPerson: (personId) => 
+    resolveRelatedEntities('persons', personId, 'affiliatedFactionIds', 'factions'),
 
-  getLocationsForPerson: (personId) => {
-    const person = dataStore.data.persons.find(p => p.id === personId);
-    if (!person) return [];
-    return (person.relatedLocationIds || [])
-      .map(lid => dataStore.data.locations.find(l => l.id === lid))
-      .filter(Boolean);
-  },
+  getLocationsForPerson: (personId) => 
+    resolveRelatedEntities('persons', personId, 'relatedLocationIds', 'locations'),
 
-  getEventsForPerson: (personId) => {
-    const person = dataStore.data.persons.find(p => p.id === personId);
-    if (!person) return [];
-    return (person.relatedEventIds || [])
-      .map(eid => dataStore.data.events.find(e => e.id === eid))
-      .filter(Boolean);
-  },
+  getEventsForPerson: (personId) => 
+    resolveRelatedEntities('persons', personId, 'relatedEventIds', 'events'),
 
   // ============================================
   // Organization Relationships
   // ============================================
 
-  getNarrativesForOrganization: (orgId) => {
-    return dataStore.data.narratives.filter(n =>
-      (n.organizationIds || []).includes(orgId)
-    );
-  },
+  getNarrativesForOrganization: (orgId) => 
+    findEntitiesReferencing('narratives', 'organizationIds', orgId),
 
-  getSubNarrativesForOrganization: (orgId) => {
-    return dataStore.data.subNarratives.filter(s =>
-      (s.organizationIds || []).includes(orgId)
-    );
-  },
+  getSubNarrativesForOrganization: (orgId) => 
+    findEntitiesReferencing('subNarratives', 'organizationIds', orgId),
 
   /**
    * Get related persons by finding people who appear in the same narratives as this org.
@@ -491,20 +443,159 @@ export const DataService = {
       .filter(Boolean);
   },
 
-  getAffiliatedFactionsForOrganization: (orgId) => {
+  getAffiliatedFactionsForOrganization: (orgId) => 
+    resolveRelatedEntities('organizations', orgId, 'affiliatedFactionIds', 'factions'),
+
+  getLocationsForOrganization: (orgId) => 
+    resolveRelatedEntities('organizations', orgId, 'relatedLocationIds', 'locations'),
+
+  // ============================================
+  // Document Relationships
+  // ============================================
+
+  /**
+   * Get documents for a narrative
+   */
+  getDocumentsForNarrative: (narrativeId) => {
+    const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
+    if (!narrative) return [];
+    return (narrative.documentIds || [])
+      .map(did => (dataStore.data.documents || []).find(d => d.id === did))
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+  },
+
+  /**
+   * Get documents for a sub-narrative
+   */
+  getDocumentsForSubNarrative: (subNarrativeId) => {
+    const subNarrative = dataStore.data.subNarratives.find(s => s.id === subNarrativeId);
+    if (!subNarrative) return [];
+    return (subNarrative.documentIds || [])
+      .map(did => (dataStore.data.documents || []).find(d => d.id === did))
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+  },
+
+  /**
+   * Get documents for a person
+   */
+  getDocumentsForPerson: (personId) => {
+    const person = dataStore.data.persons.find(p => p.id === personId);
+    if (!person) return [];
+    return (person.documentIds || [])
+      .map(did => (dataStore.data.documents || []).find(d => d.id === did))
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+  },
+
+  /**
+   * Get documents for an organization
+   */
+  getDocumentsForOrganization: (orgId) => {
     const org = dataStore.data.organizations.find(o => o.id === orgId);
     if (!org) return [];
-    return (org.affiliatedFactionIds || [])
-      .map(fid => dataStore.data.factions.find(f => f.id === fid))
+    return (org.documentIds || [])
+      .map(did => (dataStore.data.documents || []).find(d => d.id === did))
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+  },
+
+  /**
+   * Get documents for an event
+   */
+  getDocumentsForEvent: (eventId) => {
+    const documents = dataStore.data.documents || [];
+    return documents
+      .filter(d => (d.eventIds || []).includes(eventId))
+      .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+  },
+
+  /**
+   * Get documents for a location
+   */
+  getDocumentsForLocation: (locationId) => {
+    const documents = dataStore.data.documents || [];
+    return documents
+      .filter(d => (d.locationIds || []).includes(locationId))
+      .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+  },
+
+  // Reverse lookups - get entities for a document
+
+  /**
+   * Get narratives mentioned in a document
+   */
+  getNarrativesForDocument: (documentId) => {
+    const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
+    if (!doc) return [];
+    return (doc.narrativeIds || [])
+      .map(nid => dataStore.data.narratives.find(n => n.id === nid))
       .filter(Boolean);
   },
 
-  getLocationsForOrganization: (orgId) => {
-    const org = dataStore.data.organizations.find(o => o.id === orgId);
-    if (!org) return [];
-    return (org.relatedLocationIds || [])
+  /**
+   * Get sub-narratives mentioned in a document
+   */
+  getSubNarrativesForDocument: (documentId) => {
+    const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
+    if (!doc) return [];
+    return (doc.subNarrativeIds || [])
+      .map(sid => dataStore.data.subNarratives.find(s => s.id === sid))
+      .filter(Boolean);
+  },
+
+  /**
+   * Get persons mentioned in a document
+   */
+  getPersonsForDocument: (documentId) => {
+    const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
+    if (!doc) return [];
+    return (doc.personIds || [])
+      .map(pid => dataStore.data.persons.find(p => p.id === pid))
+      .filter(Boolean);
+  },
+
+  /**
+   * Get organizations mentioned in a document
+   */
+  getOrganizationsForDocument: (documentId) => {
+    const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
+    if (!doc) return [];
+    return (doc.organizationIds || [])
+      .map(oid => dataStore.data.organizations.find(o => o.id === oid))
+      .filter(Boolean);
+  },
+
+  /**
+   * Get locations mentioned in a document
+   */
+  getLocationsForDocument: (documentId) => {
+    const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
+    if (!doc) return [];
+    return (doc.locationIds || [])
       .map(lid => dataStore.data.locations.find(l => l.id === lid))
       .filter(Boolean);
+  },
+
+  /**
+   * Get events mentioned in a document
+   */
+  getEventsForDocument: (documentId) => {
+    const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
+    if (!doc) return [];
+    return (doc.eventIds || [])
+      .map(eid => dataStore.data.events.find(e => e.id === eid))
+      .filter(Boolean);
+  },
+
+  /**
+   * Get the source for a document
+   */
+  getSourceForDocument: (documentId) => {
+    const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
+    if (!doc || !doc.sourceId) return null;
+    return (dataStore.data.sources || []).find(s => s.id === doc.sourceId);
   },
 
   // ============================================
@@ -704,7 +795,7 @@ export const DataService = {
     return { dates, series, factions };
   },
 
-  // Get all locations with related narrative/event counts (with time range support)
+  // Get all locations with related narratives and events (with time range support)
   getAllLocationsWithCounts: (timeRange = null) => {
     const narratives = timeRange 
       ? dataStore.data.narratives.filter(n => DataService.narrativeHasActivityInRange(n, timeRange))
@@ -714,15 +805,21 @@ export const DataService = {
       ? dataStore.data.events.filter(e => DataService.isDateInRange(e.date, timeRange))
       : dataStore.data.events;
 
-    return dataStore.data.locations.map(loc => ({
-      ...loc,
-      narrativeCount: narratives.filter(n =>
+    return dataStore.data.locations.map(loc => {
+      const relatedNarratives = narratives.filter(n =>
         (n.locationIds || []).includes(loc.id)
-      ).length,
-      eventCount: events.filter(e =>
+      );
+      const relatedEvents = events.filter(e =>
         e.locationId === loc.id
-      ).length
-    }));
+      );
+      return {
+        ...loc,
+        narrativeCount: relatedNarratives.length,
+        eventCount: relatedEvents.length,
+        narratives: relatedNarratives,
+        events: relatedEvents
+      };
+    });
   },
 
   // Get recent events (with time range support)

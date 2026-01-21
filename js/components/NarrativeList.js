@@ -47,18 +47,12 @@ export class NarrativeList extends BaseComponent {
   }
 
   formatSentiment(sentiment) {
-    // Handle numeric sentiment values
-    if (typeof sentiment === 'number' || (typeof sentiment === 'string' && !isNaN(parseFloat(sentiment)))) {
-      const value = typeof sentiment === 'number' ? sentiment : parseFloat(sentiment);
-      if (value <= -0.6) return 'Very Negative';
-      if (value <= -0.2) return 'Negative';
-      if (value < 0.2) return 'Neutral';
-      if (value < 0.6) return 'Positive';
-      return 'Very Positive';
-    }
-    // Handle legacy string values
-    const s = sentiment || 'neutral';
-    return s.charAt(0).toUpperCase() + s.slice(1);
+    const value = typeof sentiment === 'number' ? sentiment : 0;
+    if (value <= -0.6) return 'Very Negative';
+    if (value <= -0.2) return 'Negative';
+    if (value < 0.2) return 'Neutral';
+    if (value < 0.6) return 'Positive';
+    return 'Very Positive';
   }
 
   toggleDescription() {
@@ -156,6 +150,20 @@ export class NarrativeList extends BaseComponent {
                 <a href="#" class="source-link" data-id="${narrative.id}" data-type="narrative">View source</a>
               </p>
             ` : ''}
+            ${hasSubNarratives ? `
+              <button class="narrative-expand-toggle" data-narrative-id="${narrative.id}" title="${isExpanded ? 'Collapse' : 'Expand'} sub-narratives">
+                <svg class="tree-icon" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="1">
+                  <circle cx="4" cy="8" r="2"/>
+                  <circle cx="12" cy="4" r="1.5"/>
+                  <circle cx="12" cy="12" r="1.5"/>
+                  <path d="M6 8h3M9 4v8" fill="none"/>
+                </svg>
+                <span class="subnarrative-count">${subNarratives.length}</span>
+                <svg class="chevron-icon" viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 4l4 4-4 4"/>
+                </svg>
+              </button>
+            ` : ''}
           </div>
           <div class="narrative-meta">
             ${this.options.showVolume ? `
@@ -163,14 +171,6 @@ export class NarrativeList extends BaseComponent {
             ` : ''}
             ${this.options.showSparkline ? `
               <div class="sparkline-container" data-sparkline-index="${sparklineIndex}"></div>
-            ` : ''}
-            ${hasSubNarratives ? `
-              <button class="narrative-expand-toggle" data-narrative-id="${narrative.id}" title="${isExpanded ? 'Collapse' : 'Expand'} sub-narratives">
-                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M6 4l4 4-4 4"/>
-                </svg>
-                <span class="subnarrative-count">${subNarratives.length}</span>
-              </button>
             ` : ''}
           </div>
         </div>
@@ -302,7 +302,8 @@ export class NarrativeList extends BaseComponent {
             const sparkline = new Sparkline(container, {
               width: 80,
               height: 24,
-              color: this.getSentimentColor(data.sentiment)
+              color: this.getSentimentColor(data.sentiment),
+              sentiment: data.sentiment
             });
             const values = data.volumeOverTime.map(d =>
               Object.values(d.factionVolumes || {}).reduce((a, b) => a + b, 0)
