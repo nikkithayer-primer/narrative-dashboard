@@ -155,12 +155,13 @@ export class NarrativeView extends BaseView {
       }));
     }
 
+    // Volume Over Time and Sentiment by Faction as half-width cards (side by side)
     if (data.hasVolumeTimeline) {
-      cards.push(CardBuilder.create('Volume Over Time & Events', 'narrative-volume-timeline'));
+      cards.push(CardBuilder.create('Volume & Events', 'narrative-volume-events', { halfWidth: true }));
     }
 
     if (data.factionData.length > 0) {
-      cards.push(CardBuilder.create('Sentiment by Faction', 'narrative-sentiment-chart'));
+      cards.push(CardBuilder.create('Sentiment by Faction', 'narrative-sentiment-chart', { halfWidth: true }));
     }
 
     if (data.factions.length >= 2) {
@@ -206,7 +207,7 @@ export class NarrativeView extends BaseView {
       this.components.subNarrativeList.update({ subNarratives });
     }
 
-    // Volume & Timeline Composite
+    // Volume & Events Chart (half-width)
     if (hasVolumeData || hasSourceData || allEvents.length > 0) {
       let volumeData = null;
       if (hasVolumeData) {
@@ -219,10 +220,10 @@ export class NarrativeView extends BaseView {
 
       const sourceData = hasSourceData ? sourceVolumeTime : null;
 
-      this.components.volumeTimeline = new TimelineVolumeComposite('narrative-volume-timeline', {
-        height: 450,
-        volumeHeight: 180,
-        timelineHeight: 180,
+      this.components.volumeEvents = new TimelineVolumeComposite('narrative-volume-events', {
+        height: 320,
+        volumeHeight: 140,
+        timelineHeight: 140,
         showViewToggle: !!(volumeData && sourceData),
         onEventClick: (e) => {
           window.location.hash = `#/event/${e.id}`;
@@ -231,12 +232,12 @@ export class NarrativeView extends BaseView {
           window.location.hash = `#/faction/${f.id}`;
         }
       });
-      this.components.volumeTimeline.update({
+      this.components.volumeEvents.update({
         volumeData,
         sourceData,
         events: allEvents
       });
-      this.components.volumeTimeline.enableAutoResize();
+      this.components.volumeEvents.enableAutoResize();
     }
 
     // Sentiment Chart

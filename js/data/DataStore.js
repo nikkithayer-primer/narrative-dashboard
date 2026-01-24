@@ -8,8 +8,10 @@ class DataStore {
   constructor() {
     this.storageKey = 'narrativeOS_data';
     this.datasetKey = 'narrativeOS_currentDataset';
+    this.datasetNameKey = 'narrativeOS_currentDatasetName';
     this.listeners = new Set();
     this.currentDataset = localStorage.getItem(this.datasetKey) || 'american-politics';
+    this.currentDatasetName = localStorage.getItem(this.datasetNameKey) || 'American Politics';
     this.data = this.load();
   }
 
@@ -26,13 +28,35 @@ class DataStore {
   }
 
   /**
+   * Get the current dataset name
+   * @returns {string} Current dataset display name
+   */
+  getCurrentDatasetName() {
+    return this.currentDatasetName;
+  }
+
+  /**
+   * Set the current dataset name (called from app.js when initializing/switching)
+   * @param {string} name - The display name for the dataset
+   */
+  setCurrentDatasetName(name) {
+    this.currentDatasetName = name;
+    localStorage.setItem(this.datasetNameKey, name);
+  }
+
+  /**
    * Switch to a different dataset
    * @param {string} datasetId - Identifier for the new dataset
    * @param {Object} mockDataModule - The mock data object to load
+   * @param {string} datasetName - Optional display name for the dataset
    */
-  switchDataset(datasetId, mockDataModule) {
+  switchDataset(datasetId, mockDataModule, datasetName = null) {
     this.currentDataset = datasetId;
     localStorage.setItem(this.datasetKey, datasetId);
+    if (datasetName) {
+      this.currentDatasetName = datasetName;
+      localStorage.setItem(this.datasetNameKey, datasetName);
+    }
     this.data = { ...mockDataModule };
     this.save();
   }

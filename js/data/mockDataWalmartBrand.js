@@ -1699,6 +1699,309 @@ export const mockData = {
       locationIds: ['loc-009', 'loc-010'],
       eventIds: ['event-014']
     }
+  ],
+
+  monitors: [
+    {
+      id: 'monitor-001',
+      name: 'Customer Experience Issues',
+      description: 'Track in-store experience complaints including self-checkout, staffing, and customer treatment',
+      scope: {
+        organizationIds: ['org-001'], // Walmart
+        narrativeIds: ['narr-001', 'narr-002'] // Self-checkout and empty shelves narratives
+      },
+      options: {
+        includeSubEvents: true,
+        includeSubNarratives: true,
+        includeRelatedEvents: true
+      },
+      triggers: {
+        newNarrative: true,
+        newEvent: true,
+        volumeSpike: { threshold: 500, timeWindow: '24h' },
+        sentimentShift: { threshold: 0.15, direction: 'negative' },
+        factionEngagement: { factionIds: ['faction-001'], threshold: 300 }
+      },
+      enabled: true,
+      createdAt: '2026-01-01T00:00:00Z',
+      lastTriggered: '2026-01-20T10:30:00Z'
+    },
+    {
+      id: 'monitor-002',
+      name: 'Product Safety Watch',
+      description: 'Monitor product recalls, food safety incidents, and quality concerns affecting Walmart products',
+      scope: {
+        organizationIds: ['org-001', 'org-007', 'org-008', 'org-009'], // Walmart, FDA, suppliers
+        personIds: ['person-006', 'person-007', 'person-011'], // FDA officials, food safety experts
+        narrativeIds: ['narr-004'] // Great Value recall narrative
+      },
+      options: {
+        includeSubEvents: true,
+        includeSubNarratives: true,
+        includeRelatedEvents: true
+      },
+      triggers: {
+        newNarrative: true,
+        newEvent: true,
+        volumeSpike: { threshold: 300, timeWindow: '12h' },
+        sentimentShift: { threshold: 0.20, direction: 'negative' },
+        factionEngagement: { factionIds: ['faction-004'], threshold: 200 }
+      },
+      enabled: true,
+      createdAt: '2026-01-01T00:00:00Z',
+      lastTriggered: '2026-01-20T08:00:00Z'
+    },
+    {
+      id: 'monitor-003',
+      name: 'Worker Sentiment',
+      description: 'Track employee-related narratives including working conditions, wages, and labor disputes',
+      scope: {
+        organizationIds: ['org-001', 'org-005', 'org-006'], // Walmart, UFCW, labor orgs
+        personIds: ['person-003', 'person-004', 'person-005'], // Labor advocates
+        factionIds: ['faction-002', 'faction-003'] // Workers and Labor Advocates factions
+      },
+      options: {
+        includeSubEvents: true,
+        includeSubNarratives: true,
+        includeRelatedEvents: true
+      },
+      triggers: {
+        newNarrative: true,
+        newEvent: true,
+        volumeSpike: { threshold: 400, timeWindow: '24h' },
+        sentimentShift: { threshold: 0.15, direction: 'negative' },
+        factionEngagement: null
+      },
+      enabled: true,
+      createdAt: '2026-01-01T00:00:00Z',
+      lastTriggered: '2026-01-18T14:00:00Z'
+    },
+    {
+      id: 'monitor-004',
+      name: 'Price Competitiveness',
+      description: 'Monitor narratives about Walmart pricing, value perception, and comparisons to competitors',
+      scope: {
+        organizationIds: ['org-001', 'org-010', 'org-011'], // Walmart, Aldi, Amazon
+        narrativeIds: ['narr-005'] // Price competitiveness narrative
+      },
+      options: {
+        includeSubEvents: true,
+        includeSubNarratives: true,
+        includeRelatedEvents: true
+      },
+      triggers: {
+        newNarrative: true,
+        newEvent: false,
+        volumeSpike: { threshold: 350, timeWindow: '24h' },
+        sentimentShift: { threshold: 0.15, direction: 'negative' },
+        factionEngagement: null
+      },
+      enabled: true,
+      createdAt: '2026-01-15T00:00:00Z',
+      lastTriggered: '2026-01-20T12:00:00Z'
+    },
+    {
+      id: 'monitor-005',
+      name: 'Competitor Activity',
+      description: 'Track Target, Amazon, and other competitor announcements that may impact Walmart\'s reputation',
+      scope: {
+        organizationIds: ['org-003', 'org-004', 'org-012'], // Target, Amazon, other competitors
+        factionIds: ['faction-006'], // Competitor Fans faction
+        narrativeIds: ['narr-006'] // Competitor delivery narrative
+      },
+      options: {
+        includeSubEvents: true,
+        includeSubNarratives: true,
+        includeRelatedEvents: true
+      },
+      triggers: {
+        newNarrative: true,
+        newEvent: true,
+        volumeSpike: { threshold: 300, timeWindow: '24h' },
+        sentimentShift: null,
+        factionEngagement: null
+      },
+      enabled: false, // Paused
+      createdAt: '2026-01-10T00:00:00Z',
+      lastTriggered: '2026-01-18T09:00:00Z'
+    }
+  ],
+
+  alerts: [
+    {
+      id: 'alert-001',
+      monitorId: 'monitor-001',
+      type: 'volume_spike',
+      title: 'Volume spike: Self-checkout complaints viral',
+      description: '685 frustrated consumer mentions in 24 hours, exceeding threshold of 500',
+      severity: 'critical',
+      triggeredAt: '2026-01-20T10:30:00Z',
+      acknowledged: false,
+      relatedNarrativeIds: ['narr-001'],
+      relatedSubNarrativeIds: ['sub-001', 'sub-002'],
+      relatedEventIds: ['event-001', 'event-002'],
+      relatedSubEventIds: [],
+      metadata: {
+        actualValue: 685,
+        threshold: 500,
+        timeWindow: '24h',
+        percentOver: 37
+      }
+    },
+    {
+      id: 'alert-002',
+      monitorId: 'monitor-001',
+      type: 'new_event',
+      title: 'New event: Class-action lawsuit filed in Texas',
+      description: 'Texas law firm files class-action against Walmart for systematic false detention of customers',
+      severity: 'high',
+      triggeredAt: '2026-01-18T11:00:00Z',
+      acknowledged: true,
+      relatedNarrativeIds: ['narr-001'],
+      relatedSubNarrativeIds: ['sub-002'],
+      relatedEventIds: ['event-003'],
+      relatedSubEventIds: [],
+      metadata: {
+        eventId: 'event-003',
+        eventText: 'Class-action lawsuit filed against Walmart for false detention'
+      }
+    },
+    {
+      id: 'alert-003',
+      monitorId: 'monitor-001',
+      type: 'sentiment_shift',
+      title: 'Sentiment shift: Customer experience deteriorating',
+      description: '-15% sentiment shift as self-checkout complaints gain viral traction',
+      severity: 'high',
+      triggeredAt: '2026-01-19T09:00:00Z',
+      acknowledged: false,
+      relatedNarrativeIds: ['narr-001', 'narr-002'],
+      relatedSubNarrativeIds: ['sub-001', 'sub-004'],
+      relatedEventIds: ['event-001'],
+      relatedSubEventIds: [],
+      metadata: {
+        previousSentiment: -0.53,
+        currentSentiment: -0.68,
+        delta: -0.15,
+        direction: 'negative'
+      }
+    },
+    {
+      id: 'alert-004',
+      monitorId: 'monitor-002',
+      type: 'new_narrative',
+      title: 'New narrative: Great Value recall expands',
+      description: 'FDA expands Great Value product recall to 15 SKUs after Listeria contamination found',
+      severity: 'critical',
+      triggeredAt: '2026-01-17T14:00:00Z',
+      acknowledged: true,
+      relatedNarrativeIds: ['narr-004'],
+      relatedSubNarrativeIds: ['sub-009', 'sub-010'],
+      relatedEventIds: ['event-008', 'event-009'],
+      relatedSubEventIds: [],
+      metadata: {
+        narrativeId: 'narr-004',
+        narrativeText: 'Great Value brand recall expands after contamination found in multiple products'
+      }
+    },
+    {
+      id: 'alert-005',
+      monitorId: 'monitor-002',
+      type: 'volume_spike',
+      title: 'Volume spike: Product safety concerns spreading',
+      description: '385 mentions from health-concerned consumers in 24 hours',
+      severity: 'high',
+      triggeredAt: '2026-01-20T08:00:00Z',
+      acknowledged: false,
+      relatedNarrativeIds: ['narr-004'],
+      relatedSubNarrativeIds: ['sub-009'],
+      relatedEventIds: ['event-009', 'event-010'],
+      relatedSubEventIds: [],
+      metadata: {
+        actualValue: 385,
+        threshold: 300,
+        timeWindow: '12h',
+        percentOver: 28.3
+      }
+    },
+    {
+      id: 'alert-006',
+      monitorId: 'monitor-002',
+      type: 'new_event',
+      title: 'New event: Three hospitalizations linked to recall',
+      description: 'CDC confirms three hospitalizations connected to contaminated Great Value products',
+      severity: 'critical',
+      triggeredAt: '2026-01-19T16:00:00Z',
+      acknowledged: true,
+      relatedNarrativeIds: ['narr-004'],
+      relatedSubNarrativeIds: ['sub-010'],
+      relatedEventIds: ['event-010'],
+      relatedSubEventIds: [],
+      metadata: {
+        eventId: 'event-010',
+        eventText: 'CDC confirms hospitalizations linked to Great Value product contamination'
+      }
+    },
+    {
+      id: 'alert-007',
+      monitorId: 'monitor-003',
+      type: 'faction_engagement',
+      title: 'High faction engagement: Worker narrative viral',
+      description: 'Workers (485) and Labor Advocates (345) driving #WalmartWorkers hashtag',
+      severity: 'high',
+      triggeredAt: '2026-01-18T14:00:00Z',
+      acknowledged: false,
+      relatedNarrativeIds: ['narr-003'],
+      relatedSubNarrativeIds: ['sub-006', 'sub-007'],
+      relatedEventIds: ['event-006', 'event-007'],
+      relatedSubEventIds: [],
+      metadata: {
+        factionEngagement: {
+          'faction-002': 485,
+          'faction-003': 345
+        },
+        threshold: 400,
+        totalVolume: 830
+      }
+    },
+    {
+      id: 'alert-008',
+      monitorId: 'monitor-004',
+      type: 'new_narrative',
+      title: 'New narrative: Price competitiveness questioned',
+      description: 'Viral TikTok videos show Walmart losing price comparisons to Aldi and Amazon',
+      severity: 'medium',
+      triggeredAt: '2026-01-17T12:00:00Z',
+      acknowledged: true,
+      relatedNarrativeIds: ['narr-005'],
+      relatedSubNarrativeIds: ['sub-011', 'sub-012'],
+      relatedEventIds: ['event-011'],
+      relatedSubEventIds: [],
+      metadata: {
+        narrativeId: 'narr-005',
+        narrativeText: 'Customers complain Walmart prices no longer competitive as inflation pricing sticks'
+      }
+    },
+    {
+      id: 'alert-009',
+      monitorId: 'monitor-004',
+      type: 'volume_spike',
+      title: 'Volume spike: Pricing narrative gaining traction',
+      description: '365 frustrated consumer mentions in 24 hours about pricing',
+      severity: 'medium',
+      triggeredAt: '2026-01-20T12:00:00Z',
+      acknowledged: false,
+      relatedNarrativeIds: ['narr-005'],
+      relatedSubNarrativeIds: ['sub-011'],
+      relatedEventIds: [],
+      relatedSubEventIds: [],
+      metadata: {
+        actualValue: 365,
+        threshold: 350,
+        timeWindow: '24h',
+        percentOver: 4.3
+      }
+    }
   ]
 };
 

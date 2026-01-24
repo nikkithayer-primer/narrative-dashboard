@@ -68,60 +68,60 @@
           <span>Search</span>
         </a>
         
-        <!-- Data Dropdown -->
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-trigger">
-            <span>Data</span>
-            <svg class="dropdown-arrow" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-              <path d="M4 6l4 4 4-4"/>
-            </svg>
-          </button>
-          <div class="nav-dropdown-menu">
-            <a href="#/narratives" class="nav-link" data-view="narratives">
-              <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-                <path d="M2 2h12v12H2z" rx="1"/>
-                <path d="M4 5h8M4 8h8M4 11h5"/>
-              </svg>
-              <span>Narratives</span>
-            </a>
-            <a href="#/factions" class="nav-link" data-view="factions">
-              <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-                <circle cx="8" cy="5" r="2.5"/>
-                <circle cx="4" cy="11" r="2"/>
-                <circle cx="12" cy="11" r="2"/>
-                <path d="M6 6.5L4.5 9M10 6.5l1.5 2.5"/>
-              </svg>
-              <span>Factions</span>
-            </a>
-            <a href="#/locations" class="nav-link" data-view="locations">
-              <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-                <path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/>
-                <circle cx="8" cy="6" r="2"/>
-              </svg>
-              <span>Locations</span>
-            </a>
-            <a href="#/events" class="nav-link" data-view="events">
-              <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-                <rect x="2" y="3" width="12" height="11" rx="1"/>
-                <path d="M2 6h12M5 1v3M11 1v3"/>
-              </svg>
-              <span>Events</span>
-            </a>
-            <a href="#/entities" class="nav-link" data-view="entities">
-              <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-                <circle cx="8" cy="4" r="2.5"/>
-                <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
-              </svg>
-              <span>People & Orgs</span>
-            </a>
-          </div>
-        </div>
-        
       </div>
     </div>
     
     <!-- User Avatar with Tools Dropdown -->
     <div class="navbar-right">
+      <!-- Data Dropdown -->
+      <div class="nav-dropdown data-dropdown">
+        <button class="nav-dropdown-trigger">
+          <span>Data</span>
+          <svg class="dropdown-arrow" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="#/narratives" class="nav-link" data-view="narratives">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <path d="M2 2h12v12H2z" rx="1"/>
+              <path d="M4 5h8M4 8h8M4 11h5"/>
+            </svg>
+            <span>Narratives</span>
+          </a>
+          <a href="#/factions" class="nav-link" data-view="factions">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <circle cx="8" cy="5" r="2.5"/>
+              <circle cx="4" cy="11" r="2"/>
+              <circle cx="12" cy="11" r="2"/>
+              <path d="M6 6.5L4.5 9M10 6.5l1.5 2.5"/>
+            </svg>
+            <span>Factions</span>
+          </a>
+          <a href="#/locations" class="nav-link" data-view="locations">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/>
+              <circle cx="8" cy="6" r="2"/>
+            </svg>
+            <span>Locations</span>
+          </a>
+          <a href="#/events" class="nav-link" data-view="events">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <rect x="2" y="3" width="12" height="11" rx="1"/>
+              <path d="M2 6h12M5 1v3M11 1v3"/>
+            </svg>
+            <span>Events</span>
+          </a>
+          <a href="#/entities" class="nav-link" data-view="entities">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <circle cx="8" cy="4" r="2.5"/>
+              <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
+            </svg>
+            <span>People & Orgs</span>
+          </a>
+        </div>
+      </div>
+      
       <div class="nav-dropdown avatar-dropdown">
         <button class="avatar-trigger">
           <span class="avatar-initials">JD</span>
@@ -154,7 +154,7 @@
             </svg>
             <span>Data Editor</span>
           </a>
-          <a href="data-model.html" class="nav-link">
+          <a href="#/data-model" class="nav-link" data-view="data-model">
             <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
               <ellipse cx="8" cy="4" rx="5" ry="2"/>
               <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4"/>
@@ -162,7 +162,7 @@
             </svg>
             <span>Data Model</span>
           </a>
-          <a href="component-demos.html" class="nav-link">
+          <a href="#/component-demos" class="nav-link" data-view="component-demos">
             <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
               <rect x="1" y="1" width="5" height="5" rx="1"/>
               <rect x="10" y="1" width="5" height="5" rx="1"/>

@@ -294,6 +294,16 @@ export class Router {
         this.currentView = new EditorView(this.container);
         break;
 
+      case 'data-model':
+        // Navigate to standalone data model page
+        window.location.href = 'data-model.html';
+        return;
+
+      case 'component-demos':
+        // Navigate to standalone component demos page
+        window.location.href = 'component-demos.html';
+        return;
+
       case 'status':
         // Status pages have been removed - redirect to dashboard
         // The dashboard now handles status filtering inline
@@ -642,126 +652,129 @@ export class Router {
   }
 
   /**
-   * Create the Monitors view with example monitors and alerts
+   * Create the Monitors view - loads monitors from DataService
    */
   createMonitorsView(filterOptions) {
-    // Get all narratives from DataService
-    const allNarratives = DataService.getNarratives();
+    // Load monitors from DataService
+    const monitors = DataService.getMonitors();
     
-    // Define monitor configurations with their scope filters and alerts
-    const monitors = [
-      {
-        id: 'trump-tracker',
-        name: 'Trump Activity Tracker',
-        scopeType: 'person',
-        scopeLabel: 'Donald Trump',
-        scopeIcon: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
-          <circle cx="8" cy="4" r="2.5"/>
-          <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
-        </svg>`,
-        triggers: ['Volume >500/day', 'Sentiment >15%'],
-        lastTriggered: '2 hours ago',
-        enabled: true,
-        alerts: [
-          { time: '2 hours ago', type: 'volume', typeLabel: 'Volume Spike', description: '847 mentions in 24h (threshold: 500)', severity: 'high' },
-          { time: '2 days ago', type: 'sentiment', typeLabel: 'Sentiment Shift', description: '-23% sentiment change detected', severity: 'medium' }
-        ],
-        // Filter: narratives mentioning Trump (person-003)
-        filterNarratives: (narratives) => narratives.filter(n => 
-          n.personIds?.includes('person-003')
-        )
-      },
-      {
-        id: 'ice-monitor',
-        name: 'ICE Policy Monitor',
-        scopeType: 'organization',
-        scopeLabel: 'Immigration and Customs Enforcement',
-        scopeIcon: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
-          <rect x="3" y="6" width="10" height="8" rx="1"/>
-          <path d="M5 6V4a3 3 0 0 1 6 0v2"/>
-          <rect x="5" y="9" width="2" height="2"/>
-          <rect x="9" y="9" width="2" height="2"/>
-        </svg>`,
-        triggers: ['New Narratives', 'New Events'],
-        lastTriggered: 'Yesterday',
-        enabled: true,
-        alerts: [
-          { time: '5 hours ago', type: 'narrative', typeLabel: 'New Narrative', description: '"Deportation policy misinformation" emerged', severity: 'medium' },
-          { time: '4 days ago', type: 'event', typeLabel: 'New Event', description: 'Policy announcement event detected', severity: 'low' }
-        ],
-        // Filter: narratives mentioning ICE (org-010) or DOJ (org-011)
-        filterNarratives: (narratives) => narratives.filter(n => 
-          n.organizationIds?.includes('org-010') || n.organizationIds?.includes('org-011')
-        )
-      },
-      {
-        id: 'election-watch',
-        name: 'Election Integrity Watch',
-        scopeType: 'narrative',
-        scopeLabel: 'Election & Judicial Safety',
-        scopeIcon: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+    // Helper to get scope icon based on scope type
+    const getScopeIcon = (scopeType) => {
+      const icons = {
+        narrative: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
           <path d="M2 2h12v12H2z" rx="1"/>
           <path d="M4 5h8M4 8h8M4 11h5"/>
         </svg>`,
-        triggers: ['Volume >1000/day', 'Faction Engagement'],
-        lastTriggered: '3 days ago',
-        enabled: true,
-        alerts: [
-          { time: 'Yesterday', type: 'faction', typeLabel: 'Faction Engagement', description: '3 tracked factions amplifying content', severity: 'high' }
-        ],
-        // Filter: narratives related to election/judicial safety (narr-007)
-        filterNarratives: (narratives) => narratives.filter(n => 
-          n.id === 'narr-007' || 
-          n.text?.toLowerCase().includes('election') || 
-          n.text?.toLowerCase().includes('judicial') ||
-          n.organizationIds?.includes('org-013') || // Tippecanoe Superior Court
-          n.organizationIds?.includes('org-014') || // Indiana Supreme Court
-          n.organizationIds?.includes('org-015')    // FBI
-        )
-      },
-      {
-        id: 'campaign-detector',
-        name: 'Coordinated Campaign Detector',
-        scopeType: 'faction',
-        scopeLabel: '3 tracked factions',
-        scopeIcon: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+        theme: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+          <path d="M2 2h12v12H2z" rx="1"/>
+          <path d="M4 5h8M4 8h6M4 11h4"/>
+        </svg>`,
+        faction: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
           <circle cx="8" cy="5" r="2.5"/>
           <circle cx="4" cy="11" r="2"/>
           <circle cx="12" cy="11" r="2"/>
           <path d="M6 6.5L4.5 9M10 6.5l1.5 2.5"/>
         </svg>`,
-        triggers: ['New Narratives', 'Sentiment Shift'],
-        lastTriggered: null,
-        enabled: false,
-        alerts: [], // Paused, no recent alerts
-        // Filter: narratives with high faction engagement (faction-001, faction-002, faction-003)
-        filterNarratives: (narratives) => narratives.filter(n => {
-          const factions = n.factionMentions || {};
-          const trackedFactions = ['faction-001', 'faction-002', 'faction-003'];
-          const matchCount = trackedFactions.filter(f => factions[f] && factions[f].volume > 100).length;
-          return matchCount >= 2; // At least 2 tracked factions with significant volume
-        })
-      }
-    ];
+        person: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+          <circle cx="8" cy="4" r="2.5"/>
+          <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
+        </svg>`,
+        organization: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+          <rect x="3" y="6" width="10" height="8" rx="1"/>
+          <path d="M5 6V4a3 3 0 0 1 6 0v2"/>
+          <rect x="5" y="9" width="2" height="2"/>
+          <rect x="9" y="9" width="2" height="2"/>
+        </svg>`,
+        location: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+          <path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/>
+          <circle cx="8" cy="6" r="2"/>
+        </svg>`,
+        event: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+          <rect x="2" y="3" width="12" height="11" rx="1"/>
+          <path d="M2 6h12M5 1v3M11 1v3"/>
+        </svg>`,
+        custom: `<svg class="scope-entity-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+          <circle cx="8" cy="8" r="6"/>
+          <path d="M8 5v6M5 8h6"/>
+        </svg>`
+      };
+      return icons[scopeType] || icons.custom;
+    };
     
-    // Build monitor cards HTML with container IDs for NarrativeList
-    const monitorCardsHtml = monitors.map(monitor => {
-      const matchedNarratives = monitor.filterNarratives(allNarratives);
-      const statusClass = monitor.enabled ? '' : 'monitor-paused';
-      const indicatorClass = monitor.enabled ? 'active' : 'paused';
+    // Helper to format relative time
+    const formatRelativeTime = (isoDate) => {
+      if (!isoDate) return null;
+      const date = new Date(isoDate);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      
+      if (diffHours < 1) return 'Just now';
+      if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      return date.toLocaleDateString();
+    };
+    
+    // Helper to get alert type label
+    const getAlertTypeLabel = (type) => {
+      const labels = {
+        'volume_spike': 'Volume Spike',
+        'sentiment_shift': 'Sentiment Shift',
+        'new_narrative': 'New Narrative',
+        'new_event': 'New Event',
+        'faction_engagement': 'Faction Engagement'
+      };
+      return labels[type] || type;
+    };
+    
+    // Helper to get alert type CSS class
+    const getAlertTypeClass = (type) => {
+      const classes = {
+        'volume_spike': 'volume',
+        'sentiment_shift': 'sentiment',
+        'new_narrative': 'narrative',
+        'new_event': 'event',
+        'faction_engagement': 'faction'
+      };
+      return classes[type] || 'default';
+    };
+    
+    // Build enriched monitor data with computed fields
+    const enrichedMonitors = monitors.map(monitor => {
+      const scopeType = DataService.getMonitorScopeType(monitor.id);
+      const scopeLabel = DataService.getMonitorScopeLabel(monitor.id);
+      const triggerLabels = DataService.getMonitorTriggerLabels(monitor.id);
+      const matchedNarratives = DataService.getNarrativesForMonitor(monitor.id);
+      const alerts = DataService.getAlertsForMonitor(monitor.id);
       const containerId = `monitor-narratives-${monitor.id}`;
       
-      // Store the matched narratives for later use
-      monitor.matchedNarratives = matchedNarratives;
-      monitor.containerId = containerId;
+      return {
+        ...monitor,
+        scopeType,
+        scopeLabel,
+        scopeIcon: getScopeIcon(scopeType),
+        triggerLabels,
+        matchedNarratives,
+        alerts,
+        containerId,
+        lastTriggeredFormatted: formatRelativeTime(monitor.lastTriggered)
+      };
+    });
+    
+    // Build monitor cards HTML
+    const monitorCardsHtml = enrichedMonitors.map(monitor => {
+      const statusClass = monitor.enabled ? '' : 'monitor-paused';
+      const indicatorClass = monitor.enabled ? 'active' : 'paused';
       
       // Build alerts HTML
       const alertsHtml = monitor.alerts && monitor.alerts.length > 0 
-        ? monitor.alerts.map(alert => `
+        ? monitor.alerts.slice(0, 3).map(alert => `
             <div class="monitor-alert-item">
-              <span class="alert-type-badge ${alert.type}">${alert.typeLabel}</span>
+              <span class="alert-type-badge ${getAlertTypeClass(alert.type)}">${getAlertTypeLabel(alert.type)}</span>
               <span class="alert-description">${alert.description}</span>
-              <span class="alert-time">${alert.time}</span>
+              <span class="alert-time">${formatRelativeTime(alert.triggeredAt)}</span>
             </div>
           `).join('')
         : '<div class="monitor-no-alerts">No recent alerts</div>';
@@ -788,7 +801,7 @@ export class Router {
                   <div class="popover-section">
                     <div class="popover-label">Triggers</div>
                     <div class="popover-triggers">
-                      ${monitor.triggers.map(t => `<span class="trigger-tag">${t}</span>`).join('')}
+                      ${monitor.triggerLabels.map(t => `<span class="trigger-tag">${t}</span>`).join('')}
                     </div>
                   </div>
                 </div>
@@ -797,8 +810,8 @@ export class Router {
             <div class="card-header-actions">
               ${!monitor.enabled ? '<span class="badge badge-status-paused">Paused</span>' : ''}
               <span class="monitor-meta-text">${
-                monitor.enabled 
-                  ? `Triggered ${monitor.lastTriggered}` 
+                monitor.enabled && monitor.lastTriggeredFormatted
+                  ? `Triggered ${monitor.lastTriggeredFormatted}` 
                   : ''
               }</span>
             </div>
@@ -813,11 +826,17 @@ export class Router {
                 ${alertsHtml}
               </div>
             </div>
-            <div class="monitor-narratives-container" id="${containerId}"></div>
+            <div class="monitor-narratives-container" id="${monitor.containerId}"></div>
           </div>
         </div>
       `;
     }).join('');
+    
+    // Calculate today's alerts count
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const allAlerts = DataService.getAlerts();
+    const todayAlerts = allAlerts.filter(a => new Date(a.triggeredAt) >= today);
     
     this.container.innerHTML = `
       <div class="view-header">
@@ -826,8 +845,8 @@ export class Router {
           <p class="view-subtitle">Track entities and narratives with custom alert thresholds</p>
         </div>
         <div class="view-header-stats">
-          <span class="badge badge-status-active">${monitors.filter(m => m.enabled).length} Active Monitors</span>
-          <span class="badge badge-status-high">3 Alerts Today</span>
+          <span class="badge badge-status-active">${enrichedMonitors.filter(m => m.enabled).length} Active Monitors</span>
+          <span class="badge badge-status-high">${todayAlerts.length} Alert${todayAlerts.length !== 1 ? 's' : ''} Today</span>
         </div>
       </div>
       
@@ -883,6 +902,38 @@ export class Router {
               <li class="data-list-item">
                 <span class="scope-type-item">
                   <svg class="scope-type-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+                    <path d="M2 2h12v12H2z" rx="1"/>
+                    <path d="M4 5h8M4 8h8M4 11h5"/>
+                  </svg>
+                  <span class="scope-type-label">Narrative</span>
+                </span>
+                <span class="text-xs text-muted">Watch existing narratives</span>
+              </li>
+              <li class="data-list-item">
+                <span class="scope-type-item">
+                  <svg class="scope-type-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+                    <path d="M2 2h12v12H2z" rx="1"/>
+                    <path d="M4 5h8M4 8h6M4 11h4"/>
+                  </svg>
+                  <span class="scope-type-label">Theme</span>
+                </span>
+                <span class="text-xs text-muted">Watch specific themes</span>
+              </li>
+              <li class="data-list-item">
+                <span class="scope-type-item">
+                  <svg class="scope-type-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+                    <circle cx="8" cy="5" r="2.5"/>
+                    <circle cx="4" cy="11" r="2"/>
+                    <circle cx="12" cy="11" r="2"/>
+                    <path d="M6 6.5L4.5 9M10 6.5l1.5 2.5"/>
+                  </svg>
+                  <span class="scope-type-label">Faction</span>
+                </span>
+                <span class="text-xs text-muted">Watch faction activity</span>
+              </li>
+              <li class="data-list-item">
+                <span class="scope-type-item">
+                  <svg class="scope-type-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
                     <circle cx="8" cy="4" r="2.5"/>
                     <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
                   </svg>
@@ -905,34 +956,22 @@ export class Router {
               <li class="data-list-item">
                 <span class="scope-type-item">
                   <svg class="scope-type-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
-                    <circle cx="8" cy="5" r="2.5"/>
-                    <circle cx="4" cy="11" r="2"/>
-                    <circle cx="12" cy="11" r="2"/>
-                    <path d="M6 6.5L4.5 9M10 6.5l1.5 2.5"/>
-                  </svg>
-                  <span class="scope-type-label">Faction</span>
-                </span>
-                <span class="text-xs text-muted">Watch faction activity</span>
-              </li>
-              <li class="data-list-item">
-                <span class="scope-type-item">
-                  <svg class="scope-type-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
-                    <path d="M2 2h12v12H2z" rx="1"/>
-                    <path d="M4 5h8M4 8h8M4 11h5"/>
-                  </svg>
-                  <span class="scope-type-label">Narrative</span>
-                </span>
-                <span class="text-xs text-muted">Watch existing narratives</span>
-              </li>
-              <li class="data-list-item">
-                <span class="scope-type-item">
-                  <svg class="scope-type-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
                     <path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/>
                     <circle cx="8" cy="6" r="2"/>
                   </svg>
                   <span class="scope-type-label">Location</span>
                 </span>
                 <span class="text-xs text-muted">Watch geographic areas</span>
+              </li>
+              <li class="data-list-item">
+                <span class="scope-type-item">
+                  <svg class="scope-type-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.25">
+                    <rect x="2" y="3" width="12" height="11" rx="1"/>
+                    <path d="M2 6h12M5 1v3M11 1v3"/>
+                  </svg>
+                  <span class="scope-type-label">Event</span>
+                </span>
+                <span class="text-xs text-muted">Watch specific events</span>
               </li>
             </ul>
           </div>
@@ -942,7 +981,7 @@ export class Router {
     
     // Initialize NarrativeList components for each monitor
     const narrativeListComponents = [];
-    monitors.forEach(monitor => {
+    enrichedMonitors.forEach(monitor => {
       if (monitor.matchedNarratives && monitor.matchedNarratives.length > 0) {
         const narrativeList = new NarrativeList(monitor.containerId, {
           maxItems: 5,

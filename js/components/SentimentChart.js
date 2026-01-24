@@ -88,8 +88,8 @@ export class SentimentChart extends BaseComponent {
         .attr('class', 'sentiment-bar-group')
         .attr('transform', `translate(0, ${y})`);
 
-      // Faction label (outside left)
-      svg.append('text')
+      // Faction label (outside left) - clickable link to faction page
+      const factionLabel = svg.append('text')
         .attr('x', margin.left - 10)
         .attr('y', margin.top + y + barHeight / 2 + 4)
         .attr('text-anchor', 'end')
@@ -97,6 +97,21 @@ export class SentimentChart extends BaseComponent {
         .attr('font-size', '12px')
         .attr('font-family', 'var(--font-sans)')
         .text(faction.name.length > 22 ? faction.name.slice(0, 20) + '...' : faction.name);
+      
+      // Make faction label clickable if callback is provided
+      if (this.options.onFactionClick) {
+        factionLabel
+          .style('cursor', 'pointer')
+          .on('mouseenter', function() {
+            d3.select(this).attr('fill', 'var(--accent-primary)');
+          })
+          .on('mouseleave', function() {
+            d3.select(this).attr('fill', 'var(--text-secondary)');
+          })
+          .on('click', () => {
+            this.options.onFactionClick(faction);
+          });
+      }
 
       // Background bar
       group.append('rect')

@@ -108,6 +108,7 @@ class App {
     
     // Load the dataset
     this.dataStore.data = { ...dataset.data };
+    this.dataStore.setCurrentDatasetName(dataset.name);
     this.dataStore.save();
     
     console.log(`Loaded dataset: ${dataset.name}`);
@@ -124,8 +125,8 @@ class App {
       return;
     }
 
-    // Switch the dataset in the store
-    this.dataStore.switchDataset(datasetId, dataset.data);
+    // Switch the dataset in the store (including the name)
+    this.dataStore.switchDataset(datasetId, dataset.data, dataset.name);
     
     // Update UI indicators
     this.updateDatasetIndicators(datasetId);

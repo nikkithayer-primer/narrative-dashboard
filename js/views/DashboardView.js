@@ -28,6 +28,9 @@ export class DashboardView extends BaseView {
       ? DataService.getMission(this.missionId)
       : null;
 
+    // Get the dataset name for the title
+    const datasetName = DataService.getCurrentDatasetName();
+
     // Build subtitle with filter info
     let subtitle = mission ? `Mission: ${mission.name}` : 'All missions overview';
     if (this.timeRange) {
@@ -41,7 +44,7 @@ export class DashboardView extends BaseView {
     this.container.innerHTML = `
       <div class="page-header page-header-with-stats">
         <div class="page-header-content">
-          <h1>Dashboard</h1>
+          <h1>${datasetName}</h1>
           <p class="subtitle">${subtitle}</p>
         </div>
         <div class="stats-grid">

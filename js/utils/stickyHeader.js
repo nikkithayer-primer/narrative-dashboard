@@ -9,6 +9,8 @@ let scrollThreshold = 50; // Pixels to scroll before collapsing
 let scrollHysteresis = 30; // Buffer zone to prevent flickering
 let isInitialized = false;
 let isCollapsed = false; // Track current state to apply hysteresis
+let isTransitioning = false; // Prevent state changes during CSS transitions
+const transitionDuration = 300; // Match CSS transition duration (0.3s)
 
 /**
  * Get the actual scroll container
@@ -53,6 +55,7 @@ export function initStickyHeader() {
   // Reset scroll state
   lastScrollTop = getScrollTop();
   isCollapsed = false;
+  isTransitioning = false;
   isInitialized = true;
   
   // Initial check
@@ -78,20 +81,38 @@ function updateHeaderState() {
   
   if (!pageHeader) return;
   
+  // Don't change state during CSS transitions to prevent intermediate state flickering
+  if (isTransitioning) {
+    lastScrollTop = currentScrollTop;
+    return;
+  }
+  
   // Apply hysteresis: use different thresholds for collapsing vs expanding
   // This prevents the flickering caused by layout shifts when the description toggles
   if (!isCollapsed && currentScrollTop > scrollThreshold) {
     // Collapse when scrolling down past threshold
     pageHeader.classList.add('scrolled');
     isCollapsed = true;
+    lockDuringTransition();
   } else if (isCollapsed && currentScrollTop < (scrollThreshold - scrollHysteresis)) {
     // Only expand when scrolled back up past the hysteresis buffer
     // This means you need to scroll higher than where you collapsed
     pageHeader.classList.remove('scrolled');
     isCollapsed = false;
+    lockDuringTransition();
   }
   
   lastScrollTop = currentScrollTop;
+}
+
+/**
+ * Lock state changes during CSS transition to prevent flickering
+ */
+function lockDuringTransition() {
+  isTransitioning = true;
+  setTimeout(() => {
+    isTransitioning = false;
+  }, transitionDuration);
 }
 
 /**
@@ -105,6 +126,7 @@ export function destroyStickyHeader() {
   scrollContainer = null;
   isInitialized = false;
   isCollapsed = false;
+  isTransitioning = false;
 }
 
 /**
@@ -117,6 +139,7 @@ export function resetStickyHeader() {
   }
   lastScrollTop = getScrollTop();
   isCollapsed = false;
+  isTransitioning = false;
 }
 
 export default {

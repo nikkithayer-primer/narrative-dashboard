@@ -57,6 +57,22 @@ const findEntitiesReferencing = (collection, field, targetId, isArrayField = tru
 
 export const DataService = {
   // ============================================
+  // Dataset Information
+  // ============================================
+
+  /**
+   * Get the current dataset name
+   * @returns {string} Display name of the current dataset
+   */
+  getCurrentDatasetName: () => dataStore.getCurrentDatasetName(),
+
+  /**
+   * Get the current dataset ID
+   * @returns {string} ID of the current dataset
+   */
+  getCurrentDatasetId: () => dataStore.getCurrentDataset(),
+
+  // ============================================
   // Time Range Filtering Utilities
   // ============================================
 
@@ -185,6 +201,24 @@ export const DataService = {
   getDocuments: () => dataStore.data.documents || [],
   getDocument: (id) => findById('documents', id),
   getDocumentById: (id) => findById('documents', id),
+
+  // Monitors
+  getMonitors: () => dataStore.data.monitors || [],
+  getMonitor: (id) => findById('monitors', id),
+  getMonitorById: (id) => findById('monitors', id),
+  getActiveMonitors: () => (dataStore.data.monitors || []).filter(m => m.enabled),
+  
+  // Alerts
+  getAlerts: () => dataStore.data.alerts || [],
+  getAlert: (id) => findById('alerts', id),
+  getAlertById: (id) => findById('alerts', id),
+  getAlertsForMonitor: (monitorId) => (dataStore.data.alerts || []).filter(a => a.monitorId === monitorId),
+  getUnacknowledgedAlerts: () => (dataStore.data.alerts || []).filter(a => !a.acknowledged),
+  getRecentAlerts: (limit = 10) => {
+    return [...(dataStore.data.alerts || [])]
+      .sort((a, b) => new Date(b.triggeredAt) - new Date(a.triggeredAt))
+      .slice(0, limit);
+  },
 
   // Sources
   getSources: () => dataStore.data.sources || [],
@@ -1117,6 +1151,208 @@ export const DataService = {
     });
     
     return Object.values(categoryTotals).sort((a, b) => b.volume - a.volume);
+  },
+
+  // ============================================
+  // Monitor Relationships
+  // ============================================
+
+  /**
+   * Get narratives that match a monitor's scope criteria.
+   * A narrative matches if it references any entity in the monitor's scope.
+   */
+  getNarrativesForMonitor: (monitorId) => {
+    const monitor = findById('monitors', monitorId);
+    if (!monitor) return [];
+    
+    const scope = monitor.scope || {};
+    const narratives = dataStore.data.narratives || [];
+    
+    return narratives.filter(narrative => {
+      // Check if narrative directly in scope
+      if (scope.narrativeIds?.includes(narrative.id)) return true;
+      
+      // Check person overlap
+      if (scope.personIds?.some(pId => (narrative.personIds || []).includes(pId))) return true;
+      
+      // Check organization overlap
+      if (scope.organizationIds?.some(oId => (narrative.organizationIds || []).includes(oId))) return true;
+      
+      // Check faction overlap (factionMentions is an object with faction IDs as keys)
+      if (scope.factionIds?.some(fId => narrative.factionMentions && narrative.factionMentions[fId])) return true;
+      
+      // Check location overlap
+      if (scope.locationIds?.some(lId => (narrative.locationIds || []).includes(lId))) return true;
+      
+      // Check event overlap
+      if (scope.eventIds?.some(eId => (narrative.eventIds || []).includes(eId))) return true;
+      
+      return false;
+    });
+  },
+
+  /**
+   * Get themes (sub-narratives) that match a monitor's scope criteria.
+   */
+  getSubNarrativesForMonitor: (monitorId) => {
+    const monitor = findById('monitors', monitorId);
+    if (!monitor || monitor.options?.includeSubNarratives === false) return [];
+    
+    // Get matched narratives first
+    const matchedNarratives = DataService.getNarrativesForMonitor(monitorId);
+    const matchedNarrativeIds = new Set(matchedNarratives.map(n => n.id));
+    
+    // Get sub-narratives that belong to matched narratives
+    return (dataStore.data.subNarratives || []).filter(sub => 
+      matchedNarrativeIds.has(sub.parentNarrativeId)
+    );
+  },
+
+  /**
+   * Get events that match a monitor's scope criteria.
+   * Events match if they are in scope or related to scoped entities.
+   */
+  getEventsForMonitor: (monitorId) => {
+    const monitor = findById('monitors', monitorId);
+    if (!monitor) return [];
+    
+    const scope = monitor.scope || {};
+    const events = dataStore.data.events || [];
+    const includeRelated = monitor.options?.includeRelatedEvents !== false;
+    
+    return events.filter(event => {
+      // Check if event directly in scope
+      if (scope.eventIds?.includes(event.id)) return true;
+      
+      if (includeRelated) {
+        // Check person overlap
+        if (scope.personIds?.some(pId => (event.personIds || []).includes(pId))) return true;
+        
+        // Check organization overlap
+        if (scope.organizationIds?.some(oId => (event.organizationIds || []).includes(oId))) return true;
+        
+        // Check location overlap
+        if (scope.locationIds?.includes(event.locationId)) return true;
+      }
+      
+      return false;
+    });
+  },
+
+  /**
+   * Get sub-events for matched events in a monitor.
+   */
+  getSubEventsForMonitor: (monitorId) => {
+    const monitor = findById('monitors', monitorId);
+    if (!monitor || monitor.options?.includeSubEvents === false) return [];
+    
+    const matchedEvents = DataService.getEventsForMonitor(monitorId);
+    const subEventIds = new Set();
+    
+    matchedEvents.forEach(event => {
+      (event.subEventIds || []).forEach(seId => subEventIds.add(seId));
+    });
+    
+    return (dataStore.data.events || []).filter(e => subEventIds.has(e.id));
+  },
+
+  /**
+   * Get all matched content for a monitor (narratives, themes, events, sub-events).
+   */
+  getMonitorMatchedContent: (monitorId) => {
+    return {
+      narratives: DataService.getNarrativesForMonitor(monitorId),
+      subNarratives: DataService.getSubNarrativesForMonitor(monitorId),
+      events: DataService.getEventsForMonitor(monitorId),
+      subEvents: DataService.getSubEventsForMonitor(monitorId),
+      alerts: DataService.getAlertsForMonitor(monitorId)
+    };
+  },
+
+  /**
+   * Get a formatted trigger description for display.
+   */
+  getMonitorTriggerLabels: (monitorId) => {
+    const monitor = findById('monitors', monitorId);
+    if (!monitor) return [];
+    
+    const triggers = monitor.triggers || {};
+    const labels = [];
+    
+    if (triggers.newNarrative) labels.push('New Narratives');
+    if (triggers.newEvent) labels.push('New Events');
+    if (triggers.volumeSpike) {
+      labels.push(`Volume >${triggers.volumeSpike.threshold}/${triggers.volumeSpike.timeWindow}`);
+    }
+    if (triggers.sentimentShift) {
+      const dir = triggers.sentimentShift.direction === 'any' ? '±' : 
+                  triggers.sentimentShift.direction === 'negative' ? '-' : '+';
+      labels.push(`Sentiment ${dir}${Math.round(triggers.sentimentShift.threshold * 100)}%`);
+    }
+    if (triggers.factionEngagement) {
+      labels.push('Faction Engagement');
+    }
+    
+    return labels;
+  },
+
+  /**
+   * Get scope label for a monitor (primary entity being watched).
+   */
+  getMonitorScopeLabel: (monitorId) => {
+    const monitor = findById('monitors', monitorId);
+    if (!monitor) return '';
+    
+    const scope = monitor.scope || {};
+    
+    // Return the most specific scope first
+    if (scope.personIds?.length === 1) {
+      const person = findById('persons', scope.personIds[0]);
+      return person?.name || 'Person';
+    }
+    if (scope.personIds?.length > 1) {
+      return `${scope.personIds.length} people`;
+    }
+    if (scope.organizationIds?.length === 1) {
+      const org = findById('organizations', scope.organizationIds[0]);
+      return org?.name || 'Organization';
+    }
+    if (scope.organizationIds?.length > 1) {
+      return `${scope.organizationIds.length} organizations`;
+    }
+    if (scope.factionIds?.length) {
+      return `${scope.factionIds.length} faction${scope.factionIds.length > 1 ? 's' : ''}`;
+    }
+    if (scope.narrativeIds?.length) {
+      return `${scope.narrativeIds.length} narrative${scope.narrativeIds.length > 1 ? 's' : ''}`;
+    }
+    if (scope.locationIds?.length) {
+      return `${scope.locationIds.length} location${scope.locationIds.length > 1 ? 's' : ''}`;
+    }
+    
+    return 'Custom scope';
+  },
+
+  /**
+   * Get scope type for a monitor (for icon selection).
+   * Returns the first matching scope type in priority order.
+   */
+  getMonitorScopeType: (monitorId) => {
+    const monitor = findById('monitors', monitorId);
+    if (!monitor) return 'custom';
+    
+    const scope = monitor.scope || {};
+    
+    // Check in order of priority for display
+    if (scope.narrativeIds?.length) return 'narrative';
+    if (scope.themeIds?.length) return 'theme';
+    if (scope.factionIds?.length) return 'faction';
+    if (scope.personIds?.length) return 'person';
+    if (scope.organizationIds?.length) return 'organization';
+    if (scope.locationIds?.length) return 'location';
+    if (scope.eventIds?.length) return 'event';
+    
+    return 'custom';
   },
 
   // Search across all entities

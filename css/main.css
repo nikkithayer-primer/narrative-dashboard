@@ -204,6 +204,13 @@ body {
 .navbar-right {
   display: flex;
   align-items: center;
+  gap: var(--space-md);
+}
+
+/* Data dropdown on right side */
+.data-dropdown .nav-dropdown-menu {
+  right: 0;
+  left: auto;
 }
 
 .logo {

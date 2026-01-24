@@ -5,117 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Primer - Data Model Reference</title>
   
-  <!-- Local Fonts via main.css -->
+  <!-- App Styles (shared with main app) -->
   <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
   
   <style>
-    :root {
-      --bg-primary: #F8F9FA;
-      --bg-secondary: #FFFFFF;
-      --bg-tertiary: #F0F2F5;
-      --bg-hover: #E8EAED;
-      --border-color: #B6BFC9;
-      --border-subtle: #D8DDE3;
-      --text-strong: #212636;
-      --text-primary: #3B485C;
-      --text-secondary: #506078;
-      --text-muted: #66778C;
-      --accent-primary: #3169ED;
-      --accent-secondary: #2855C5;
-      --accent-muted: #E8EEFF;
-      
-      /* Sentiment colors */
-      --sentiment-positive: #66BB6A;
-      --sentiment-negative: #E57373;
-      
-      /* Entity colors */
-      --color-mission: #8b5cf6;
-      --color-narrative: #ef4444;
-      --color-faction: #f59e0b;
-      --color-location: #10b981;
-      --color-event: #3b82f6;
-      --color-entity: #ec4899;
-      --color-source: #06b6d4;
-      
-      --font-sans: 'Neue Haas Grotesk Text', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-display: 'Neue Haas Grotesk Display', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'SF Mono', Consolas, monospace;
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    /* Override body overflow from main.css to allow scrolling */
     body {
-      font-family: var(--font-sans);
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--text-primary);
-      background: var(--bg-primary);
+      overflow-y: auto;
+      height: auto;
       min-height: 100vh;
     }
 
-    /* Header */
-    .header {
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border-color);
-      padding: 16px 32px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-icon {
-      width: 24px;
-      height: 24px;
-      color: var(--accent-primary);
-    }
-
-    .logo-text {
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-
-    .header-title {
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .back-link {
-      color: var(--accent-primary);
-      text-decoration: none;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
-
     /* Main Content */
-    .main {
+    .data-model-main {
       max-width: 1400px;
       margin: 0 auto;
       padding: 32px;
@@ -125,13 +28,13 @@
       margin-bottom: 40px;
     }
 
-    .page-title {
+    .page-intro .page-title {
       font-size: 28px;
       font-weight: 600;
       margin-bottom: 12px;
     }
 
-    .page-description {
+    .page-intro .page-description {
       color: var(--text-secondary);
       font-size: 15px;
       max-width: 800px;
@@ -486,43 +389,158 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-      .main {
+      .data-model-main {
         padding: 20px;
       }
 
       .entities-grid {
         grid-template-columns: 1fr;
       }
-
-      .header-content {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-      }
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
-          <line x1="12" y1="22" x2="12" y2="15.5"/>
-          <polyline points="22 8.5 12 15.5 2 8.5"/>
-          <polyline points="2 15.5 12 8.5 22 15.5"/>
-          <line x1="12" y1="2" x2="12" y2="8.5"/>
-        </svg>
-        <span class="logo-text">Primer</span>
-      </div>
-      <span class="header-title">Data Model Reference</span>
-      <a href="index.html" class="back-link">
-        <span>←</span> Back to Dashboard
+  <nav class="top-navbar">
+    <div class="navbar-left">
+      <a href="index.html#/dashboard" class="logo">
+        <img src="img/logo.png" alt="Primer" class="logo-img">
       </a>
+      
+      <div class="navbar-links">
+        <a href="index.html#/dashboard" class="nav-link">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+            <rect x="1" y="1" width="6" height="6" rx="1"/>
+            <rect x="9" y="1" width="6" height="6" rx="1"/>
+            <rect x="1" y="9" width="6" height="6" rx="1"/>
+            <rect x="9" y="9" width="6" height="6" rx="1"/>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="index.html#/monitors" class="nav-link">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+            <rect x="1" y="2" width="14" height="10" rx="1"/>
+            <path d="M5 14h6M8 12v2"/>
+            <path d="M4 6h2M4 8h3M10 5l2 2-2 2"/>
+          </svg>
+          <span>Monitors</span>
+        </a>
+        <a href="index.html#/workspaces" class="nav-link">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+            <rect x="1" y="1" width="14" height="14" rx="1"/>
+            <path d="M1 5h14"/>
+            <path d="M5 5v10"/>
+          </svg>
+          <span>Workspaces</span>
+        </a>
+        <a href="index.html#/ai-briefing" class="nav-link">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+            <circle cx="8" cy="8" r="6"/>
+            <path d="M8 5v3l2 1"/>
+            <circle cx="8" cy="8" r="1.5" fill="var(--text-secondary)"/>
+            <path d="M3 3l1.5 1.5M13 3l-1.5 1.5M3 13l1.5-1.5M13 13l-1.5-1.5"/>
+          </svg>
+          <span>AI Briefing</span>
+        </a>
+        <a href="index.html#/search" class="nav-link">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+            <circle cx="7" cy="7" r="4.5"/>
+            <path d="M10.5 10.5L14 14"/>
+          </svg>
+          <span>Search</span>
+        </a>
+      </div>
     </div>
-  </header>
+    
+    <!-- User Avatar with Tools Dropdown -->
+    <div class="navbar-right">
+      <!-- Data Dropdown -->
+      <div class="nav-dropdown data-dropdown">
+        <button class="nav-dropdown-trigger">
+          <span>Data</span>
+          <svg class="dropdown-arrow" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="index.html#/narratives" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <path d="M2 2h12v12H2z" rx="1"/>
+              <path d="M4 5h8M4 8h8M4 11h5"/>
+            </svg>
+            <span>Narratives</span>
+          </a>
+          <a href="index.html#/factions" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <circle cx="8" cy="5" r="2.5"/>
+              <circle cx="4" cy="11" r="2"/>
+              <circle cx="12" cy="11" r="2"/>
+              <path d="M6 6.5L4.5 9M10 6.5l1.5 2.5"/>
+            </svg>
+            <span>Factions</span>
+          </a>
+          <a href="index.html#/locations" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/>
+              <circle cx="8" cy="6" r="2"/>
+            </svg>
+            <span>Locations</span>
+          </a>
+          <a href="index.html#/events" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <rect x="2" y="3" width="12" height="11" rx="1"/>
+              <path d="M2 6h12M5 1v3M11 1v3"/>
+            </svg>
+            <span>Events</span>
+          </a>
+          <a href="index.html#/entities" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <circle cx="8" cy="4" r="2.5"/>
+              <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
+            </svg>
+            <span>People & Orgs</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="nav-dropdown avatar-dropdown">
+        <button class="avatar-trigger">
+          <span class="avatar-initials">JD</span>
+        </button>
+        <div class="nav-dropdown-menu avatar-menu">
+          <div class="avatar-menu-header">
+            <span class="avatar-name">Jane Doe</span>
+            <span class="avatar-email">jane.doe@primer.ai</span>
+          </div>
+          <div class="avatar-menu-divider"></div>
+          <a href="index.html#/editor" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <path d="M11 2l3 3-9 9H2v-3l9-9z"/>
+            </svg>
+            <span>Data Editor</span>
+          </a>
+          <a href="data-model.html" class="nav-link active">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <ellipse cx="8" cy="4" rx="5" ry="2"/>
+              <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4"/>
+              <path d="M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+            </svg>
+            <span>Data Model</span>
+          </a>
+          <a href="component-demos.html" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <rect x="1" y="1" width="5" height="5" rx="1"/>
+              <rect x="10" y="1" width="5" height="5" rx="1"/>
+              <rect x="1" y="10" width="5" height="5" rx="1"/>
+              <rect x="10" y="10" width="5" height="5" rx="1"/>
+            </svg>
+            <span>Component Demos</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-  <main class="main">
+  <main class="data-model-main">
     <section class="page-intro">
       <h1 class="page-title">Data Model Documentation</h1>
       <p class="page-description">
@@ -543,7 +561,7 @@
       </a>
       <a href="#subnarrative" class="nav-pill">
         <span class="dot" style="background: #f87171"></span>
-        SubNarrative
+        Theme
       </a>
       <a href="#faction" class="nav-pill">
         <span class="dot" style="background: var(--color-faction)"></span>
@@ -602,7 +620,7 @@
           <path d="M 200 85 L 200 135" stroke="#606070" stroke-width="1.5" fill="none"/>
           <text x="210" y="115" fill="#9090a0" font-size="9">contains</text>
           
-          <!-- Narrative to SubNarrative (1:N) -->
+          <!-- Narrative to Theme (1:N) -->
           <path d="M 200 185 L 200 235" stroke="#606070" stroke-width="1.5" fill="none"/>
           <text x="210" y="215" fill="#9090a0" font-size="9">has</text>
           
@@ -623,7 +641,7 @@
           <!-- Narrative to Event (N:M) -->
           <path d="M 200 185 L 460 380" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
           
-          <!-- SubNarrative connections (similar to Narrative) -->
+          <!-- Theme connections (similar to Narrative) -->
           <path d="M 280 260 L 380 180" stroke="#505058" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
           <path d="M 280 270 L 460 300" stroke="#505058" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
           <path d="M 280 275 L 620 300" stroke="#505058" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
@@ -676,66 +694,91 @@
           <!-- Entity Boxes -->
           <!-- Mission -->
           <g transform="translate(120, 35)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#8b5cf6" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#8b5cf6"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Mission</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Mission</text>
           </g>
 
           <!-- Narrative -->
           <g transform="translate(120, 135)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#ef4444" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#ef4444" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#ef4444"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Narrative</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Narrative</text>
           </g>
 
-          <!-- SubNarrative -->
+          <!-- Theme -->
           <g transform="translate(120, 235)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#f87171" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#f87171" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#f87171"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">SubNarrative</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Theme</text>
           </g>
 
           <!-- Faction -->
           <g transform="translate(420, 135)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#f59e0b" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#f59e0b"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Faction</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Faction</text>
           </g>
 
           <!-- Person -->
           <g transform="translate(420, 285)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#ec4899" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#ec4899" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#ec4899"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Person</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Person</text>
           </g>
 
           <!-- Organization -->
           <g transform="translate(660, 285)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#a855f7" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#a855f7" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#a855f7"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Organization</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Organization</text>
           </g>
 
           <!-- Location -->
           <g transform="translate(200, 380)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#10b981" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#10b981"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Location</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Location</text>
           </g>
 
           <!-- Event -->
           <g transform="translate(460, 380)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#3b82f6" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#3b82f6"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">Event</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Event</text>
           </g>
 
           <!-- SubEvent -->
           <g transform="translate(460, 485)">
-            <rect width="160" height="50" rx="6" fill="#2a2a2f" stroke="#60a5fa" stroke-width="2"/>
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#60a5fa"/>
-            <text x="40" y="30" fill="#e0e0e4" font-size="14" font-weight="600">SubEvent</text>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">SubEvent</text>
           </g>
+
+          <!-- Monitor -->
+          <g transform="translate(720, 380)">
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#14b8a6"/>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Monitor</text>
+          </g>
+
+          <!-- Alert -->
+          <g transform="translate(720, 485)">
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#f97316"/>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Alert</text>
+          </g>
+
+          <!-- Monitor connections -->
+          <!-- Monitor to Alert (1:N) -->
+          <path d="M 800 430 L 800 485" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="810" y="460" fill="#9090a0" font-size="9">generates</text>
+          
+          <!-- Monitor watches entities (dashed) -->
+          <path d="M 720 400 L 580 310" stroke="#14b8a6" stroke-width="1" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 720 410 L 620 400" stroke="#14b8a6" stroke-width="1" fill="none" stroke-dasharray="4,4"/>
+          <path d="M 750 380 L 580 160" stroke="#14b8a6" stroke-width="1" fill="none" stroke-dasharray="4,4"/>
+          <text x="660" y="270" fill="#14b8a6" font-size="8">watches</text>
 
           <!-- Legend -->
           <g transform="translate(880, 50)">
@@ -745,7 +788,9 @@
             <line x1="0" y1="50" x2="40" y2="50" stroke="#606070" stroke-width="1.5" stroke-dasharray="4,4"/>
             <text x="50" y="54" fill="#606070" font-size="10">Many-to-Many</text>
             <line x1="0" y1="75" x2="40" y2="75" stroke="#505058" stroke-width="1" stroke-dasharray="3,3"/>
-            <text x="50" y="79" fill="#606070" font-size="10">SubNarrative links</text>
+            <text x="50" y="79" fill="#606070" font-size="10">Theme links</text>
+            <line x1="0" y1="100" x2="40" y2="100" stroke="#14b8a6" stroke-width="1" stroke-dasharray="4,4"/>
+            <text x="50" y="104" fill="#14b8a6" font-size="10">Monitor watches</text>
           </g>
         </svg>
       </div>
@@ -797,70 +842,75 @@
 
           <!-- Monitor -->
           <g transform="translate(80, 175)">
-            <rect width="140" height="50" rx="6" fill="#2a2a2f" stroke="#14b8a6" stroke-width="2"/>
+            <rect width="140" height="50" rx="6" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/>
             <circle cx="18" cy="25" r="8" fill="#14b8a6"/>
-            <text x="36" y="30" fill="#e0e0e4" font-size="13" font-weight="600">Monitor</text>
+            <text x="36" y="30" fill="#333333" font-size="13" font-weight="600">Monitor</text>
           </g>
 
           <!-- Alert -->
           <g transform="translate(80, 345)">
-            <rect width="140" height="50" rx="6" fill="#2a2a2f" stroke="#f97316" stroke-width="2"/>
+            <rect width="140" height="50" rx="6" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
             <circle cx="18" cy="25" r="8" fill="#f97316"/>
-            <text x="36" y="30" fill="#e0e0e4" font-size="13" font-weight="600">Alert</text>
+            <text x="36" y="30" fill="#333333" font-size="13" font-weight="600">Alert</text>
           </g>
 
-          <!-- Scope Entities -->
-          <g transform="translate(350, 65)">
-            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#ec4899" stroke-width="1.5"/>
-            <circle cx="14" cy="16" r="5" fill="#ec4899"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">Person</text>
+          <!-- Scope Entities (watchable types) -->
+          <g transform="translate(350, 50)">
+            <rect width="120" height="28" rx="4" fill="#ffffff" stroke="#ef4444" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="5" fill="#ef4444"/>
+            <text x="26" y="18" fill="#333333" font-size="10">Narrative</text>
           </g>
-          <g transform="translate(350, 105)">
-            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#a855f7" stroke-width="1.5"/>
-            <circle cx="14" cy="16" r="5" fill="#a855f7"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">Organization</text>
+          <g transform="translate(350, 85)">
+            <rect width="120" height="28" rx="4" fill="#ffffff" stroke="#f87171" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="5" fill="#f87171"/>
+            <text x="26" y="18" fill="#333333" font-size="10">Theme</text>
           </g>
-          <g transform="translate(350, 145)">
-            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#f59e0b" stroke-width="1.5"/>
-            <circle cx="14" cy="16" r="5" fill="#f59e0b"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">Faction</text>
+          <g transform="translate(350, 120)">
+            <rect width="120" height="28" rx="4" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="5" fill="#f59e0b"/>
+            <text x="26" y="18" fill="#333333" font-size="10">Faction</text>
           </g>
-          <g transform="translate(350, 185)">
-            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#ef4444" stroke-width="1.5"/>
-            <circle cx="14" cy="16" r="5" fill="#ef4444"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">Narrative</text>
+          <g transform="translate(350, 155)">
+            <rect width="120" height="28" rx="4" fill="#ffffff" stroke="#ec4899" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="5" fill="#ec4899"/>
+            <text x="26" y="18" fill="#333333" font-size="10">Person</text>
+          </g>
+          <g transform="translate(350, 190)">
+            <rect width="120" height="28" rx="4" fill="#ffffff" stroke="#a855f7" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="5" fill="#a855f7"/>
+            <text x="26" y="18" fill="#333333" font-size="10">Organization</text>
           </g>
           <g transform="translate(350, 225)">
-            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#10b981" stroke-width="1.5"/>
-            <circle cx="14" cy="16" r="5" fill="#10b981"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">Location</text>
+            <rect width="120" height="28" rx="4" fill="#ffffff" stroke="#10b981" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="5" fill="#10b981"/>
+            <text x="26" y="18" fill="#333333" font-size="10">Location</text>
           </g>
-          <g transform="translate(350, 265)">
-            <rect width="120" height="32" rx="4" fill="#2a2a2f" stroke="#3b82f6" stroke-width="1.5"/>
-            <circle cx="14" cy="16" r="5" fill="#3b82f6"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">Event</text>
+          <g transform="translate(350, 260)">
+            <rect width="120" height="28" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="5" fill="#3b82f6"/>
+            <text x="26" y="18" fill="#333333" font-size="10">Event</text>
           </g>
 
           <!-- Matched Results -->
           <g transform="translate(580, 85)">
-            <rect width="130" height="32" rx="4" fill="#2a2a2f" stroke="#ef4444" stroke-width="1.5"/>
+            <rect width="130" height="32" rx="4" fill="#ffffff" stroke="#ef4444" stroke-width="1.5"/>
             <circle cx="14" cy="16" r="5" fill="#ef4444"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">Narrative</text>
+            <text x="26" y="20" fill="#333333" font-size="10">Narrative</text>
           </g>
           <g transform="translate(580, 125)">
-            <rect width="130" height="32" rx="4" fill="#2a2a2f" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <rect width="130" height="32" rx="4" fill="#ffffff" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
             <circle cx="14" cy="16" r="5" fill="#ef4444" opacity="0.6"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">SubNarrative</text>
+            <text x="26" y="20" fill="#333333" font-size="10">Theme</text>
           </g>
           <g transform="translate(580, 175)">
-            <rect width="130" height="32" rx="4" fill="#2a2a2f" stroke="#3b82f6" stroke-width="1.5"/>
+            <rect width="130" height="32" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
             <circle cx="14" cy="16" r="5" fill="#3b82f6"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">Event</text>
+            <text x="26" y="20" fill="#333333" font-size="10">Event</text>
           </g>
           <g transform="translate(580, 215)">
-            <rect width="130" height="32" rx="4" fill="#2a2a2f" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <rect width="130" height="32" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
             <circle cx="14" cy="16" r="5" fill="#3b82f6" opacity="0.6"/>
-            <text x="26" y="20" fill="#e0e0e4" font-size="10">SubEvent</text>
+            <text x="26" y="20" fill="#333333" font-size="10">SubEvent</text>
           </g>
 
           <!-- Trigger Types Label -->
@@ -1533,12 +1583,12 @@
           </div>
         </article>
 
-        <!-- SubNarrative -->
+        <!-- Theme -->
         <article id="subnarrative" class="entity-card">
           <header class="entity-header">
             <div class="entity-icon" style="background: rgba(248, 113, 113, 0.2); color: #f87171;">◈</div>
             <div class="entity-info">
-              <h3>SubNarrative</h3>
+              <h3>Theme</h3>
               <p>Sub-components or variations of a parent narrative</p>
             </div>
           </header>
@@ -1704,10 +1754,56 @@
                 <span class="field-name">scope</span>
                 <div class="field-meta">
                   <span class="field-type required">object</span>
-                  <p class="field-desc">Defines what entities to watch</p>
-                  <p class="field-enum">
-                    Contains optional arrays: <code>personIds</code> <code>organizationIds</code> <code>factionIds</code> <code>narrativeIds</code> <code>locationIds</code> <code>eventIds</code>
-                  </p>
+                  <p class="field-desc">Defines what entities to watch. A monitor can watch any combination of the entity types below.</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">scope.narrativeIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Watch specific narratives for updates, volume spikes, or sentiment changes</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">scope.themeIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Watch specific themes (sub-narratives) for activity</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">scope.factionIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Watch faction activity and engagement patterns</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">scope.personIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Watch individuals for mentions in narratives and events</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">scope.organizationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Watch organizations for mentions and activity</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">scope.locationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Watch geographic areas for narrative and event activity</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">scope.eventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Watch specific events for updates and related activity</p>
                 </div>
               </li>
               <li class="field-item">
@@ -1985,7 +2081,7 @@
               <td>
                 <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
                   <span class="dot" style="background: #f87171"></span>
-                  SubNarrative
+                  Theme
                 </span>
               </td>
               <td>1:N</td>
@@ -2080,7 +2176,7 @@
               <td>
                 <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
                   <span class="dot" style="background: #f87171"></span>
-                  SubNarrative
+                  Theme
                 </span>
               </td>
               <td class="relationship-type">mentions</td>
@@ -2091,13 +2187,13 @@
                 </span>
               </td>
               <td>N:M</td>
-              <td>SubNarratives can mention multiple factions</td>
+              <td>Themes can mention multiple factions</td>
             </tr>
             <tr>
               <td>
                 <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
                   <span class="dot" style="background: #f87171"></span>
-                  SubNarrative
+                  Theme
                 </span>
               </td>
               <td class="relationship-type">mentions</td>
@@ -2108,13 +2204,13 @@
                 </span>
               </td>
               <td>N:M</td>
-              <td>SubNarratives can mention multiple people</td>
+              <td>Themes can mention multiple people</td>
             </tr>
             <tr>
               <td>
                 <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
                   <span class="dot" style="background: #f87171"></span>
-                  SubNarrative
+                  Theme
                 </span>
               </td>
               <td class="relationship-type">mentions</td>
@@ -2125,13 +2221,13 @@
                 </span>
               </td>
               <td>N:M</td>
-              <td>SubNarratives can mention multiple organizations</td>
+              <td>Themes can mention multiple organizations</td>
             </tr>
             <tr>
               <td>
                 <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
                   <span class="dot" style="background: #f87171"></span>
-                  SubNarrative
+                  Theme
                 </span>
               </td>
               <td class="relationship-type">references</td>
@@ -2142,13 +2238,13 @@
                 </span>
               </td>
               <td>N:M</td>
-              <td>SubNarratives can reference multiple locations</td>
+              <td>Themes can reference multiple locations</td>
             </tr>
             <tr>
               <td>
                 <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
                   <span class="dot" style="background: #f87171"></span>
-                  SubNarrative
+                  Theme
                 </span>
               </td>
               <td class="relationship-type">references</td>
@@ -2159,7 +2255,7 @@
                 </span>
               </td>
               <td>N:M</td>
-              <td>SubNarratives can reference multiple events</td>
+              <td>Themes can reference multiple events</td>
             </tr>
             <tr>
               <td>
@@ -2459,6 +2555,23 @@
               </td>
               <td class="relationship-type">watches</td>
               <td>
+                <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
+                  <span class="dot" style="background: #f87171"></span>
+                  Theme
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Monitors can watch specific themes for activity</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(20, 184, 166, 0.15);">
+                  <span class="dot" style="background: #14b8a6"></span>
+                  Monitor
+                </span>
+              </td>
+              <td class="relationship-type">watches</td>
+              <td>
                 <span class="entity-badge" style="background: rgba(16, 185, 129, 0.15);">
                   <span class="dot" style="background: var(--color-location)"></span>
                   Location
@@ -2529,7 +2642,7 @@
               <td>
                 <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
                   <span class="dot" style="background: var(--color-narrative)"></span>
-                  SubNarrative
+                  Theme
                 </span>
               </td>
               <td>N:M</td>
@@ -2597,7 +2710,7 @@
               <td>
                 <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
                   <span class="dot" style="background: var(--color-narrative)"></span>
-                  SubNarrative
+                  Theme
                 </span>
               </td>
               <td>N:M</td>
@@ -2716,12 +2829,26 @@
   <span class="key">"name"</span>: <span class="string">"Trump Activity Tracker"</span>,
   <span class="key">"description"</span>: <span class="string">"Monitor narratives and events mentioning Donald Trump with high engagement"</span>,
   <span class="key">"scope"</span>: {
+    <span class="comment">// Watch any combination of entity types</span>
+    <span class="key">"narrativeIds"</span>: [
+      <span class="string">"660e8400-e29b-41d4-a716-446655440001"</span>
+    ],
+    <span class="key">"themeIds"</span>: [
+      <span class="string">"sub-001"</span>,
+      <span class="string">"sub-002"</span>
+    ],
     <span class="key">"personIds"</span>: [
       <span class="string">"880e8400-e29b-41d4-a716-446655440010"</span>
     ],
+    <span class="key">"organizationIds"</span>: [
+      <span class="string">"org-010"</span>,
+      <span class="string">"org-011"</span>
+    ],
     <span class="key">"factionIds"</span>: [
-      <span class="string">"770e8400-e29b-41d4-a716-446655440002"</span>,
-      <span class="string">"770e8400-e29b-41d4-a716-446655440003"</span>
+      <span class="string">"770e8400-e29b-41d4-a716-446655440002"</span>
+    ],
+    <span class="key">"locationIds"</span>: [
+      <span class="string">"990e8400-e29b-41d4-a716-446655440001"</span>
     ],
     <span class="key">"eventIds"</span>: [
       <span class="string">"bb0e8400-e29b-41d4-a716-446655440040"</span>
@@ -2818,7 +2945,7 @@
     { <span class="comment">/* Narrative objects */</span> }
   ],
   <span class="key">"subNarratives"</span>: [
-    { <span class="comment">/* SubNarrative objects */</span> }
+    { <span class="comment">/* Theme objects */</span> }
   ],
   <span class="key">"factions"</span>: [
     { <span class="comment">/* Faction objects */</span> }
@@ -2855,6 +2982,27 @@
   </footer>
 
   <script>
+    // Dropdown functionality
+    const dropdowns = document.querySelectorAll('.nav-dropdown');
+    dropdowns.forEach((dropdown) => {
+      const trigger = dropdown.querySelector('.nav-dropdown-trigger, .avatar-trigger');
+      if (trigger) {
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dropdowns.forEach(other => {
+            if (other !== dropdown) other.classList.remove('open');
+          });
+          dropdown.classList.toggle('open');
+        });
+      }
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-dropdown')) {
+        dropdowns.forEach(dropdown => dropdown.classList.remove('open'));
+      }
+    });
+
     // Tab switching functionality
     document.querySelectorAll('.schema-tab').forEach(tab => {
       tab.addEventListener('click', () => {
