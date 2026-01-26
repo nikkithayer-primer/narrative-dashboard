@@ -44,6 +44,63 @@ export const mockData = {
     { id: 'social', name: 'Social Media', color: '#B07AA1' }
   ],
 
+  users: [
+    {
+      id: 'user-001',
+      username: 'kpatel',
+      displayName: 'Kevin Patel',
+      role: 'Senior Technical Analyst',
+      department: 'Technical Intelligence',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: true
+    },
+    {
+      id: 'user-002',
+      username: 'jlin',
+      displayName: 'Jennifer Lin',
+      role: 'China Economic Analyst',
+      department: 'Economic Intelligence',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    },
+    {
+      id: 'user-003',
+      username: 'mwatkins',
+      displayName: 'Marcus Watkins',
+      role: 'Supply Chain Analyst',
+      department: 'Supply Chain Analysis',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    },
+    {
+      id: 'user-004',
+      username: 'akim',
+      displayName: 'Angela Kim',
+      role: 'Policy Analyst',
+      department: 'Policy Analysis',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    },
+    {
+      id: 'user-005',
+      username: 'rmorris',
+      displayName: 'Ryan Morris',
+      role: 'Technical Lead',
+      department: 'Technical Intelligence',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    },
+    {
+      id: 'user-006',
+      username: 'ctanaka',
+      displayName: 'Christine Tanaka',
+      role: 'Division Chief',
+      department: 'Semiconductor Analysis',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    }
+  ],
+
   missions: [
     {
       id: 'mission-001',
@@ -2223,7 +2280,80 @@ export const mockData = {
       organizationIds: ['org-001', 'org-002', 'org-010'],
       locationIds: ['loc-001', 'loc-002'],
       eventIds: ['event-001', 'event-002'],
-      factionIds: ['faction-001', 'faction-002', 'faction-003']
+      factionIds: ['faction-001', 'faction-002', 'faction-003'],
+      highlights: [
+        {
+          id: 'highlight-001',
+          userId: 'user-001',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 149,
+          highlightedText: 'Imagery analysis of Huawei Mate 70 teardowns confirms SMIC-manufactured Kirin 9100 processors at 5nm node. Die markings and packaging consistent with',
+          createdAt: '2026-01-16T09:30:00Z'
+        },
+        {
+          id: 'highlight-002',
+          userId: 'user-005',
+          blockIndex: 4,
+          startOffset: 0,
+          endOffset: 125,
+          highlightedText: 'Process yields estimated at 20-35%, compared to 80%+ for TSMC\'s EUV-based 5nm. Cost per functional die approximately 2.8-3.2x',
+          createdAt: '2026-01-16T10:00:00Z'
+        },
+        {
+          id: 'highlight-003',
+          userId: 'user-006',
+          blockIndex: 8,
+          startOffset: 0,
+          endOffset: 147,
+          highlightedText: 'Achievement demonstrates export controls have not prevented advancement but have imposed significant cost and capability penalties. Recommend monitoring',
+          createdAt: '2026-01-16T10:30:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-001',
+          userId: 'user-001',
+          blockIndex: 4,
+          anchorStartOffset: 0,
+          anchorEndOffset: 125,
+          anchorText: 'Process yields estimated at 20-35%, compared to 80%+ for TSMC\'s EUV-based 5nm. Cost per functional die approximately 2.8-3.2x',
+          content: 'The yield gap is significant but narrowing. Six months ago we estimated 15-20%. They\'re improving faster than projected.',
+          createdAt: '2026-01-16T10:15:00Z',
+          replies: [
+            {
+              id: 'reply-001',
+              userId: 'user-005',
+              content: 'Agreed. We should update our projections. The learning curve is steeper than we modeled.',
+              createdAt: '2026-01-16T10:45:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-002',
+          userId: 'user-006',
+          blockIndex: 8,
+          anchorStartOffset: 0,
+          anchorEndOffset: 147,
+          anchorText: 'Achievement demonstrates export controls have not prevented advancement but have imposed significant cost and capability penalties. Recommend monitoring',
+          content: 'This is the key takeaway for policymakers. Controls are working but not as a barrier—more as a tax on China\'s progress.',
+          createdAt: '2026-01-16T11:00:00Z',
+          replies: [
+            {
+              id: 'reply-002',
+              userId: 'user-004',
+              content: 'Should we recommend enhanced controls on DUV equipment? That\'s their current workaround.',
+              createdAt: '2026-01-16T11:30:00Z'
+            },
+            {
+              id: 'reply-003',
+              userId: 'user-006',
+              content: 'That\'s being discussed. The policy team is modeling scenarios. ASML revenue impact is a concern.',
+              createdAt: '2026-01-16T12:00:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - Export Controls Effectiveness Review (SECRET)
@@ -2256,7 +2386,74 @@ export const mockData = {
       organizationIds: ['org-002', 'org-004', 'org-005', 'org-006', 'org-010'],
       locationIds: ['loc-003', 'loc-004', 'loc-005'],
       eventIds: ['event-003', 'event-004', 'event-005', 'event-008', 'event-009'],
-      factionIds: ['faction-001', 'faction-002', 'faction-004', 'faction-006']
+      factionIds: ['faction-001', 'faction-002', 'faction-004', 'faction-006'],
+      highlights: [
+        {
+          id: 'highlight-004',
+          userId: 'user-004',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 168,
+          highlightedText: 'Export controls have successfully prevented Chinese access to EUV lithography, maintaining a 2-3 generation gap in leading-edge production capability. However, controls',
+          createdAt: '2026-01-18T15:00:00Z'
+        },
+        {
+          id: 'highlight-005',
+          userId: 'user-002',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 143,
+          highlightedText: 'Intelligence indicates Huawei accumulated $5-8 billion in semiconductor equipment prior to expanded restrictions. Commerce Department investigation',
+          createdAt: '2026-01-18T15:30:00Z'
+        },
+        {
+          id: 'highlight-006',
+          userId: 'user-006',
+          blockIndex: 7,
+          startOffset: 0,
+          endOffset: 119,
+          highlightedText: 'ASML projects $2.5B annual revenue loss from China restrictions. Company stock declined 8% following announcement. Dutch',
+          createdAt: '2026-01-18T16:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-003',
+          userId: 'user-002',
+          blockIndex: 5,
+          anchorStartOffset: 0,
+          anchorEndOffset: 143,
+          anchorText: 'Intelligence indicates Huawei accumulated $5-8 billion in semiconductor equipment prior to expanded restrictions. Commerce Department investigation',
+          content: 'The stockpiling strategy was sophisticated. They anticipated the restrictions and prepared accordingly. We need better lead-time indicators.',
+          createdAt: '2026-01-18T15:45:00Z',
+          replies: [
+            {
+              id: 'reply-004',
+              userId: 'user-003',
+              content: 'Supply chain team is building a tracking model for future equipment purchases by Chinese firms. Should have baseline by Q2.',
+              createdAt: '2026-01-18T16:15:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-004',
+          userId: 'user-004',
+          blockIndex: 7,
+          anchorStartOffset: 119,
+          anchorEndOffset: 216,
+          anchorText: 'Dutch government concerns about economic impact may affect long-term compliance. Peter Wennink (person-004) expressed frustration',
+          content: 'Allied alignment is fragile. We should flag this for the policy team—Dutch compliance is essential.',
+          createdAt: '2026-01-18T16:30:00Z',
+          replies: [
+            {
+              id: 'reply-005',
+              userId: 'user-006',
+              content: 'State is aware. There\'s a ministerial meeting next month to discuss continued coordination.',
+              createdAt: '2026-01-18T17:00:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - Big Fund III Investment Analysis
@@ -2289,7 +2486,74 @@ export const mockData = {
       organizationIds: ['org-007', 'org-008', 'org-009', 'org-016', 'org-017', 'org-022'],
       locationIds: ['loc-002', 'loc-006'],
       eventIds: ['event-006', 'event-007'],
-      factionIds: ['faction-001', 'faction-002', 'faction-003', 'faction-005']
+      factionIds: ['faction-001', 'faction-002', 'faction-003', 'faction-005'],
+      highlights: [
+        {
+          id: 'highlight-007',
+          userId: 'user-002',
+          blockIndex: 1,
+          startOffset: 0,
+          endOffset: 175,
+          highlightedText: 'China has launched the third phase of its National Integrated Circuit Industry Investment Fund ("Big Fund III") with 340 billion yuan ($47 billion). This exceeds the combined',
+          createdAt: '2026-01-19T11:00:00Z'
+        },
+        {
+          id: 'highlight-008',
+          userId: 'user-001',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 196,
+          highlightedText: 'State Council guidelines prioritize: (1) Advanced packaging technologies including chiplets and 2.5D/3D stacking, (2) Semiconductor manufacturing equipment with focus on lithography, (3) EDA software',
+          createdAt: '2026-01-19T11:30:00Z'
+        },
+        {
+          id: 'highlight-009',
+          userId: 'user-006',
+          blockIndex: 7,
+          startOffset: 0,
+          endOffset: 155,
+          highlightedText: 'Big Fund has mixed track record. Phase I investments in YMTC and CXMT showed technology progress but corruption scandals led to arrests of senior officials.',
+          createdAt: '2026-01-19T12:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-005',
+          userId: 'user-002',
+          blockIndex: 1,
+          anchorStartOffset: 175,
+          anchorEndOffset: 292,
+          anchorText: 'This exceeds the combined total of Phase I ($21B) and Phase II ($29B), representing a significant escalation of state-directed semiconductor investment.',
+          content: 'The scale signals strategic priority at the highest levels. This isn\'t incremental—it\'s a whole-of-government commitment.',
+          createdAt: '2026-01-19T11:15:00Z',
+          replies: [
+            {
+              id: 'reply-006',
+              userId: 'user-006',
+              content: 'Agreed. Include this in the weekly strategic assessment. NSC will want to see the comparison with our CHIPS Act funding.',
+              createdAt: '2026-01-19T11:45:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-006',
+          userId: 'user-001',
+          blockIndex: 3,
+          anchorStartOffset: 196,
+          anchorEndOffset: 274,
+          anchorText: 'Notably absent: direct investment in leading-edge logic fabs.',
+          content: 'This is interesting. They may be recognizing that logic fab investment has diminishing returns without EUV access.',
+          createdAt: '2026-01-19T12:00:00Z',
+          replies: [
+            {
+              id: 'reply-007',
+              userId: 'user-005',
+              content: 'Or pivoting to areas where they can achieve self-sufficiency faster. Equipment and EDA are strategic bottlenecks.',
+              createdAt: '2026-01-19T12:30:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - YMTC Supply Chain Analysis (SECRET)
@@ -2322,7 +2586,74 @@ export const mockData = {
       organizationIds: ['org-013', 'org-014', 'org-015', 'org-005'],
       locationIds: ['loc-007', 'loc-004'],
       eventIds: ['event-010', 'event-011'],
-      factionIds: ['faction-001', 'faction-002', 'faction-003', 'faction-006']
+      factionIds: ['faction-001', 'faction-002', 'faction-003', 'faction-006'],
+      highlights: [
+        {
+          id: 'highlight-010',
+          userId: 'user-003',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 178,
+          highlightedText: 'TechInsights teardown analysis has confirmed YMTC 232-layer 3D NAND chips in: smartphones from 3 Chinese brands, SSDs from 2 Taiwanese ODMs, and USB drives from multiple white-label',
+          createdAt: '2026-01-19T17:00:00Z'
+        },
+        {
+          id: 'highlight-011',
+          userId: 'user-004',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 199,
+          highlightedText: 'Analysis indicates chips are reaching global markets through: (1) Direct integration by Chinese OEMs not subject to US jurisdiction, (2) Module assembly in Southeast Asia obscuring chip origin, (3)',
+          createdAt: '2026-01-19T17:30:00Z'
+        },
+        {
+          id: 'highlight-012',
+          userId: 'user-001',
+          blockIndex: 7,
+          startOffset: 0,
+          endOffset: 157,
+          highlightedText: 'YMTC 232-layer NAND demonstrates competitive performance with Samsung and SK Hynix offerings in sequential read/write and random IOPS. Power efficiency approximately',
+          createdAt: '2026-01-19T18:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-007',
+          userId: 'user-003',
+          blockIndex: 5,
+          anchorStartOffset: 0,
+          anchorEndOffset: 199,
+          anchorText: 'Analysis indicates chips are reaching global markets through: (1) Direct integration by Chinese OEMs not subject to US jurisdiction, (2) Module assembly in Southeast Asia obscuring chip origin, (3)',
+          content: 'The Southeast Asia module assembly pathway is the hardest to track. We need better visibility into Vietnamese and Malaysian assembly operations.',
+          createdAt: '2026-01-19T17:45:00Z',
+          replies: [
+            {
+              id: 'reply-008',
+              userId: 'user-006',
+              content: 'Commerce is aware but enforcement resources are limited. Prioritize the highest-volume pathways.',
+              createdAt: '2026-01-19T18:15:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-008',
+          userId: 'user-001',
+          blockIndex: 7,
+          anchorStartOffset: 0,
+          anchorEndOffset: 157,
+          anchorText: 'YMTC 232-layer NAND demonstrates competitive performance with Samsung and SK Hynix offerings in sequential read/write and random IOPS. Power efficiency approximately',
+          content: 'The technology gap is narrowing faster than expected. Two years ago they were 3 generations behind. Now it\'s less than one.',
+          createdAt: '2026-01-19T18:30:00Z',
+          replies: [
+            {
+              id: 'reply-009',
+              userId: 'user-005',
+              content: 'Memory is a different story than logic. More commoditized and easier to reverse-engineer. But still concerning.',
+              createdAt: '2026-01-19T19:00:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - TSMC Arizona Operations Assessment
@@ -2354,7 +2685,100 @@ export const mockData = {
       organizationIds: ['org-020', 'org-021'],
       locationIds: ['loc-009', 'loc-010'],
       eventIds: ['event-013', 'event-014'],
-      factionIds: ['faction-001', 'faction-005', 'faction-006']
+      factionIds: ['faction-001', 'faction-005', 'faction-006'],
+      highlights: [
+        {
+          id: 'highlight-013',
+          userId: 'user-001',
+          blockIndex: 1,
+          startOffset: 0,
+          endOffset: 151,
+          highlightedText: 'TSMC\'s $40 billion Arizona fabrication facility faces significant delays. Original 2024 production target has slipped to late 2025 for 4nm chips. Cost',
+          createdAt: '2026-01-17T16:00:00Z'
+        },
+        {
+          id: 'highlight-014',
+          userId: 'user-004',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 163,
+          highlightedText: 'Cultural tensions between Taiwanese management and American workforce well-documented. Arizona Building and Construction Trades Council (org-021) filed formal grievances',
+          createdAt: '2026-01-17T16:30:00Z'
+        },
+        {
+          id: 'highlight-015',
+          userId: 'user-006',
+          blockIndex: 6,
+          startOffset: 0,
+          endOffset: 144,
+          highlightedText: 'Delays undermine CHIPS Act goal of domestic semiconductor manufacturing. Intel and Samsung facing similar challenges at US facilities. Questions',
+          createdAt: '2026-01-17T17:00:00Z'
+        },
+        {
+          id: 'highlight-016',
+          userId: 'user-002',
+          blockIndex: 8,
+          startOffset: 0,
+          endOffset: 142,
+          highlightedText: 'Chinese Tech Industry Supporters faction (faction-001) amplifying TSMC Arizona difficulties. Narrative framing: US manufacturing decline vs.',
+          createdAt: '2026-01-17T17:30:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-009',
+          userId: 'user-004',
+          blockIndex: 4,
+          anchorStartOffset: 0,
+          anchorEndOffset: 200,
+          anchorText: 'Key friction points include: expectations around overtime and weekend work, communication styles, decision-making hierarchy, and training approaches. TSMC has brought approximately 500 Taiwanese engineers',
+          content: 'The cultural integration challenges were predictable. We flagged this in the CHIPS Act implementation assessment last year.',
+          createdAt: '2026-01-17T16:45:00Z',
+          replies: [
+            {
+              id: 'reply-010',
+              userId: 'user-001',
+              content: 'True, but the depth of the issues is worse than expected. This affects all reshoring efforts, not just TSMC.',
+              createdAt: '2026-01-17T17:15:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-010',
+          userId: 'user-006',
+          blockIndex: 6,
+          anchorStartOffset: 144,
+          anchorEndOffset: 285,
+          anchorText: 'Questions emerging about viability of reshoring advanced chip production without fundamental changes to work culture expectations.',
+          content: 'This is the hard question nobody wants to address. Do we adapt American work culture or accept that leading-edge fabs will always be in Asia?',
+          createdAt: '2026-01-17T17:45:00Z',
+          replies: [
+            {
+              id: 'reply-011',
+              userId: 'user-002',
+              content: 'Worth noting that Intel and GlobalFoundries have operated US fabs successfully. The issue may be specific to leading-edge processes.',
+              createdAt: '2026-01-17T18:00:00Z'
+            },
+            {
+              id: 'reply-012',
+              userId: 'user-006',
+              content: 'Good point. Intel\'s new Ohio fab will be an important test case. Different company, different approach.',
+              createdAt: '2026-01-17T18:30:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-011',
+          userId: 'user-002',
+          blockIndex: 8,
+          anchorStartOffset: 142,
+          anchorEndOffset: 261,
+          anchorText: 'Narrative framing: US manufacturing decline vs. Chinese industrial capability. Global Times and CGTN coverage emphasizes "American workers can\'t match Asian discipline."',
+          content: 'This narrative is gaining traction internationally. We should prepare counter-messaging emphasizing different metrics of success.',
+          createdAt: '2026-01-17T18:15:00Z',
+          replies: []
+        }
+      ]
     }
   ],
 

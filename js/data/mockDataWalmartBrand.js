@@ -43,6 +43,63 @@ export const mockData = {
     { id: 'social', name: 'Social Media', color: '#B07AA1' }
   ],
 
+  users: [
+    {
+      id: 'user-001',
+      username: 'jrodriguez',
+      displayName: 'Jessica Rodriguez',
+      role: 'Senior Brand Analyst',
+      department: 'Corporate Communications',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: true
+    },
+    {
+      id: 'user-002',
+      username: 'mthompson',
+      displayName: 'Michael Thompson',
+      role: 'Brand Intelligence Manager',
+      department: 'Corporate Communications',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    },
+    {
+      id: 'user-003',
+      username: 'spatek',
+      displayName: 'Sarah Patek',
+      role: 'Social Media Analyst',
+      department: 'Digital Marketing',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    },
+    {
+      id: 'user-004',
+      username: 'dwilson',
+      displayName: 'David Wilson',
+      role: 'Risk Analyst',
+      department: 'Legal Affairs',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    },
+    {
+      id: 'user-005',
+      username: 'lchen',
+      displayName: 'Linda Chen',
+      role: 'Competitive Intelligence Lead',
+      department: 'Strategy & Planning',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    },
+    {
+      id: 'user-006',
+      username: 'rjackson',
+      displayName: 'Robert Jackson',
+      role: 'VP Corporate Communications',
+      department: 'Corporate Communications',
+      avatarUrl: 'img/placeholders/avatar-default.svg',
+      isCurrentUser: false
+    }
+  ],
+
   missions: [
     {
       id: 'mission-001',
@@ -1987,7 +2044,73 @@ export const mockData = {
       organizationIds: ['org-001', 'org-002'],
       locationIds: ['loc-001', 'loc-002'],
       eventIds: ['event-001', 'event-002', 'event-003'],
-      factionIds: ['faction-001', 'faction-002', 'faction-005']
+      factionIds: ['faction-001', 'faction-002', 'faction-005'],
+      highlights: [
+        {
+          id: 'highlight-001',
+          userId: 'user-001',
+          blockIndex: 1,
+          startOffset: 0,
+          endOffset: 125,
+          highlightedText: 'The self-checkout controversy has escalated significantly over the past week, with viral social media content driving negative sentiment.',
+          createdAt: '2026-01-19T09:15:00Z'
+        },
+        {
+          id: 'highlight-002',
+          userId: 'user-003',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 142,
+          highlightedText: 'TikTok remains the primary driver of negative content, with the original detention video (doc-001) accumulating over 8 million views.',
+          createdAt: '2026-01-19T09:45:00Z'
+        },
+        {
+          id: 'highlight-003',
+          userId: 'user-006',
+          blockIndex: 1,
+          startOffset: 126,
+          endOffset: 273,
+          highlightedText: 'The class-action lawsuit filed in Texas represents a material legal risk that requires immediate attention from Legal and Loss Prevention teams.',
+          createdAt: '2026-01-19T10:30:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-001',
+          userId: 'user-001',
+          blockIndex: 3,
+          anchorStartOffset: 0,
+          anchorEndOffset: 142,
+          anchorText: 'TikTok remains the primary driver of negative content, with the original detention video (doc-001) accumulating over 8 million views.',
+          content: '8 million views in 5 days is unprecedented for a brand incident. We need to escalate our response strategy.',
+          createdAt: '2026-01-19T09:30:00Z',
+          replies: [
+            {
+              id: 'reply-001',
+              userId: 'user-002',
+              content: 'Agreed. I\'m scheduling an emergency meeting with the crisis team for this afternoon.',
+              createdAt: '2026-01-19T09:45:00Z'
+            },
+            {
+              id: 'reply-002',
+              userId: 'user-006',
+              content: 'Include Legal. The Texas lawsuit changes the calculus on our public response.',
+              createdAt: '2026-01-19T10:00:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-002',
+          userId: 'user-005',
+          blockIndex: 5,
+          anchorStartOffset: 0,
+          anchorEndOffset: 135,
+          anchorText: 'Target and Costco have notably refrained from capitalizing on negative coverage. However, Aldi-affiliated accounts have seen increased',
+          content: 'Interesting that major competitors are staying quiet. This could indicate they\'re worried about similar exposure.',
+          createdAt: '2026-01-19T11:00:00Z',
+          replies: []
+        }
+      ]
     },
 
     // Internal Document - Food Safety Incident Report
@@ -2020,7 +2143,74 @@ export const mockData = {
       organizationIds: ['org-001', 'org-007', 'org-008'],
       locationIds: ['loc-001', 'loc-007'],
       eventIds: ['event-008', 'event-009', 'event-010'],
-      factionIds: ['faction-004', 'faction-001']
+      factionIds: ['faction-004', 'faction-001'],
+      highlights: [
+        {
+          id: 'highlight-004',
+          userId: 'user-004',
+          blockIndex: 3,
+          startOffset: 82,
+          endOffset: 167,
+          highlightedText: 'Estimated 2.3 million units in consumer hands. Three confirmed hospitalizations linked to contaminated products',
+          createdAt: '2026-01-18T12:00:00Z'
+        },
+        {
+          id: 'highlight-005',
+          userId: 'user-002',
+          blockIndex: 5,
+          startOffset: 133,
+          endOffset: 231,
+          highlightedText: 'Supplier audit history shows last inspection was 14 months ago—outside our standard 12-month cycle.',
+          createdAt: '2026-01-18T12:30:00Z'
+        },
+        {
+          id: 'highlight-006',
+          userId: 'user-006',
+          blockIndex: 9,
+          startOffset: 0,
+          endOffset: 148,
+          highlightedText: 'Preliminary estimate of recall costs: $12-18 million including product destruction, logistics, refunds, and communications. Potential litigation',
+          createdAt: '2026-01-18T13:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-003',
+          userId: 'user-004',
+          blockIndex: 3,
+          anchorStartOffset: 137,
+          anchorEndOffset: 213,
+          anchorText: 'Three confirmed hospitalizations linked to contaminated products as of this report.',
+          content: 'Legal exposure is significant with confirmed hospitalizations. We need to track case numbers daily and prepare for potential wrongful death claims if conditions worsen.',
+          createdAt: '2026-01-18T12:15:00Z',
+          replies: [
+            {
+              id: 'reply-003',
+              userId: 'user-006',
+              content: 'Agreed. Loop in outside counsel. We need a litigation hold on all supplier communications.',
+              createdAt: '2026-01-18T12:45:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-004',
+          userId: 'user-002',
+          blockIndex: 5,
+          anchorStartOffset: 133,
+          anchorEndOffset: 231,
+          anchorText: 'Supplier audit history shows last inspection was 14 months ago—outside our standard 12-month cycle.',
+          content: 'This is a process failure on our end. Need to audit our entire supplier inspection schedule immediately.',
+          createdAt: '2026-01-18T13:00:00Z',
+          replies: [
+            {
+              id: 'reply-004',
+              userId: 'user-001',
+              content: 'QA team already on it. Preliminary review shows 23 other suppliers outside cycle. Report by EOD Friday.',
+              createdAt: '2026-01-18T13:30:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - Labor Relations Assessment
@@ -2053,7 +2243,74 @@ export const mockData = {
       organizationIds: ['org-001', 'org-005', 'org-006'],
       locationIds: ['loc-001', 'loc-004', 'loc-006'],
       eventIds: ['event-006', 'event-007'],
-      factionIds: ['faction-002', 'faction-003', 'faction-001']
+      factionIds: ['faction-002', 'faction-003', 'faction-001'],
+      highlights: [
+        {
+          id: 'highlight-007',
+          userId: 'user-003',
+          blockIndex: 1,
+          startOffset: 0,
+          endOffset: 164,
+          highlightedText: 'The #WalmartWorkers hashtag has accumulated over 50 million views on TikTok, primarily driven by current associates sharing videos depicting understaffed stores',
+          createdAt: '2026-01-17T15:00:00Z'
+        },
+        {
+          id: 'highlight-008',
+          userId: 'user-002',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 109,
+          highlightedText: 'Analysis identified 12 associate accounts with >100K followers creating original content. Three accounts appear',
+          createdAt: '2026-01-17T15:30:00Z'
+        },
+        {
+          id: 'highlight-009',
+          userId: 'user-001',
+          blockIndex: 7,
+          startOffset: 0,
+          endOffset: 158,
+          highlightedText: 'Review of scheduling data for stores featured in viral content reveals average staffing levels at 87% of optimal during peak hours. Regional variance significant',
+          createdAt: '2026-01-17T16:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-005',
+          userId: 'user-003',
+          blockIndex: 3,
+          anchorStartOffset: 110,
+          anchorEndOffset: 217,
+          anchorText: 'Three accounts appear to be coordinating with UFCW organizers based on timing patterns and shared messaging.',
+          content: 'The coordination patterns are clear. These aren\'t organic—message timing matches UFCW press releases within minutes.',
+          createdAt: '2026-01-17T15:45:00Z',
+          replies: [
+            {
+              id: 'reply-005',
+              userId: 'user-004',
+              content: 'Document everything but be careful about retaliation claims. We need Legal guidance before any action on associates.',
+              createdAt: '2026-01-17T16:00:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-006',
+          userId: 'user-001',
+          blockIndex: 7,
+          anchorStartOffset: 0,
+          anchorEndOffset: 113,
+          anchorText: 'Review of scheduling data for stores featured in viral content reveals average staffing levels at 87% of optimal',
+          content: 'This validates the associates\' claims. We need to address the underlying issue, not just the social media response.',
+          createdAt: '2026-01-17T16:30:00Z',
+          replies: [
+            {
+              id: 'reply-006',
+              userId: 'user-006',
+              content: 'Agreed. This needs to go to the CEO briefing. Recommend accelerating Q2 hiring plans.',
+              createdAt: '2026-01-17T17:00:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - Competitive Intelligence Brief
@@ -2084,7 +2341,74 @@ export const mockData = {
       organizationIds: ['org-001', 'org-003', 'org-004', 'org-010'],
       locationIds: ['loc-001'],
       eventIds: ['event-011', 'event-012', 'event-013'],
-      factionIds: ['faction-006', 'faction-001', 'faction-005']
+      factionIds: ['faction-006', 'faction-001', 'faction-005'],
+      highlights: [
+        {
+          id: 'highlight-010',
+          userId: 'user-005',
+          blockIndex: 1,
+          startOffset: 0,
+          endOffset: 123,
+          highlightedText: 'Target\'s Shipt service achieved 98% on-time delivery in Q4, compared to Walmart\'s 89%. Amazon\'s sub-24-hour coverage now reaches',
+          createdAt: '2026-01-18T10:00:00Z'
+        },
+        {
+          id: 'highlight-011',
+          userId: 'user-001',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 97,
+          highlightedText: 'Viral TikTok price comparisons are gaining traction. Internal analysis confirms Aldi prices 15-22%',
+          createdAt: '2026-01-18T10:30:00Z'
+        },
+        {
+          id: 'highlight-012',
+          userId: 'user-006',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 91,
+          highlightedText: '"Everyday Low Prices" brand promise under significant pressure. Competitor Supporters faction',
+          createdAt: '2026-01-18T11:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-007',
+          userId: 'user-005',
+          blockIndex: 1,
+          anchorStartOffset: 0,
+          anchorEndOffset: 99,
+          anchorText: 'Target\'s Shipt service achieved 98% on-time delivery in Q4, compared to Walmart\'s 89%. Amazon\'s sub',
+          content: 'The 9-point gap with Target is concerning. This was 4 points last quarter. We\'re losing ground fast on delivery.',
+          createdAt: '2026-01-18T10:15:00Z',
+          replies: [
+            {
+              id: 'reply-007',
+              userId: 'user-002',
+              content: 'Delivery infrastructure investment has been deferred twice. Time to escalate to the board.',
+              createdAt: '2026-01-18T10:45:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-008',
+          userId: 'user-001',
+          blockIndex: 3,
+          anchorStartOffset: 98,
+          anchorEndOffset: 220,
+          anchorText: 'We retained pandemic-era price increases longer than competitors on 340+ SKUs. WSJ analysis (doc-016) accurately reflects our pricing position.',
+          content: 'The WSJ article is damaging because it\'s accurate. We need to accelerate the pricing review on those 340 SKUs.',
+          createdAt: '2026-01-18T11:15:00Z',
+          replies: [
+            {
+              id: 'reply-008',
+              userId: 'user-006',
+              content: 'Finance is modeling scenarios. Option A margin impact might be worth it to protect the brand promise.',
+              createdAt: '2026-01-18T11:45:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - Store Closure Impact Assessment
@@ -2115,7 +2439,74 @@ export const mockData = {
       organizationIds: ['org-001', 'org-013'],
       locationIds: ['loc-009', 'loc-010'],
       eventIds: ['event-014'],
-      factionIds: ['faction-001', 'faction-003', 'faction-005']
+      factionIds: ['faction-001', 'faction-003', 'faction-005'],
+      highlights: [
+        {
+          id: 'highlight-013',
+          userId: 'user-002',
+          blockIndex: 1,
+          startOffset: 0,
+          endOffset: 144,
+          highlightedText: 'The 2026 optimization program includes closure of 23 underperforming stores, 18 of which are in rural communities with populations under 15,000.',
+          createdAt: '2026-01-20T11:00:00Z'
+        },
+        {
+          id: 'highlight-014',
+          userId: 'user-004',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 140,
+          highlightedText: 'In 14 of 18 rural locations, Walmart is the sole general merchandise and grocery retailer within 25 miles. Historical data shows our entry',
+          createdAt: '2026-01-20T11:30:00Z'
+        },
+        {
+          id: 'highlight-015',
+          userId: 'user-006',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 111,
+          highlightedText: 'State Rep. James Williams (person-017) has proposed legislation requiring 180-day closure notice for rural stores.',
+          createdAt: '2026-01-20T12:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-009',
+          userId: 'user-004',
+          blockIndex: 3,
+          anchorStartOffset: 141,
+          anchorEndOffset: 281,
+          anchorText: 'Historical data shows our entry into these markets correlated with closure of 47 local retailers. This creates significant reputational risk and potential legislative response.',
+          content: 'This is the narrative opponents will use. "Walmart killed local stores, now abandons community." We need proactive messaging.',
+          createdAt: '2026-01-20T11:45:00Z',
+          replies: [
+            {
+              id: 'reply-009',
+              userId: 'user-002',
+              content: 'Community Relations is drafting talking points. Also exploring partnership with Dollar General to provide some continuity.',
+              createdAt: '2026-01-20T12:15:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-010',
+          userId: 'user-006',
+          blockIndex: 5,
+          anchorStartOffset: 0,
+          anchorEndOffset: 111,
+          anchorText: 'State Rep. James Williams (person-017) has proposed legislation requiring 180-day closure notice for rural stores.',
+          content: 'This legislation could spread to other states. Government Affairs needs to engage with state legislators before the announcements.',
+          createdAt: '2026-01-20T12:30:00Z',
+          replies: [
+            {
+              id: 'reply-010',
+              userId: 'user-001',
+              content: 'Already coordinating with GA. They want to brief affected legislators 48 hours before public announcement.',
+              createdAt: '2026-01-20T13:00:00Z'
+            }
+          ]
+        }
+      ]
     }
   ],
 

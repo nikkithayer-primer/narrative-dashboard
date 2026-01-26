@@ -534,8 +534,8 @@
 
 /* Portion Marks - inline, no color coding */
 .portion-mark {
-  font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-muted);
+  font-size: 80%;
   white-space: nowrap;
 }
 
@@ -3958,9 +3958,11 @@
 .document-viewer-content {
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+}
+
+.document-viewer-content:focus {
+  outline: none;
 }
 
 /* Full width mode for details view */
@@ -4039,8 +4041,6 @@
 
 /* Document body with constrained width - newspaper style */
 .document-viewer-content-body {
-  flex: 1;
-  overflow-y: auto;
   padding: var(--space-xl) var(--space-lg);
 }
 
@@ -4456,7 +4456,7 @@
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--bg-elevated);
+  background: #ffffff;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: var(--space-sm) var(--space-md);
@@ -4475,7 +4475,7 @@
   visibility: visible;
 }
 
-.highlight-tooltip::after {
+.highlight-tooltip::before {
   content: '';
   position: absolute;
   top: 100%;
@@ -4483,6 +4483,17 @@
   transform: translateX(-50%);
   border: 6px solid transparent;
   border-top-color: var(--border-color);
+}
+
+.highlight-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #ffffff;
+  margin-top: -1px;
 }
 
 .highlight-tooltip-user {
@@ -4765,7 +4776,6 @@
 /* Document content wrapper for margin annotations */
 .document-content-wrapper {
   position: relative;
-  padding-left: 32px;
 }
 
 .content-block-wrapper {

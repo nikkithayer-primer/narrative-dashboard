@@ -678,13 +678,21 @@ export class DocumentTable extends BaseComponent {
   /**
    * Open viewer mode with the specified document
    * @param {Object} doc - The document to display
+   * @param {boolean} updateUrl - Whether to update the URL (default: true)
    */
-  openViewer(doc) {
+  openViewer(doc, updateUrl = true) {
     // Mark document as read
     DocumentTable.markDocumentAsRead(doc.id);
     
     this.viewerMode = true;
     this.selectedDocument = doc;
+    
+    // Update URL with doc ID for persistence across page refresh
+    if (updateUrl) {
+      const currentHash = window.location.hash.split('?')[0];
+      window.history.replaceState(null, '', `${currentHash}?doc=${doc.id}`);
+    }
+    
     this.render();
     this.setupKeyboardNavigation();
   }
@@ -696,6 +704,11 @@ export class DocumentTable extends BaseComponent {
     this.removeKeyboardNavigation();
     this.viewerMode = false;
     this.selectedDocument = null;
+    
+    // Remove doc ID from URL
+    const currentHash = window.location.hash.split('?')[0];
+    window.history.replaceState(null, '', currentHash);
+    
     this.render();
   }
 
@@ -764,6 +777,11 @@ export class DocumentTable extends BaseComponent {
     // Mark as read and update selection
     DocumentTable.markDocumentAsRead(nextDoc.id);
     this.selectedDocument = nextDoc;
+    
+    // Update URL with new doc ID
+    const currentHash = window.location.hash.split('?')[0];
+    window.history.replaceState(null, '', `${currentHash}?doc=${nextDoc.id}`);
+    
     this.render();
     this.setupKeyboardNavigation(); // Re-attach after render
   }
@@ -785,6 +803,11 @@ export class DocumentTable extends BaseComponent {
     // Mark as read and update selection
     DocumentTable.markDocumentAsRead(prevDoc.id);
     this.selectedDocument = prevDoc;
+    
+    // Update URL with new doc ID
+    const currentHash = window.location.hash.split('?')[0];
+    window.history.replaceState(null, '', `${currentHash}?doc=${prevDoc.id}`);
+    
     this.render();
     this.setupKeyboardNavigation(); // Re-attach after render
   }
@@ -913,6 +936,11 @@ export class DocumentTable extends BaseComponent {
         // Mark document as read when clicked in sidebar
         DocumentTable.markDocumentAsRead(doc.id);
         this.selectedDocument = doc;
+        
+        // Update URL with new doc ID
+        const currentHash = window.location.hash.split('?')[0];
+        window.history.replaceState(null, '', `${currentHash}?doc=${doc.id}`);
+        
         this.render();
       });
 
@@ -968,6 +996,7 @@ export class DocumentTable extends BaseComponent {
     // Create content area with type-specific class
     const contentArea = document.createElement('div');
     contentArea.className = `document-viewer-content ${docTypeClass} ${this.viewerTab === 'details' ? 'document-viewer-content-fullwidth' : ''}`;
+    contentArea.tabIndex = 0; // Make focusable for keyboard navigation (Page Up/Down)
 
     if (this.viewerTab === 'content') {
       // Document header - type-specific
@@ -993,8 +1022,16 @@ export class DocumentTable extends BaseComponent {
     // Initialize components based on active tab
     if (this.viewerTab === 'content') {
       // Render document content using DocumentContentRenderer
+      // Fetch highlights and comments with resolved user data
+      const highlights = DataService.getHighlightsForDocument(this.selectedDocument.id);
+      const comments = DataService.getCommentsForDocument(this.selectedDocument.id);
+      
       this.contentRenderer = new DocumentContentRenderer('document-viewer-content-body');
-      this.contentRenderer.update({ document: this.selectedDocument });
+      this.contentRenderer.update({ 
+        document: this.selectedDocument,
+        highlights: highlights || [],
+        comments: comments || []
+      });
     } else {
       // Initialize details view components
       this.initializeDetailsComponents(this.selectedDocument);
@@ -1024,6 +1061,9 @@ export class DocumentTable extends BaseComponent {
         }
       });
     });
+
+    // Focus content area for keyboard navigation (Page Up/Down)
+    contentArea.focus();
   }
 
   /**
