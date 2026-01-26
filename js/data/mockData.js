@@ -3019,7 +3019,74 @@ export const mockData = {
       personIds: [],
       organizationIds: [],
       locationIds: [],
-      eventIds: []
+      eventIds: [],
+      highlights: [
+        {
+          id: 'highlight-010',
+          userId: 'user-003',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 105,
+          highlightedText: 'Network infrastructure analysis identified 47 distinct command and control nodes coordinating the amplification campaign',
+          createdAt: '2026-01-17T16:00:00Z'
+        },
+        {
+          id: 'highlight-011',
+          userId: 'user-006',
+          blockIndex: 4,
+          startOffset: 0,
+          endOffset: 123,
+          highlightedText: 'Malware signatures recovered from compromised accounts match known tooling associated with state-sponsored cyber operations.',
+          createdAt: '2026-01-17T16:30:00Z'
+        },
+        {
+          id: 'highlight-012',
+          userId: 'user-001',
+          blockIndex: 6,
+          startOffset: 80,
+          endOffset: 193,
+          highlightedText: 'we assess with high confidence that this campaign is directed by a foreign intelligence service',
+          createdAt: '2026-01-17T17:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-007',
+          userId: 'user-003',
+          blockIndex: 3,
+          anchorStartOffset: 0,
+          anchorEndOffset: 105,
+          anchorText: 'Network infrastructure analysis identified 47 distinct command and control nodes coordinating the amplification campaign',
+          content: 'This is a significant escalation from the 12 nodes we identified last month. They\'re clearly scaling up operations.',
+          createdAt: '2026-01-17T16:15:00Z',
+          replies: [
+            {
+              id: 'reply-009',
+              userId: 'user-006',
+              content: 'Agreed. We should brief the NSC on this expansion. Can you prepare a trend analysis?',
+              createdAt: '2026-01-17T16:45:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-008',
+          userId: 'user-001',
+          blockIndex: 6,
+          anchorStartOffset: 80,
+          anchorEndOffset: 193,
+          anchorText: 'we assess with high confidence that this campaign is directed by a foreign intelligence service',
+          content: 'This is the key finding. Make sure this language is in the PDB summary.',
+          createdAt: '2026-01-17T17:15:00Z',
+          replies: [
+            {
+              id: 'reply-010',
+              userId: 'user-003',
+              content: 'Already drafted. Should be in tomorrow morning\'s brief.',
+              createdAt: '2026-01-17T17:30:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - Minnesota Immigration Enforcement Situation Report (SECRET)
@@ -3052,7 +3119,73 @@ export const mockData = {
       organizationIds: ['org-010', 'org-011', 'org-016'],
       locationIds: ['loc-002', 'loc-008'],
       eventIds: ['event-010', 'event-011', 'event-013', 'event-014', 'event-017'],
-      factionIds: ['faction-001', 'faction-002', 'faction-003']
+      factionIds: ['faction-001', 'faction-002', 'faction-003'],
+      highlights: [
+        {
+          id: 'highlight-013',
+          userId: 'user-002',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 98,
+          highlightedText: 'The fatal shooting of protester Renee Good by ICE agent on January 17 remains under investigation.',
+          createdAt: '2026-01-19T09:15:00Z'
+        },
+        {
+          id: 'highlight-014',
+          userId: 'user-004',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 118,
+          highlightedText: 'Minnesota AG Keith Ellison (person-007) pursuing state court injunction against ICE operations. Federal judge ruled',
+          createdAt: '2026-01-19T09:45:00Z'
+        },
+        {
+          id: 'highlight-015',
+          userId: 'user-001',
+          blockIndex: 9,
+          startOffset: 0,
+          endOffset: 180,
+          highlightedText: 'American Left Wing faction (faction-002) shows 92% negative sentiment toward federal actions. Immigration Rights faction (faction-003) actively organizing demonstrations.',
+          createdAt: '2026-01-19T10:30:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-009',
+          userId: 'user-002',
+          blockIndex: 3,
+          anchorStartOffset: 99,
+          anchorEndOffset: 228,
+          anchorText: 'FBI civil rights probe has pivoted focus from agent to victim\'s background, generating significant backlash from civil liberties organizations.',
+          content: 'This pivot is going to dominate the news cycle. Legal team should prepare talking points for the inevitable congressional inquiries.',
+          createdAt: '2026-01-19T09:30:00Z',
+          replies: [
+            {
+              id: 'reply-011',
+              userId: 'user-005',
+              content: 'Already seeing calls for hearings from the Congressional Hispanic Caucus.',
+              createdAt: '2026-01-19T09:45:00Z'
+            },
+            {
+              id: 'reply-012',
+              userId: 'user-002',
+              content: 'Loop in Congressional Affairs. They need to be ahead of this.',
+              createdAt: '2026-01-19T10:00:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-010',
+          userId: 'user-001',
+          blockIndex: 9,
+          anchorStartOffset: 0,
+          anchorEndOffset: 95,
+          anchorText: 'American Left Wing faction (faction-002) shows 92% negative sentiment toward federal actions.',
+          content: 'These sentiment numbers are useful for the weekly faction dynamics brief. Include trend data from the past 30 days.',
+          createdAt: '2026-01-19T10:45:00Z',
+          replies: []
+        }
+      ]
     },
 
     // Internal Document - Church Protest FACE Act Assessment
@@ -3084,7 +3217,80 @@ export const mockData = {
       organizationIds: ['org-010', 'org-016'],
       locationIds: ['loc-008'],
       eventIds: ['event-017', 'event-018', 'event-019', 'event-020'],
-      factionIds: ['faction-001', 'faction-002', 'faction-004']
+      factionIds: ['faction-001', 'faction-002', 'faction-004'],
+      highlights: [
+        {
+          id: 'highlight-016',
+          userId: 'user-005',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 132,
+          highlightedText: 'Video evidence shows protesters entered sanctuary during service and chanted slogans. No physical contact with congregants documented.',
+          createdAt: '2026-01-20T12:00:00Z'
+        },
+        {
+          id: 'highlight-017',
+          userId: 'user-002',
+          blockIndex: 6,
+          startOffset: 0,
+          endOffset: 78,
+          highlightedText: 'Prosecution faces challenges: (1) Protesters did not prevent congregants from entering/exiting',
+          createdAt: '2026-01-20T12:30:00Z'
+        },
+        {
+          id: 'highlight-018',
+          userId: 'user-006',
+          blockIndex: 8,
+          startOffset: 0,
+          endOffset: 122,
+          highlightedText: 'AAG Harmeet Dhillon\'s statement that journalist Don Lemon is "on notice" raises significant First Amendment issues.',
+          createdAt: '2026-01-20T13:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-011',
+          userId: 'user-005',
+          blockIndex: 6,
+          anchorStartOffset: 0,
+          anchorEndOffset: 274,
+          anchorText: 'Prosecution faces challenges: (1) Protesters did not prevent congregants from entering/exiting, (2) No evidence of threat or force, (3) First Amendment concerns regarding political speech in semi-public forum. Defense likely to argue protest targeted government official, not religious exercise.',
+          content: 'These are significant hurdles. If DOJ proceeds despite weak case, it looks political. Recommend flagging this for leadership.',
+          createdAt: '2026-01-20T12:45:00Z',
+          replies: [
+            {
+              id: 'reply-013',
+              userId: 'user-001',
+              content: 'Good analysis. Include this in the daily litigation summary.',
+              createdAt: '2026-01-20T13:15:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-012',
+          userId: 'user-006',
+          blockIndex: 8,
+          anchorStartOffset: 122,
+          anchorEndOffset: 241,
+          anchorText: 'Threatening prosecution of journalists for covering protests may face constitutional challenges and generate adverse media coverage.',
+          content: 'This is the bigger story. Press freedom groups are already mobilizing. Expect significant international attention.',
+          createdAt: '2026-01-20T13:30:00Z',
+          replies: [
+            {
+              id: 'reply-014',
+              userId: 'user-002',
+              content: 'CPJ and RSF have already issued statements. Should we prepare a foreign media impact assessment?',
+              createdAt: '2026-01-20T13:45:00Z'
+            },
+            {
+              id: 'reply-015',
+              userId: 'user-006',
+              content: 'Yes, particularly for European allies. They\'re very sensitive to press freedom issues.',
+              createdAt: '2026-01-20T14:00:00Z'
+            }
+          ]
+        }
+      ]
     },
 
     // Internal Document - Indiana Judge Shooting Security Assessment
@@ -3115,7 +3321,67 @@ export const mockData = {
       organizationIds: ['org-013', 'org-014', 'org-015'],
       locationIds: ['loc-007'],
       eventIds: ['event-015', 'event-016'],
-      factionIds: []
+      factionIds: [],
+      highlights: [
+        {
+          id: 'highlight-019',
+          userId: 'user-004',
+          blockIndex: 3,
+          startOffset: 67,
+          endOffset: 187,
+          highlightedText: 'In 2025, there were 47 documented threats against federal judges, up 35% from 2024. State judges face similar escalating threat environment',
+          createdAt: '2026-01-20T10:00:00Z'
+        },
+        {
+          id: 'highlight-020',
+          userId: 'user-001',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 97,
+          highlightedText: 'Multi-agency investigation led by Indiana State Police with FBI support. Motive undetermined—working theories',
+          createdAt: '2026-01-20T10:30:00Z'
+        },
+        {
+          id: 'highlight-021',
+          userId: 'user-003',
+          blockIndex: 7,
+          startOffset: 0,
+          endOffset: 109,
+          highlightedText: 'Indiana Chief Justice Loretta H. Rush issued security advisory to all state judges. US Marshals Service increasing',
+          createdAt: '2026-01-20T11:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-013',
+          userId: 'user-004',
+          blockIndex: 3,
+          anchorStartOffset: 67,
+          anchorEndOffset: 187,
+          anchorText: 'In 2025, there were 47 documented threats against federal judges, up 35% from 2024. State judges face similar escalating threat environment',
+          content: 'This trend is deeply concerning. We should recommend enhanced protective intelligence sharing with state judicial security programs.',
+          createdAt: '2026-01-20T10:15:00Z',
+          replies: [
+            {
+              id: 'reply-016',
+              userId: 'user-001',
+              content: 'Good idea. Set up a call with USMS Judicial Security Division to discuss protocols.',
+              createdAt: '2026-01-20T10:45:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-014',
+          userId: 'user-003',
+          blockIndex: 5,
+          anchorStartOffset: 98,
+          anchorEndOffset: 200,
+          anchorText: 'working theories include case-related retaliation and personal dispute. Judge Meyer presided over both criminal and civil matters',
+          content: 'Need to track this investigation closely. If it\'s case-related, there may be implications for other judges handling similar matters.',
+          createdAt: '2026-01-20T11:15:00Z',
+          replies: []
+        }
+      ]
     },
 
     // Internal Document - RFK Dietary Guidelines Impact Assessment
@@ -3146,7 +3412,73 @@ export const mockData = {
       organizationIds: ['org-022', 'org-023'],
       locationIds: ['loc-001'],
       eventIds: ['event-026'],
-      factionIds: ['faction-005']
+      factionIds: ['faction-005'],
+      highlights: [
+        {
+          id: 'highlight-022',
+          userId: 'user-002',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 108,
+          highlightedText: 'Guidelines contradict mainstream nutritional science and WHO recommendations. American Heart Association and',
+          createdAt: '2026-01-19T15:00:00Z'
+        },
+        {
+          id: 'highlight-023',
+          userId: 'user-006',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 141,
+          highlightedText: 'World Resources Institute analysis indicates full adoption would require approximately 100 million additional acres of farmland and add hundreds',
+          createdAt: '2026-01-19T15:30:00Z'
+        },
+        {
+          id: 'highlight-024',
+          userId: 'user-001',
+          blockIndex: 3,
+          startOffset: 160,
+          endOffset: 272,
+          highlightedText: 'Kennedy\'s past statements calling factory meat "bigger threat than Osama bin Laden" create credibility challenges.',
+          createdAt: '2026-01-19T16:00:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-015',
+          userId: 'user-002',
+          blockIndex: 3,
+          anchorStartOffset: 160,
+          anchorEndOffset: 272,
+          anchorText: 'Kennedy\'s past statements calling factory meat "bigger threat than Osama bin Laden" create credibility challenges.',
+          content: 'Media is already running the contradiction angle. Expect this to be a recurring talking point in the news cycle.',
+          createdAt: '2026-01-19T15:15:00Z',
+          replies: [
+            {
+              id: 'reply-017',
+              userId: 'user-005',
+              content: 'Should we prepare a historical analysis of his position shifts for context?',
+              createdAt: '2026-01-19T15:45:00Z'
+            },
+            {
+              id: 'reply-018',
+              userId: 'user-002',
+              content: 'Yes, that would be useful. Also include his funding sources over time.',
+              createdAt: '2026-01-19T16:00:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-016',
+          userId: 'user-006',
+          blockIndex: 7,
+          anchorStartOffset: 0,
+          anchorEndOffset: 143,
+          anchorText: 'Wellness Skeptics faction (faction-005) showing 78% positive sentiment. Climate Concerned faction strongly opposed. Conspiracy Theory faction',
+          content: 'Interesting cross-faction dynamics here. The wellness skeptics aligning with meat industry messaging is worth tracking.',
+          createdAt: '2026-01-19T16:30:00Z',
+          replies: []
+        }
+      ]
     },
 
     // Internal Document - Congressional Oversight Legal Analysis (SECRET)
@@ -3177,7 +3509,100 @@ export const mockData = {
       organizationIds: ['org-017', 'org-020'],
       locationIds: ['loc-009'],
       eventIds: ['event-021', 'event-022'],
-      factionIds: ['faction-001', 'faction-002']
+      factionIds: ['faction-001', 'faction-002'],
+      highlights: [
+        {
+          id: 'highlight-025',
+          userId: 'user-005',
+          blockIndex: 1,
+          startOffset: 0,
+          endOffset: 134,
+          highlightedText: 'Federal Judge Jia Cobb ruled January 20 that DHS can require one-week advance notice for congressional facility inspections, despite blocking',
+          createdAt: '2026-01-20T17:00:00Z'
+        },
+        {
+          id: 'highlight-026',
+          userId: 'user-001',
+          blockIndex: 3,
+          startOffset: 0,
+          endOffset: 178,
+          highlightedText: 'Rep. Alexandria Ocasio-Cortez (person-021) and Sen. Ed Markey (person-022) announced plans to introduce legislation codifying no-notice inspection rights. House Oversight Committee Chair',
+          createdAt: '2026-01-20T17:30:00Z'
+        },
+        {
+          id: 'highlight-027',
+          userId: 'user-003',
+          blockIndex: 5,
+          startOffset: 0,
+          endOffset: 88,
+          highlightedText: 'Ruling creates circuit split with previous DC Circuit holdings on congressional oversight authority.',
+          createdAt: '2026-01-20T18:00:00Z'
+        },
+        {
+          id: 'highlight-028',
+          userId: 'user-002',
+          blockIndex: 7,
+          startOffset: 0,
+          endOffset: 104,
+          highlightedText: 'Seven-day notice window provides opportunity for facility preparation that may compromise oversight effectiveness.',
+          createdAt: '2026-01-20T18:15:00Z'
+        }
+      ],
+      comments: [
+        {
+          id: 'comment-017',
+          userId: 'user-005',
+          blockIndex: 3,
+          anchorStartOffset: 155,
+          anchorEndOffset: 268,
+          anchorText: 'House Oversight Committee Chair Rep. James Comer (person-023) has not indicated opposition, suggesting potential bipartisan path.',
+          content: 'This is significant. If Comer doesn\'t oppose, the legislation has a real chance. Track his statements closely.',
+          createdAt: '2026-01-20T17:45:00Z',
+          replies: [
+            {
+              id: 'reply-019',
+              userId: 'user-001',
+              content: 'Congressional Affairs should reach out to his staff for a temperature check.',
+              createdAt: '2026-01-20T18:00:00Z'
+            },
+            {
+              id: 'reply-020',
+              userId: 'user-005',
+              content: 'On it. Will report back by end of day tomorrow.',
+              createdAt: '2026-01-20T18:15:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-018',
+          userId: 'user-003',
+          blockIndex: 5,
+          anchorStartOffset: 0,
+          anchorEndOffset: 88,
+          anchorText: 'Ruling creates circuit split with previous DC Circuit holdings on congressional oversight authority.',
+          content: 'Circuit split makes SCOTUS review more likely. Should we prepare a Supreme Court contingency analysis?',
+          createdAt: '2026-01-20T18:30:00Z',
+          replies: [
+            {
+              id: 'reply-021',
+              userId: 'user-006',
+              content: 'Yes, especially given the current Court\'s views on executive power. Get legal team started on this.',
+              createdAt: '2026-01-20T18:45:00Z'
+            }
+          ]
+        },
+        {
+          id: 'comment-019',
+          userId: 'user-002',
+          blockIndex: 7,
+          anchorStartOffset: 106,
+          anchorEndOffset: 229,
+          anchorText: 'Recommend developing protocols for rapid response to inspection announcements to ensure transparency while maintaining security requirements.',
+          content: 'Good recommendation. This should go to the operations team for implementation planning.',
+          createdAt: '2026-01-20T19:00:00Z',
+          replies: []
+        }
+      ]
     }
   ],
 
