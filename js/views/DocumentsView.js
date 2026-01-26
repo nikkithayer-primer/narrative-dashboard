@@ -134,6 +134,20 @@ export class DocumentsView extends BaseView {
 
     this.documentTable.update({ documents });
     
+    // Check for persisted viewer state in URL (e.g., #/documents?doc=doc-123)
+    const hashParts = window.location.hash.split('?');
+    if (hashParts[1]) {
+      const urlParams = new URLSearchParams(hashParts[1]);
+      const docId = urlParams.get('doc');
+      if (docId) {
+        const doc = documents.find(d => d.id === docId);
+        if (doc) {
+          // Open viewer without updating URL (it's already set)
+          this.documentTable.openViewer(doc, false);
+        }
+      }
+    }
+    
     // Attach publisher type filter listener
     this.attachFilterListeners();
   }
