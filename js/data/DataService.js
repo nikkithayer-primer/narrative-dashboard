@@ -18,8 +18,10 @@ import { dataStore } from './DataStore.js';
  * @returns {Object|undefined} The found entity or undefined
  */
 const findById = (collection, id) => {
-  const data = dataStore.data[collection];
-  return data ? data.find(item => item.id === id) : undefined;
+  if (!id) return undefined;
+  const data = dataStore.data?.[collection];
+  if (!data || !Array.isArray(data)) return undefined;
+  return data.find(item => item && item.id === id);
 };
 
 /**
@@ -31,12 +33,18 @@ const findById = (collection, id) => {
  * @returns {Array} Array of resolved entities (nulls filtered out)
  */
 const resolveRelatedEntities = (sourceCollection, sourceId, relationField, targetCollection) => {
-  const source = findById(sourceCollection, sourceId);
-  if (!source) return [];
-  const ids = source[relationField] || [];
-  return ids
-    .map(id => findById(targetCollection, id))
-    .filter(Boolean);
+  try {
+    const source = findById(sourceCollection, sourceId);
+    if (!source) return [];
+    const ids = source[relationField];
+    if (!ids || !Array.isArray(ids)) return [];
+    return ids
+      .map(id => findById(targetCollection, id))
+      .filter(Boolean);
+  } catch (e) {
+    console.error(`DataService: Error resolving related entities from ${sourceCollection} to ${targetCollection}:`, e);
+    return [];
+  }
 };
 
 /**
@@ -48,11 +56,23 @@ const resolveRelatedEntities = (sourceCollection, sourceId, relationField, targe
  * @returns {Array} Array of matching entities
  */
 const findEntitiesReferencing = (collection, field, targetId, isArrayField = true) => {
-  const data = dataStore.data[collection] || [];
-  if (isArrayField) {
-    return data.filter(item => (item[field] || []).includes(targetId));
+  try {
+    if (!targetId) return [];
+    const data = dataStore.data?.[collection];
+    if (!data || !Array.isArray(data)) return [];
+    
+    if (isArrayField) {
+      return data.filter(item => {
+        if (!item) return false;
+        const fieldValue = item[field];
+        return Array.isArray(fieldValue) && fieldValue.includes(targetId);
+      });
+    }
+    return data.filter(item => item && item[field] === targetId);
+  } catch (e) {
+    console.error(`DataService: Error finding entities referencing ${targetId} in ${collection}.${field}:`, e);
+    return [];
   }
-  return data.filter(item => item[field] === targetId);
 };
 
 export const DataService = {
@@ -90,7 +110,7 @@ export const DataService = {
 
   /**
    * Filter volumeOverTime array by time range
-   * @param {Array} volumeOverTime - Array of { date, factionVolumes, sourceVolumes }
+   * @param {Array} volumeOverTime - Array of { date, factionVolumes, publisherVolumes }
    * @param {Object|null} timeRange - { start: Date, end: Date } or null
    * @returns {Array} Filtered array
    */
@@ -119,21 +139,22 @@ export const DataService = {
   // ============================================
 
   // Missions
-  getMissions: () => dataStore.data.missions,
+  getMissions: () => dataStore.data?.missions || [],
   getMission: (id) => findById('missions', id),
 
   // Narratives - now supports time range filtering
   getNarratives: (missionId = null, timeRange = null) => {
-    let narratives = dataStore.data.narratives;
+    let narratives = dataStore.data?.narratives;
+    if (!narratives || !Array.isArray(narratives)) return [];
     
     // Filter by mission
     if (missionId && missionId !== 'all') {
-      narratives = narratives.filter(n => n.missionId === missionId);
+      narratives = narratives.filter(n => n && n.missionId === missionId);
     }
     
     // Filter by time range
     if (timeRange) {
-      narratives = narratives.filter(n => DataService.narrativeHasActivityInRange(n, timeRange));
+      narratives = narratives.filter(n => n && DataService.narrativeHasActivityInRange(n, timeRange));
     }
     
     return narratives;
@@ -167,33 +188,33 @@ export const DataService = {
   },
 
   // Themes
-  getSubNarratives: () => dataStore.data.subNarratives,
+  getSubNarratives: () => dataStore.data?.subNarratives || [],
   getSubNarrative: (id) => findById('subNarratives', id),
   getSubNarrativeById: (id) => findById('subNarratives', id),
 
   // Factions
-  getFactions: () => dataStore.data.factions,
+  getFactions: () => dataStore.data?.factions || [],
   getFaction: (id) => findById('factions', id),
   getFactionById: (id) => findById('factions', id),
-  getFactionOverlaps: () => dataStore.data.factionOverlaps,
+  getFactionOverlaps: () => dataStore.data?.factionOverlaps || [],
 
   // Locations
-  getLocations: () => dataStore.data.locations,
+  getLocations: () => dataStore.data?.locations || [],
   getLocation: (id) => findById('locations', id),
   getLocationById: (id) => findById('locations', id),
 
   // Events
-  getEvents: () => dataStore.data.events,
+  getEvents: () => dataStore.data?.events || [],
   getEvent: (id) => findById('events', id),
   getEventById: (id) => findById('events', id),
 
   // Persons
-  getPersons: () => dataStore.data.persons,
+  getPersons: () => dataStore.data?.persons || [],
   getPerson: (id) => findById('persons', id),
   getPersonById: (id) => findById('persons', id),
 
   // Organizations
-  getOrganizations: () => dataStore.data.organizations,
+  getOrganizations: () => dataStore.data?.organizations || [],
   getOrganization: (id) => findById('organizations', id),
   getOrganizationById: (id) => findById('organizations', id),
 
@@ -201,6 +222,64 @@ export const DataService = {
   getDocuments: () => dataStore.data.documents || [],
   getDocument: (id) => findById('documents', id),
   getDocumentById: (id) => findById('documents', id),
+  
+  /**
+   * Get documents filtered by document type
+   * @param {string} type - Document type (social_post, tiktok, news_article, internal)
+   * @returns {Array} Filtered documents
+   */
+  getDocumentsByType: (type) => {
+    return (dataStore.data.documents || []).filter(d => d.documentType === type);
+  },
+  
+  /**
+   * Get documents filtered by classification level
+   * @param {string} classification - Classification code (U, CUI, C, S, TS)
+   * @returns {Array} Filtered documents
+   */
+  getDocumentsByClassification: (classification) => {
+    return (dataStore.data.documents || []).filter(d => (d.classification || 'U') === classification);
+  },
+  
+  /**
+   * Get the effective classification of a document
+   * If document has portion marks, returns the highest classification
+   * @param {Object} doc - Document object
+   * @returns {string} Classification code
+   */
+  getDocumentClassification: (doc) => {
+    if (!doc) return 'U';
+    
+    // If document has explicit classification, use it
+    if (doc.classification) return doc.classification;
+    
+    // If document has content blocks with portion marks, calculate highest
+    if (doc.contentBlocks && doc.contentBlocks.length > 0) {
+      const classificationOrder = { 'U': 0, 'CUI': 1, 'C': 2, 'S': 3, 'TS': 4 };
+      let highest = 'U';
+      
+      doc.contentBlocks.forEach(block => {
+        if (block.portionMark && block.portionMark.classification) {
+          const current = block.portionMark.classification;
+          if (classificationOrder[current] > classificationOrder[highest]) {
+            highest = current;
+          }
+        }
+      });
+      
+      return highest;
+    }
+    
+    return 'U';
+  },
+  
+  /**
+   * Get classified documents (non-U classification)
+   * @returns {Array} Documents with classification above U
+   */
+  getClassifiedDocuments: () => {
+    return (dataStore.data.documents || []).filter(d => d.classification && d.classification !== 'U');
+  },
 
   // Monitors
   getMonitors: () => dataStore.data.monitors || [],
@@ -220,31 +299,89 @@ export const DataService = {
       .slice(0, limit);
   },
 
-  // Sources
-  getSources: () => dataStore.data.sources || [],
-  getSource: (id) => findById('sources', id),
-  getSourceCategories: () => dataStore.data.sourceCategories || [],
+  // Topics
+  getTopics: () => dataStore.data.topics || [],
+  getTopic: (id) => findById('topics', id),
+  getTopicById: (id) => findById('topics', id),
   
-  getSourcesByType: (type) => {
-    return (dataStore.data.sources || []).filter(s => s.type === type);
+  // Get topics filtered by time range
+  getTopicsInRange: (timeRange = null) => {
+    let topics = dataStore.data.topics || [];
+    if (!timeRange) return topics;
+    
+    return topics.filter(topic => {
+      const startDate = new Date(topic.startDate);
+      const endDate = topic.endDate ? new Date(topic.endDate) : new Date();
+      // Topic overlaps with range if topic starts before range ends AND topic ends after range starts
+      return startDate <= timeRange.end && endDate >= timeRange.start;
+    });
   },
   
-  getSocialSources: () => {
-    return (dataStore.data.sources || []).filter(s => s.type === 'social');
-  },
-  
-  getNewsSources: () => {
-    return (dataStore.data.sources || []).filter(s => 
-      s.type === 'national_news' || s.type === 'international_news'
+  // Get active topics (those without an end date or end date in future)
+  getActiveTopics: () => {
+    const now = new Date();
+    return (dataStore.data.topics || []).filter(topic => 
+      !topic.endDate || new Date(topic.endDate) >= now
     );
   },
   
-  getNationalNewsSources: () => {
-    return (dataStore.data.sources || []).filter(s => s.type === 'national_news');
+  // Get topics by document
+  getTopicsForDocument: (documentId) => {
+    return (dataStore.data.topics || []).filter(topic =>
+      (topic.documentIds || []).includes(documentId)
+    );
+  },
+
+  // Publishers (with fallback to sources for backward compatibility)
+  // Some datasets use 'publishers' while others use 'sources'
+  getPublishers: () => {
+    // Prefer publishers, fall back to sources
+    if (dataStore.data.publishers && dataStore.data.publishers.length > 0) {
+      return dataStore.data.publishers;
+    }
+    return dataStore.data.sources || [];
   },
   
-  getInternationalNewsSources: () => {
-    return (dataStore.data.sources || []).filter(s => s.type === 'international_news');
+  getPublisher: (id) => {
+    // Check publishers first, then sources
+    const publisher = findById('publishers', id);
+    if (publisher) return publisher;
+    return findById('sources', id);
+  },
+  
+  getPublisherCategories: () => {
+    // Prefer publisherCategories, fall back to sourceCategories
+    if (dataStore.data.publisherCategories && dataStore.data.publisherCategories.length > 0) {
+      return dataStore.data.publisherCategories;
+    }
+    return dataStore.data.sourceCategories || [];
+  },
+  
+  getPublishersByType: (type) => {
+    const publishers = DataService.getPublishers();
+    return publishers.filter(p => p.type === type);
+  },
+  
+  getSocialPublishers: () => {
+    const publishers = DataService.getPublishers();
+    return publishers.filter(p => p.type === 'social');
+  },
+  
+  getNewsPublishers: () => {
+    const publishers = DataService.getPublishers();
+    return publishers.filter(p => 
+      p.type === 'national_news' || p.type === 'international_news' || p.type === 'news'
+    );
+  },
+  
+  getNationalNewsPublishers: () => {
+    const publishers = DataService.getPublishers();
+    return publishers.filter(p => p.type === 'national_news');
+  },
+  
+  getInternationalNewsPublishers: () => {
+    const publishers = DataService.getPublishers();
+    return publishers.filter(p => p.type === 'international_news');
   },
 
   // ============================================
@@ -492,6 +629,81 @@ export const DataService = {
     resolveRelatedEntities('organizations', orgId, 'relatedLocationIds', 'locations'),
 
   // ============================================
+  // Topic Relationships
+  // ============================================
+
+  /**
+   * Get documents for a topic
+   */
+  getDocumentsForTopic: (topicId) => {
+    const topic = findById('topics', topicId);
+    if (!topic) return [];
+    return (topic.documentIds || [])
+      .map(did => (dataStore.data.documents || []).find(d => d.id === did))
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+  },
+
+  /**
+   * Get topic volume over time filtered by time range
+   */
+  getTopicVolumeOverTime: (topicId, timeRange = null) => {
+    const topic = findById('topics', topicId);
+    if (!topic || !topic.volumeOverTime) return [];
+    
+    if (!timeRange) return topic.volumeOverTime;
+    
+    return topic.volumeOverTime.filter(entry => 
+      DataService.isDateInRange(entry.date, timeRange)
+    );
+  },
+
+  /**
+   * Get total volume for a topic (optionally filtered by time range)
+   */
+  getTopicTotalVolume: (topicId, timeRange = null) => {
+    const volumeData = DataService.getTopicVolumeOverTime(topicId, timeRange);
+    return volumeData.reduce((sum, entry) => sum + (entry.volume || 0), 0);
+  },
+
+  /**
+   * Get topic duration in days
+   */
+  getTopicDuration: (topicId) => {
+    const topic = findById('topics', topicId);
+    if (!topic) return 0;
+    
+    const start = new Date(topic.startDate);
+    const end = topic.endDate ? new Date(topic.endDate) : new Date();
+    const diffTime = Math.abs(end - start);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  },
+
+  /**
+   * Get aggregate topic volume over time (all topics combined)
+   */
+  getAggregateTopicVolumeOverTime: (timeRange = null) => {
+    const topics = DataService.getTopicsInRange(timeRange);
+    const dateMap = new Map();
+
+    topics.forEach(topic => {
+      const volumeData = timeRange 
+        ? DataService.getTopicVolumeOverTime(topic.id, timeRange)
+        : topic.volumeOverTime || [];
+      
+      volumeData.forEach(entry => {
+        const current = dateMap.get(entry.date) || 0;
+        dateMap.set(entry.date, current + (entry.volume || 0));
+      });
+    });
+
+    const dates = [...dateMap.keys()].sort();
+    const volumes = dates.map(date => dateMap.get(date));
+
+    return { dates, volumes };
+  },
+
+  // ============================================
   // Document Relationships
   // ============================================
 
@@ -652,12 +864,172 @@ export const DataService = {
   },
 
   /**
-   * Get the source for a document
+   * Get the publisher for a document
+   * Handles both 'publisherId' and 'sourceId' field names for backward compatibility
    */
-  getSourceForDocument: (documentId) => {
+  getPublisherForDocument: (documentId) => {
     const doc = (dataStore.data.documents || []).find(d => d.id === documentId);
-    if (!doc || !doc.sourceId) return null;
-    return (dataStore.data.sources || []).find(s => s.id === doc.sourceId);
+    if (!doc) return null;
+    
+    // Check publisherId first, then sourceId
+    const publisherId = doc.publisherId || doc.sourceId;
+    if (!publisherId) return null;
+    
+    return DataService.getPublisher(publisherId);
+  },
+
+  // ============================================
+  // User Methods
+  // ============================================
+
+  /**
+   * Get all users
+   * @returns {Array} Array of user objects
+   */
+  getUsers: () => dataStore.data.users || [],
+
+  /**
+   * Get a user by ID
+   * @param {string} userId - The user ID
+   * @returns {Object|undefined} The user object or undefined
+   */
+  getUser: (userId) => findById('users', userId),
+
+  /**
+   * Get the current (logged-in) user
+   * @returns {Object|undefined} The current user object
+   */
+  getCurrentUser: () => {
+    return (dataStore.data.users || []).find(u => u.isCurrentUser);
+  },
+
+  // ============================================
+  // Highlight Methods
+  // ============================================
+
+  /**
+   * Get all highlights for a document
+   * @param {string} documentId - The document ID
+   * @returns {Array} Array of highlights with resolved user data
+   */
+  getHighlightsForDocument: (documentId) => {
+    const doc = findById('documents', documentId);
+    if (!doc || !doc.highlights) return [];
+    
+    return doc.highlights.map(highlight => ({
+      ...highlight,
+      user: findById('users', highlight.userId)
+    }));
+  },
+
+  /**
+   * Get all highlights by a specific user across all documents
+   * @param {string} userId - The user ID
+   * @returns {Array} Array of highlights with document references
+   */
+  getHighlightsByUser: (userId) => {
+    const documents = dataStore.data.documents || [];
+    const highlights = [];
+    
+    documents.forEach(doc => {
+      (doc.highlights || []).forEach(highlight => {
+        if (highlight.userId === userId) {
+          highlights.push({
+            ...highlight,
+            documentId: doc.id,
+            documentTitle: doc.title || doc.content?.substring(0, 50)
+          });
+        }
+      });
+    });
+    
+    return highlights.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  },
+
+  // ============================================
+  // Comment Methods
+  // ============================================
+
+  /**
+   * Get all comments for a document
+   * @param {string} documentId - The document ID
+   * @returns {Array} Array of comments with resolved user data and replies
+   */
+  getCommentsForDocument: (documentId) => {
+    const doc = findById('documents', documentId);
+    if (!doc || !doc.comments) return [];
+    
+    return doc.comments.map(comment => ({
+      ...comment,
+      user: findById('users', comment.userId),
+      replies: (comment.replies || []).map(reply => ({
+        ...reply,
+        user: findById('users', reply.userId)
+      }))
+    }));
+  },
+
+  /**
+   * Get all comments by a specific user across all documents
+   * @param {string} userId - The user ID
+   * @returns {Array} Array of comments with document references
+   */
+  getCommentsByUser: (userId) => {
+    const documents = dataStore.data.documents || [];
+    const comments = [];
+    
+    documents.forEach(doc => {
+      (doc.comments || []).forEach(comment => {
+        // Check main comment
+        if (comment.userId === userId) {
+          comments.push({
+            ...comment,
+            documentId: doc.id,
+            documentTitle: doc.title || doc.content?.substring(0, 50),
+            isReply: false
+          });
+        }
+        // Check replies
+        (comment.replies || []).forEach(reply => {
+          if (reply.userId === userId) {
+            comments.push({
+              ...reply,
+              parentCommentId: comment.id,
+              documentId: doc.id,
+              documentTitle: doc.title || doc.content?.substring(0, 50),
+              isReply: true
+            });
+          }
+        });
+      });
+    });
+    
+    return comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  },
+
+  /**
+   * Get comment count for a document
+   * @param {string} documentId - The document ID
+   * @returns {number} Total number of comments and replies
+   */
+  getCommentCountForDocument: (documentId) => {
+    const doc = findById('documents', documentId);
+    if (!doc || !doc.comments) return 0;
+    
+    return doc.comments.reduce((count, comment) => {
+      return count + 1 + (comment.replies || []).length;
+    }, 0);
+  },
+
+  /**
+   * Get highlight count for a document
+   * @param {string} documentId - The document ID
+   * @returns {number} Number of highlights
+   */
+  getHighlightCountForDocument: (documentId) => {
+    const doc = findById('documents', documentId);
+    if (!doc || !doc.highlights) return 0;
+    return doc.highlights.length;
   },
 
   // ============================================
@@ -672,53 +1044,69 @@ export const DataService = {
   buildNetworkGraph: (personIds, orgIds) => {
     const nodes = [];
     const links = [];
-    const narratives = dataStore.data.narratives;
+    
+    // Validate inputs
+    const safePersonIds = Array.isArray(personIds) ? personIds.filter(Boolean) : [];
+    const safeOrgIds = Array.isArray(orgIds) ? orgIds.filter(Boolean) : [];
+    
+    const narratives = dataStore.data?.narratives || [];
+    if (!Array.isArray(narratives)) {
+      console.error('DataService: narratives is not an array');
+      return { nodes, links };
+    }
 
-    // Build index: entityId -> Set of narrative IDs
-    const entityToNarratives = new Map();
-    narratives.forEach(n => {
-      (n.personIds || []).forEach(pId => {
-        if (!entityToNarratives.has(pId)) entityToNarratives.set(pId, new Set());
-        entityToNarratives.get(pId).add(n.id);
+    try {
+      // Build index: entityId -> Set of narrative IDs
+      const entityToNarratives = new Map();
+      narratives.forEach(n => {
+        if (!n) return;
+        (n.personIds || []).forEach(pId => {
+          if (!pId) return;
+          if (!entityToNarratives.has(pId)) entityToNarratives.set(pId, new Set());
+          entityToNarratives.get(pId).add(n.id);
+        });
+        (n.organizationIds || []).forEach(oId => {
+          if (!oId) return;
+          if (!entityToNarratives.has(oId)) entityToNarratives.set(oId, new Set());
+          entityToNarratives.get(oId).add(n.id);
+        });
       });
-      (n.organizationIds || []).forEach(oId => {
-        if (!entityToNarratives.has(oId)) entityToNarratives.set(oId, new Set());
-        entityToNarratives.get(oId).add(n.id);
+
+      // Helper to find shared narratives between two entities
+      const getSharedNarratives = (id1, id2) => {
+        const set1 = entityToNarratives.get(id1) || new Set();
+        const set2 = entityToNarratives.get(id2) || new Set();
+        const sharedIds = [...set1].filter(nId => set2.has(nId));
+        return sharedIds.map(nId => narratives.find(n => n && n.id === nId)).filter(Boolean);
+      };
+
+      const persons = dataStore.data?.persons || [];
+      const organizations = dataStore.data?.organizations || [];
+
+      // Add person nodes
+      safePersonIds.forEach(pId => {
+        const person = persons.find(p => p && p.id === pId);
+        if (person) {
+          nodes.push({ id: pId, label: person.name || 'Unknown', type: 'person', data: person });
+        }
       });
-    });
 
-    // Helper to find shared narratives between two entities
-    const getSharedNarratives = (id1, id2) => {
-      const set1 = entityToNarratives.get(id1) || new Set();
-      const set2 = entityToNarratives.get(id2) || new Set();
-      const sharedIds = [...set1].filter(nId => set2.has(nId));
-      return sharedIds.map(nId => narratives.find(n => n.id === nId)).filter(Boolean);
-    };
-
-    // Add person nodes
-    personIds.forEach(pId => {
-      const person = dataStore.data.persons.find(p => p.id === pId);
-      if (person) {
-        nodes.push({ id: pId, label: person.name, type: 'person', data: person });
-      }
-    });
-
-    // Add organization nodes
-    orgIds.forEach(oId => {
-      const org = dataStore.data.organizations.find(o => o.id === oId);
-      if (org) {
-        nodes.push({ id: oId, label: org.name, type: 'organization', data: org });
-      }
-    });
+      // Add organization nodes
+      safeOrgIds.forEach(oId => {
+        const org = organizations.find(o => o && o.id === oId);
+        if (org) {
+          nodes.push({ id: oId, label: org.name || 'Unknown', type: 'organization', data: org });
+        }
+      });
 
     const nodeIds = new Set(nodes.map(n => n.id));
     const addedLinks = new Set(); // Track links to avoid duplicates
 
     // Compute person-person links from shared narratives
-    for (let i = 0; i < personIds.length; i++) {
-      for (let j = i + 1; j < personIds.length; j++) {
-        const p1 = personIds[i];
-        const p2 = personIds[j];
+    for (let i = 0; i < safePersonIds.length; i++) {
+      for (let j = i + 1; j < safePersonIds.length; j++) {
+        const p1 = safePersonIds[i];
+        const p2 = safePersonIds[j];
         const sharedNarratives = getSharedNarratives(p1, p2);
         
         if (sharedNarratives.length > 0) {
@@ -738,10 +1126,10 @@ export const DataService = {
     }
 
     // Compute org-org links from shared narratives
-    for (let i = 0; i < orgIds.length; i++) {
-      for (let j = i + 1; j < orgIds.length; j++) {
-        const o1 = orgIds[i];
-        const o2 = orgIds[j];
+    for (let i = 0; i < safeOrgIds.length; i++) {
+      for (let j = i + 1; j < safeOrgIds.length; j++) {
+        const o1 = safeOrgIds[i];
+        const o2 = safeOrgIds[j];
         const sharedNarratives = getSharedNarratives(o1, o2);
         
         if (sharedNarratives.length > 0) {
@@ -761,8 +1149,8 @@ export const DataService = {
     }
 
     // Compute person-org links from shared narratives
-    personIds.forEach(pId => {
-      orgIds.forEach(oId => {
+    safePersonIds.forEach(pId => {
+      safeOrgIds.forEach(oId => {
         const sharedNarratives = getSharedNarratives(pId, oId);
         
         if (sharedNarratives.length > 0) {
@@ -782,6 +1170,10 @@ export const DataService = {
     });
 
     return { nodes, links };
+    } catch (e) {
+      console.error('DataService: Error building network graph:', e);
+      return { nodes: [], links: [] };
+    }
   },
 
   // ============================================
@@ -992,103 +1384,103 @@ export const DataService = {
   },
 
   // ============================================
-  // Source Relationships
+  // Publisher Relationships
   // ============================================
 
-  getSourcesForNarrative: (narrativeId) => {
+  getPublishersForNarrative: (narrativeId) => {
     const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
-    if (!narrative || !narrative.sourceVolumes) return [];
+    if (!narrative || !narrative.publisherVolumes) return [];
     
-    const sources = dataStore.data.sources || [];
-    return Object.entries(narrative.sourceVolumes).map(([sourceId, data]) => {
-      const source = sources.find(s => s.id === sourceId);
-      return source ? { source, ...data } : null;
+    const publishers = dataStore.data.publishers || [];
+    return Object.entries(narrative.publisherVolumes).map(([publisherId, data]) => {
+      const publisher = publishers.find(p => p.id === publisherId);
+      return publisher ? { publisher, ...data } : null;
     }).filter(Boolean);
   },
 
-  getFactionSourcesForNarrative: (narrativeId) => {
+  getFactionPublishersForNarrative: (narrativeId) => {
     const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
-    if (!narrative || !narrative.factionSources) return [];
+    if (!narrative || !narrative.factionPublishers) return [];
     
     const factions = dataStore.data.factions;
-    const sources = dataStore.data.sources || [];
+    const publishers = dataStore.data.publishers || [];
     
-    return Object.entries(narrative.factionSources).map(([factionId, sourceCounts]) => {
+    return Object.entries(narrative.factionPublishers).map(([factionId, publisherCounts]) => {
       const faction = factions.find(f => f.id === factionId);
       if (!faction) return null;
       
-      const sourceData = Object.entries(sourceCounts).map(([sourceId, volume]) => {
-        const source = sources.find(s => s.id === sourceId);
-        return source ? { source, volume } : null;
+      const publisherData = Object.entries(publisherCounts).map(([publisherId, volume]) => {
+        const publisher = publishers.find(p => p.id === publisherId);
+        return publisher ? { publisher, volume } : null;
       }).filter(Boolean);
       
-      return { faction, sources: sourceData };
+      return { faction, publishers: publisherData };
     }).filter(Boolean);
   },
 
-  getSourceVolumeOverTime: (narrativeId) => {
+  getPublisherVolumeOverTime: (narrativeId) => {
     const narrative = dataStore.data.narratives.find(n => n.id === narrativeId);
-    if (!narrative || !narrative.volumeOverTime) return { dates: [], series: [], sources: [] };
+    if (!narrative || !narrative.volumeOverTime) return { dates: [], series: [], publishers: [] };
     
-    const sources = dataStore.data.sources || [];
-    const allSourceIds = new Set();
+    const publishers = dataStore.data.publishers || [];
+    const allPublisherIds = new Set();
     
-    // Collect all source IDs present in the time series
+    // Collect all publisher IDs present in the time series
     narrative.volumeOverTime.forEach(entry => {
-      Object.keys(entry.sourceVolumes || {}).forEach(id => allSourceIds.add(id));
+      Object.keys(entry.publisherVolumes || {}).forEach(id => allPublisherIds.add(id));
     });
     
-    const sourceIds = [...allSourceIds];
-    const relevantSources = sourceIds.map(id => sources.find(s => s.id === id)).filter(Boolean);
+    const publisherIds = [...allPublisherIds];
+    const relevantPublishers = publisherIds.map(id => publishers.find(p => p.id === id)).filter(Boolean);
     
     const dates = narrative.volumeOverTime.map(e => e.date);
-    const series = relevantSources.map(source => 
-      narrative.volumeOverTime.map(entry => (entry.sourceVolumes || {})[source.id] || 0)
+    const series = relevantPublishers.map(publisher => 
+      narrative.volumeOverTime.map(entry => (entry.publisherVolumes || {})[publisher.id] || 0)
     );
     
-    return { dates, series, sources: relevantSources };
+    return { dates, series, publishers: relevantPublishers };
   },
 
-  // Aggregate source volumes across multiple narratives (with time range support)
-  getAggregateSourceVolumes: (missionId = null, timeRange = null) => {
+  // Aggregate publisher volumes across multiple narratives (with time range support)
+  getAggregatePublisherVolumes: (missionId = null, timeRange = null) => {
     const narratives = DataService.getNarratives(missionId, timeRange);
-    const sources = dataStore.data.sources || [];
-    const sourceTotals = {};
+    const publishers = dataStore.data.publishers || [];
+    const publisherTotals = {};
     
     narratives.forEach(n => {
       // If time range specified, calculate from volumeOverTime
       if (timeRange && n.volumeOverTime) {
         const filteredVolume = DataService.filterVolumeByTimeRange(n.volumeOverTime, timeRange);
         filteredVolume.forEach(entry => {
-          Object.entries(entry.sourceVolumes || {}).forEach(([sourceId, vol]) => {
-            if (!sourceTotals[sourceId]) {
-              sourceTotals[sourceId] = { volume: 0, sentimentCounts: { positive: 0, neutral: 0, negative: 0 } };
+          Object.entries(entry.publisherVolumes || {}).forEach(([publisherId, vol]) => {
+            if (!publisherTotals[publisherId]) {
+              publisherTotals[publisherId] = { volume: 0, sentimentCounts: { positive: 0, neutral: 0, negative: 0 } };
             }
-            sourceTotals[sourceId].volume += vol;
+            publisherTotals[publisherId].volume += vol;
           });
         });
       } else {
-        // Use aggregate sourceVolumes
-        Object.entries(n.sourceVolumes || {}).forEach(([sourceId, data]) => {
-          if (!sourceTotals[sourceId]) {
-            sourceTotals[sourceId] = { volume: 0, sentimentCounts: { positive: 0, neutral: 0, negative: 0 } };
+        // Use aggregate publisherVolumes
+        Object.entries(n.publisherVolumes || {}).forEach(([publisherId, data]) => {
+          if (!publisherTotals[publisherId]) {
+            publisherTotals[publisherId] = { volume: 0, sentimentCounts: { positive: 0, neutral: 0, negative: 0 } };
           }
-          sourceTotals[sourceId].volume += data.volume || 0;
+          publisherTotals[publisherId].volume += data.volume || 0;
           if (data.sentiment) {
-            sourceTotals[sourceId].sentimentCounts[data.sentiment]++;
+            publisherTotals[publisherId].sentimentCounts[data.sentiment]++;
           }
         });
       }
     });
     
-    return Object.entries(sourceTotals).map(([sourceId, totals]) => {
-      const source = sources.find(s => s.id === sourceId);
-      return source ? { source, ...totals } : null;
+    return Object.entries(publisherTotals).map(([publisherId, totals]) => {
+      const publisher = publishers.find(p => p.id === publisherId);
+      return publisher ? { publisher, ...totals } : null;
     }).filter(Boolean).sort((a, b) => b.volume - a.volume);
   },
 
-  // Aggregate source volumes over time (with time range and status support)
-  getAggregateSourceVolumeOverTime: (missionId = null, timeRange = null, statusFilter = null) => {
+  // Aggregate publisher volumes over time (with time range and status support)
+  getAggregatePublisherVolumeOverTime: (missionId = null, timeRange = null, statusFilter = null) => {
     let narratives = DataService.getNarratives(missionId);
     
     // Apply status filter if provided (statusFilter is an array of statuses)
@@ -1096,7 +1488,7 @@ export const DataService = {
       narratives = narratives.filter(n => statusFilter.includes(n.status || 'new'));
     }
     
-    const sources = dataStore.data.sources || [];
+    const publishers = dataStore.data.publishers || [];
     const dateMap = new Map();
 
     narratives.forEach(n => {
@@ -1106,47 +1498,47 @@ export const DataService = {
           dateMap.set(entry.date, {});
         }
         const dayData = dateMap.get(entry.date);
-        Object.entries(entry.sourceVolumes || {}).forEach(([sId, vol]) => {
-          dayData[sId] = (dayData[sId] || 0) + vol;
+        Object.entries(entry.publisherVolumes || {}).forEach(([pId, vol]) => {
+          dayData[pId] = (dayData[pId] || 0) + vol;
         });
       });
     });
 
     const dates = [...dateMap.keys()].sort();
-    const allSourceIds = new Set();
+    const allPublisherIds = new Set();
     dateMap.forEach(dayData => {
-      Object.keys(dayData).forEach(id => allSourceIds.add(id));
+      Object.keys(dayData).forEach(id => allPublisherIds.add(id));
     });
     
-    const relevantSources = [...allSourceIds].map(id => sources.find(s => s.id === id)).filter(Boolean);
-    const series = relevantSources.map(source =>
-      dates.map(date => (dateMap.get(date) || {})[source.id] || 0)
+    const relevantPublishers = [...allPublisherIds].map(id => publishers.find(p => p.id === id)).filter(Boolean);
+    const series = relevantPublishers.map(publisher =>
+      dates.map(date => (dateMap.get(date) || {})[publisher.id] || 0)
     );
 
-    return { dates, series, sources: relevantSources };
+    return { dates, series, publishers: relevantPublishers };
   },
 
-  // Get top sources by total volume (with time range support)
-  getTopSources: (missionId = null, limit = 5, timeRange = null) => {
-    const aggregated = DataService.getAggregateSourceVolumes(missionId, timeRange);
+  // Get top publishers by total volume (with time range support)
+  getTopPublishers: (missionId = null, limit = 5, timeRange = null) => {
+    const aggregated = DataService.getAggregatePublisherVolumes(missionId, timeRange);
     return aggregated.slice(0, limit);
   },
 
-  // Get source category totals (with time range support)
-  getSourceCategoryTotals: (missionId = null, timeRange = null) => {
-    const aggregated = DataService.getAggregateSourceVolumes(missionId, timeRange);
-    const categories = dataStore.data.sourceCategories || [];
+  // Get publisher category totals (with time range support)
+  getPublisherCategoryTotals: (missionId = null, timeRange = null) => {
+    const aggregated = DataService.getAggregatePublisherVolumes(missionId, timeRange);
+    const categories = dataStore.data.publisherCategories || [];
     const categoryTotals = {};
     
     categories.forEach(cat => {
-      categoryTotals[cat.id] = { category: cat, volume: 0, sources: [] };
+      categoryTotals[cat.id] = { category: cat, volume: 0, publishers: [] };
     });
     
     aggregated.forEach(item => {
-      const type = item.source.type;
+      const type = item.publisher.type;
       if (categoryTotals[type]) {
         categoryTotals[type].volume += item.volume;
-        categoryTotals[type].sources.push(item);
+        categoryTotals[type].publishers.push(item);
       }
     });
     
@@ -1357,10 +1749,10 @@ export const DataService = {
 
   // Search across all entities
   search: (query) => {
-    const lowerQuery = query.toLowerCase();
     const results = {
       narratives: [],
       subNarratives: [],
+      topics: [],
       factions: [],
       locations: [],
       events: [],
@@ -1368,27 +1760,41 @@ export const DataService = {
       organizations: []
     };
 
-    results.narratives = dataStore.data.narratives.filter(n =>
-      n.text.toLowerCase().includes(lowerQuery)
-    );
-    results.subNarratives = dataStore.data.subNarratives.filter(s =>
-      s.text.toLowerCase().includes(lowerQuery)
-    );
-    results.factions = dataStore.data.factions.filter(f =>
-      f.name.toLowerCase().includes(lowerQuery)
-    );
-    results.locations = dataStore.data.locations.filter(l =>
-      l.name.toLowerCase().includes(lowerQuery)
-    );
-    results.events = dataStore.data.events.filter(e =>
-      e.text.toLowerCase().includes(lowerQuery)
-    );
-    results.persons = dataStore.data.persons.filter(p =>
-      p.name.toLowerCase().includes(lowerQuery)
-    );
-    results.organizations = dataStore.data.organizations.filter(o =>
-      o.name.toLowerCase().includes(lowerQuery)
-    );
+    if (!query || typeof query !== 'string') {
+      return results;
+    }
+
+    try {
+      const lowerQuery = query.toLowerCase();
+      
+      results.narratives = (dataStore.data?.narratives || []).filter(n =>
+        n && n.text && n.text.toLowerCase().includes(lowerQuery)
+      );
+      results.subNarratives = (dataStore.data?.subNarratives || []).filter(s =>
+        s && s.text && s.text.toLowerCase().includes(lowerQuery)
+      );
+      results.topics = (dataStore.data?.topics || []).filter(t =>
+        t && ((t.headline && t.headline.toLowerCase().includes(lowerQuery)) ||
+        (Array.isArray(t.bulletPoints) && t.bulletPoints.some(bp => bp && bp.toLowerCase().includes(lowerQuery))))
+      );
+      results.factions = (dataStore.data?.factions || []).filter(f =>
+        f && f.name && f.name.toLowerCase().includes(lowerQuery)
+      );
+      results.locations = (dataStore.data?.locations || []).filter(l =>
+        l && l.name && l.name.toLowerCase().includes(lowerQuery)
+      );
+      results.events = (dataStore.data?.events || []).filter(e =>
+        e && e.text && e.text.toLowerCase().includes(lowerQuery)
+      );
+      results.persons = (dataStore.data?.persons || []).filter(p =>
+        p && p.name && p.name.toLowerCase().includes(lowerQuery)
+      );
+      results.organizations = (dataStore.data?.organizations || []).filter(o =>
+        o && o.name && o.name.toLowerCase().includes(lowerQuery)
+      );
+    } catch (e) {
+      console.error('DataService: Error during search:', e);
+    }
 
     return results;
   }

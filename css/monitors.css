@@ -3,6 +3,47 @@
  * Styles for the Monitors view
  */
 
+/* Header Actions with Dropdowns */
+.view-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Monitor Dropdown Menu Styles */
+.monitor-dropdown-menu {
+  min-width: 240px;
+  padding: var(--space-sm) 0;
+}
+
+.dropdown-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.dropdown-item-row:hover {
+  background: var(--bg-hover);
+}
+
+.dropdown-item-row > *:first-child {
+  flex-shrink: 0;
+}
+
+.dropdown-item-row > *:last-child {
+  text-align: right;
+  margin-left: auto;
+}
+
+.dropdown-item-row .data-label {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
 /* Monitors Section */
 .monitors-section {
   margin-bottom: var(--space-lg);

@@ -12,7 +12,7 @@ import {
   CardManager,
   NetworkGraphCard,
   NarrativeListCard,
-  DocumentListCard,
+  DocumentTableCard,
   MapCard,
   TimelineCard,
   SentimentChartCard,
@@ -48,12 +48,27 @@ export class EntityDetailView extends BaseView {
     // Fetch all related data
     const data = this.fetchEntityData(entity);
     
-    // Build cards
-    this.setupCards(entity, data);
+    // Store data for card setup
+    this._entityData = { entity, data };
+    
+    // Determine active tab
+    const activeTab = this.getCurrentTab();
+    const hasDocuments = data.documents.length > 0;
+    
+    // Build cards based on active tab
+    if (this.isDocumentsTab()) {
+      this.setupDocumentsCard(entity, data);
+    } else {
+      this.setupDashboardCards(entity, data);
+    }
+    
+    // Generate tabs config
+    const baseHref = `#/${this.entityType}/${this.entityId}`;
+    const tabsConfig = hasDocuments ? this.getTabsConfig(baseHref, true) : null;
     
     // Render page
     this.container.innerHTML = `
-      ${this.renderHeader(entity)}
+      ${this.renderHeader(entity, tabsConfig, activeTab)}
       <div class="content-area">
         <div class="content-grid">
           ${this.cardManager.getHtml()}
@@ -64,10 +79,10 @@ export class EntityDetailView extends BaseView {
     // Initialize card width toggles
     const contentGrid = this.container.querySelector('.content-grid');
     if (contentGrid) {
-      // First 4 cards default to half-width for entity views
-      initAllCardToggles(contentGrid, `${this.entityType}-${this.entityId}`, { 
-        0: 'half', 1: 'half', 2: 'half', 3: 'half' 
-      });
+      const tabSuffix = this.isDocumentsTab() ? '-docs' : '';
+      // First 4 cards default to half-width for entity views (dashboard only)
+      const defaults = this.isDocumentsTab() ? {} : { 0: 'half', 1: 'half', 2: 'half', 3: 'half' };
+      initAllCardToggles(contentGrid, `${this.entityType}-${this.entityId}${tabSuffix}`, defaults);
     }
 
     // Initialize all card components
@@ -120,9 +135,12 @@ export class EntityDetailView extends BaseView {
   }
 
   /**
-   * Set up card components based on available data
+   * Set up card components for Dashboard tab (all cards except documents)
    */
-  setupCards(entity, data) {
+  setupDashboardCards(entity, data) {
+    // Reset card manager for fresh setup
+    this.cardManager = new CardManager(this);
+    
     const prefix = this.isPerson ? 'person' : 'org';
     const hasNetwork = data.relatedPersons.length > 0 || data.relatedOrgs.length > 0;
 
@@ -181,21 +199,36 @@ export class EntityDetailView extends BaseView {
         showCount: true
       }));
     }
+  }
 
-    // Documents
+  /**
+   * Set up card for Documents tab (full-width document table)
+   */
+  setupDocumentsCard(entity, data) {
+    // Reset card manager for fresh setup
+    this.cardManager = new CardManager(this);
+    
+    const prefix = this.isPerson ? 'person' : 'org';
+
     if (data.documents.length > 0) {
-      this.cardManager.add(new DocumentListCard(this, `${prefix}-documents`, {
+      this.cardManager.add(new DocumentTableCard(this, `${prefix}-documents`, {
         title: 'Source Documents',
         documents: data.documents,
-        showCount: true
+        showCount: true,
+        fullWidth: true,
+        maxItems: 50,
+        enableViewerMode: true
       }));
     }
   }
 
   /**
    * Render the page header
+   * @param {Object} entity - The entity object
+   * @param {Array} tabsConfig - Tabs configuration for PageHeader
+   * @param {string} activeTab - The currently active tab
    */
-  renderHeader(entity) {
+  renderHeader(entity, tabsConfig = null, activeTab = 'dashboard') {
     const personIcon = `<svg viewBox="0 0 16 16" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25">
       <circle cx="8" cy="4" r="2.5"/>
       <path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/>
@@ -239,7 +272,11 @@ export class EntityDetailView extends BaseView {
       ],
       title: entity.name,
       icon: icon,
-      subtitle: typeLabel
+      imageUrl: entity.imageUrl || null,
+      imageAlt: entity.name,
+      subtitle: typeLabel,
+      tabs: tabsConfig,
+      activeTab: activeTab
     });
   }
 

@@ -15,11 +15,13 @@ import { Timeline } from '../components/Timeline.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
 import { getSourceViewer } from '../components/SourceViewerModal.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
+import { renderEntityList } from '../utils/entityRenderer.js';
 
 export class SubNarrativeView extends BaseView {
   constructor(container, subNarrativeId, options = {}) {
     super(container, options);
     this.subNarrativeId = subNarrativeId;
+    this.networkViewMode = 'graph'; // 'graph' or 'list'
   }
 
   async render() {
@@ -93,6 +95,9 @@ export class SubNarrativeView extends BaseView {
         getSourceViewer().open(subNarrative, 'subnarrative');
       });
     }
+
+    // Initialize drag-and-drop for cards
+    this.initDragDrop();
   }
 
   fetchSubNarrativeData(subNarrative) {
@@ -143,7 +148,11 @@ export class SubNarrativeView extends BaseView {
     }
 
     if (data.hasNetwork) {
-      cards.push(CardBuilder.create('People & Organizations', 'sub-network'));
+      const entityCount = data.personIds.length + data.orgIds.length;
+      cards.push(CardBuilder.create('People & Organizations', 'sub-network', {
+        count: entityCount,
+        actions: this.getNetworkToggleHtml('sub-network')
+      }));
     }
 
     return cards.join('');
@@ -230,8 +239,58 @@ export class SubNarrativeView extends BaseView {
 
     // Network Graph
     if (personIds.length > 0 || orgIds.length > 0) {
-      const networkData = DataService.buildNetworkGraph(personIds, orgIds);
+      const persons = personIds.map(id => DataService.getPerson(id)).filter(Boolean);
+      const orgs = orgIds.map(id => DataService.getOrganization(id)).filter(Boolean);
+      
+      this._networkData = {
+        personIds,
+        orgIds,
+        persons,
+        orgs,
+        graphData: DataService.buildNetworkGraph(personIds, orgIds)
+      };
+      
+      this.renderNetworkView();
+      this.setupNetworkToggle('sub-network');
+    }
+  }
 
+  /**
+   * Get the HTML for the network view toggle buttons
+   */
+  getNetworkToggleHtml(containerId) {
+    return `
+      <div class="view-toggle network-view-toggle" data-container="${containerId}">
+        <button class="view-toggle-btn ${this.networkViewMode === 'graph' ? 'active' : ''}" data-view="graph" title="Network Graph">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="4" r="2"/>
+            <circle cx="4" cy="12" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M8 6v2M6 10l-1 1M10 10l1 1"/>
+          </svg>
+        </button>
+        <button class="view-toggle-btn ${this.networkViewMode === 'list' ? 'active' : ''}" data-view="list" title="List View">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2 4h12M2 8h12M2 12h12"/>
+          </svg>
+        </button>
+      </div>
+    `;
+  }
+
+  /**
+   * Render the network view based on current mode
+   */
+  renderNetworkView() {
+    const container = document.getElementById('sub-network');
+    if (!container || !this._networkData) return;
+
+    if (this.components.network) {
+      this.components.network.destroy();
+      this.components.network = null;
+    }
+
+    if (this.networkViewMode === 'graph') {
       this.components.network = new NetworkGraph('sub-network', {
         height: 400,
         onNodeClick: (node) => {
@@ -242,9 +301,53 @@ export class SubNarrativeView extends BaseView {
           this.showConnectingNarrativesModal(link);
         }
       });
-      this.components.network.update(networkData);
+      this.components.network.update(this._networkData.graphData);
       this.components.network.enableAutoResize();
+    } else {
+      this.renderNetworkListView(container);
     }
+  }
+
+  /**
+   * Render list view for people and organizations
+   */
+  renderNetworkListView(container) {
+    const { persons, orgs } = this._networkData;
+    const allEntities = [
+      ...persons.map(p => ({ ...p, _type: 'person' })),
+      ...orgs.map(o => ({ ...o, _type: 'organization' }))
+    ];
+
+    container.innerHTML = renderEntityList(allEntities, { sortByName: true });
+
+    container.querySelectorAll('.entity-list-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.dataset.id;
+        const type = item.dataset.type;
+        window.location.hash = `#/${type}/${id}`;
+      });
+    });
+  }
+
+  /**
+   * Set up network view toggle listeners
+   */
+  setupNetworkToggle(containerId) {
+    const toggleContainer = document.querySelector(`.network-view-toggle[data-container="${containerId}"]`);
+    if (!toggleContainer) return;
+
+    toggleContainer.querySelectorAll('.view-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const newView = btn.dataset.view;
+        if (newView !== this.networkViewMode) {
+          this.networkViewMode = newView;
+          toggleContainer.querySelectorAll('.view-toggle-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.view === newView);
+          });
+          this.renderNetworkView();
+        }
+      });
+    });
   }
 }
 

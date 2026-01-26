@@ -99,19 +99,17 @@ export class NetworkGraph extends BaseComponent {
       .attr('d', 'M 0,-5 L 10,0 L 0,5')
       .attr('fill', 'var(--border-color)');
 
-    // Glow filter
-    const filter = defs.append('filter')
-      .attr('id', `glow-${this.containerId}`)
-      .attr('x', '-50%')
-      .attr('y', '-50%')
-      .attr('width', '200%')
-      .attr('height', '200%');
-    filter.append('feGaussianBlur')
-      .attr('stdDeviation', '3')
-      .attr('result', 'coloredBlur');
-    const feMerge = filter.append('feMerge');
-    feMerge.append('feMergeNode').attr('in', 'coloredBlur');
-    feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+    // Clip paths for circular images - create one for each node with an image
+    nodesCopy.forEach((node, i) => {
+      if (node.data && node.data.imageUrl) {
+        defs.append('clipPath')
+          .attr('id', `clip-${this.containerId}-${i}`)
+          .append('circle')
+          .attr('r', nodeRadius)
+          .attr('cx', 0)
+          .attr('cy', 0);
+      }
+    });
 
     // Stop existing simulation
     if (this.simulation) {
@@ -175,23 +173,33 @@ export class NetworkGraph extends BaseComponent {
       .attr('class', d => `node node-${d.type}`)
       .call(this.drag(this.simulation));
 
-    // Node glow circle
-    node.append('circle')
-      .attr('r', nodeRadius + 3)
-      .attr('fill', 'none')
-      .attr('stroke', d => d.type === 'person' ? 'var(--accent-success)' : 'var(--accent-primary)')
-      .attr('stroke-width', 0)
-      .attr('class', 'node-glow');
+    // Helper to check if node has a valid image
+    const hasImage = d => d.data && d.data.imageUrl;
+    const containerId = this.containerId;
 
-    // Node main circle
+    // Node main circle (background for nodes without images, or border for nodes with images)
     node.append('circle')
       .attr('r', nodeRadius)
-      .attr('fill', d => d.type === 'person' ? 'var(--accent-success)' : 'var(--accent-primary)')
-      .attr('stroke', 'var(--bg-primary)')
+      .attr('fill', d => hasImage(d) ? 'var(--bg-tertiary)' : (d.type === 'person' ? 'var(--accent-success)' : 'var(--accent-primary)'))
+      .attr('stroke', d => hasImage(d) ? (d.type === 'person' ? 'var(--accent-success)' : 'var(--accent-primary)') : 'var(--bg-primary)')
       .attr('stroke-width', 3);
 
-    // Node icon (SVG icons matching ListView.js)
-    const iconGroup = node.append('g')
+    // Add circular images for nodes that have imageUrl
+    node.filter(d => hasImage(d)).each(function(d, i) {
+      const nodeIndex = nodesCopy.indexOf(d);
+      d3.select(this).append('image')
+        .attr('xlink:href', d.data.imageUrl)
+        .attr('x', -nodeRadius)
+        .attr('y', -nodeRadius)
+        .attr('width', nodeRadius * 2)
+        .attr('height', nodeRadius * 2)
+        .attr('clip-path', `url(#clip-${containerId}-${nodeIndex})`)
+        .attr('preserveAspectRatio', 'xMidYMid slice')
+        .style('pointer-events', 'none');
+    });
+
+    // Node icon (SVG icons matching ListView.js) - only for nodes WITHOUT images
+    const iconGroup = node.filter(d => !hasImage(d)).append('g')
       .attr('class', 'node-icon')
       .attr('transform', 'translate(-8, -8)')
       .style('pointer-events', 'none');
@@ -265,20 +273,18 @@ export class NetworkGraph extends BaseComponent {
       .attr('font-family', 'var(--font-sans)')
       .style('pointer-events', 'none');
 
-    // Hover effects
-    node.on('mouseover', function() {
-      d3.select(this).select('.node-glow')
-        .attr('stroke-width', 4)
-        .attr('filter', `url(#glow-${this.containerId})`);
-    }.bind(this))
-    .on('mouseout', function() {
-      d3.select(this).select('.node-glow')
-        .attr('stroke-width', 0)
-        .attr('filter', null);
-    });
+    // Add CSS transition for smooth scaling and set up hover effects
+    node.style('transition', 'transform 150ms ease-out')
+      .style('cursor', 'pointer');
 
-    // Click handler
-    node.on('click', (event, d) => {
+    // Hover effects - scale up node slightly
+    node.on('mouseover', function(event, d) {
+      d3.select(this).attr('transform', `translate(${d.x},${d.y}) scale(1.15)`);
+    })
+    .on('mouseout', function(event, d) {
+      d3.select(this).attr('transform', `translate(${d.x},${d.y}) scale(1)`);
+    })
+    .on('click', (event, d) => {
       if (this.options.onNodeClick) {
         this.options.onNodeClick(d);
       }
@@ -292,11 +298,11 @@ export class NetworkGraph extends BaseComponent {
         .attr('x2', d => d.target.x)
         .attr('y2', d => d.target.y);
 
-      node.attr('transform', d => {
+      node.each(function(d) {
         // Keep within bounds
         d.x = Math.max(nodeRadius, Math.min(width - nodeRadius, d.x));
         d.y = Math.max(nodeRadius, Math.min(height - nodeRadius, d.y));
-        return `translate(${d.x},${d.y})`;
+        d3.select(this).attr('transform', `translate(${d.x},${d.y})`);
       });
     });
   }

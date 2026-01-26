@@ -10,8 +10,17 @@ class DataStore {
     this.datasetKey = 'narrativeOS_currentDataset';
     this.datasetNameKey = 'narrativeOS_currentDatasetName';
     this.listeners = new Set();
-    this.currentDataset = localStorage.getItem(this.datasetKey) || 'american-politics';
-    this.currentDatasetName = localStorage.getItem(this.datasetNameKey) || 'American Politics';
+    
+    // Safely read from localStorage with fallbacks
+    try {
+      this.currentDataset = localStorage.getItem(this.datasetKey) || 'american-politics';
+      this.currentDatasetName = localStorage.getItem(this.datasetNameKey) || 'American Politics';
+    } catch (e) {
+      console.error('DataStore: Failed to read from localStorage:', e);
+      this.currentDataset = 'american-politics';
+      this.currentDatasetName = 'American Politics';
+    }
+    
     this.data = this.load();
   }
 
@@ -41,7 +50,11 @@ class DataStore {
    */
   setCurrentDatasetName(name) {
     this.currentDatasetName = name;
-    localStorage.setItem(this.datasetNameKey, name);
+    try {
+      localStorage.setItem(this.datasetNameKey, name);
+    } catch (e) {
+      console.error('DataStore: Failed to save dataset name to localStorage:', e);
+    }
   }
 
   /**
@@ -51,11 +64,20 @@ class DataStore {
    * @param {string} datasetName - Optional display name for the dataset
    */
   switchDataset(datasetId, mockDataModule, datasetName = null) {
+    if (!datasetId || !mockDataModule) {
+      console.error('DataStore: switchDataset requires datasetId and mockDataModule');
+      return;
+    }
+    
     this.currentDataset = datasetId;
-    localStorage.setItem(this.datasetKey, datasetId);
-    if (datasetName) {
-      this.currentDatasetName = datasetName;
-      localStorage.setItem(this.datasetNameKey, datasetName);
+    try {
+      localStorage.setItem(this.datasetKey, datasetId);
+      if (datasetName) {
+        this.currentDatasetName = datasetName;
+        localStorage.setItem(this.datasetNameKey, datasetName);
+      }
+    } catch (e) {
+      console.error('DataStore: Failed to save dataset info to localStorage:', e);
     }
     this.data = { ...mockDataModule };
     this.save();
@@ -69,7 +91,11 @@ class DataStore {
     const stored = localStorage.getItem(this.storageKey);
     if (stored) {
       try {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        // Merge with defaults to ensure all expected fields exist
+        // This handles backward compatibility when new fields are added
+        const defaults = this.getDefaultData();
+        return { ...defaults, ...parsed };
       } catch (e) {
         console.error('Failed to parse stored data:', e);
       }
@@ -78,7 +104,12 @@ class DataStore {
   }
 
   save() {
-    localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+    } catch (e) {
+      console.error('DataStore: Failed to save data to localStorage:', e);
+      // Storage quota exceeded or other error - continue with in-memory data
+    }
     this.notifyListeners();
   }
 
@@ -88,7 +119,13 @@ class DataStore {
   }
 
   notifyListeners() {
-    this.listeners.forEach(cb => cb(this.data));
+    this.listeners.forEach(cb => {
+      try {
+        cb(this.data);
+      } catch (e) {
+        console.error('DataStore: Error in listener callback:', e);
+      }
+    });
   }
 
   generateId(prefix) {
@@ -105,18 +142,34 @@ class DataStore {
    * @param {string} prefix - ID prefix (e.g., 'mission', 'narr')
    * @param {Object} data - Entity data
    * @param {Object} defaults - Default values to merge
-   * @returns {string} The generated ID
+   * @returns {string|null} The generated ID or null if creation failed
    */
   createEntity(collection, prefix, data, defaults = {}) {
+    // Ensure collection exists
+    if (!this.data[collection]) {
+      console.warn(`DataStore: Collection '${collection}' does not exist, creating it`);
+      this.data[collection] = [];
+    }
+    
+    if (!Array.isArray(this.data[collection])) {
+      console.error(`DataStore: Collection '${collection}' is not an array`);
+      return null;
+    }
+    
     const id = this.generateId(prefix);
-    this.data[collection].push({
-      id,
-      ...defaults,
-      ...data,
-      createdAt: new Date().toISOString()
-    });
-    this.save();
-    return id;
+    try {
+      this.data[collection].push({
+        id,
+        ...defaults,
+        ...data,
+        createdAt: new Date().toISOString()
+      });
+      this.save();
+      return id;
+    } catch (e) {
+      console.error(`DataStore: Failed to create entity in '${collection}':`, e);
+      return null;
+    }
   }
 
   /**
@@ -127,15 +180,30 @@ class DataStore {
    * @returns {boolean} Whether the update was successful
    */
   updateEntity(collection, id, updates) {
-    const idx = this.data[collection].findIndex(item => item.id === id);
+    if (!this.data[collection] || !Array.isArray(this.data[collection])) {
+      console.error(`DataStore: Collection '${collection}' does not exist or is not an array`);
+      return false;
+    }
+    
+    if (!id) {
+      console.error('DataStore: updateEntity requires an id');
+      return false;
+    }
+    
+    const idx = this.data[collection].findIndex(item => item && item.id === id);
     if (idx !== -1) {
-      this.data[collection][idx] = {
-        ...this.data[collection][idx],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      this.save();
-      return true;
+      try {
+        this.data[collection][idx] = {
+          ...this.data[collection][idx],
+          ...updates,
+          updatedAt: new Date().toISOString()
+        };
+        this.save();
+        return true;
+      } catch (e) {
+        console.error(`DataStore: Failed to update entity in '${collection}':`, e);
+        return false;
+      }
     }
     return false;
   }
@@ -148,12 +216,26 @@ class DataStore {
    * @returns {boolean} Whether the delete was successful
    */
   deleteEntity(collection, id, cleanupFn = null) {
+    if (!this.data[collection] || !Array.isArray(this.data[collection])) {
+      console.error(`DataStore: Collection '${collection}' does not exist or is not an array`);
+      return false;
+    }
+    
+    if (!id) {
+      console.error('DataStore: deleteEntity requires an id');
+      return false;
+    }
+    
     const initialLength = this.data[collection].length;
-    this.data[collection] = this.data[collection].filter(item => item.id !== id);
+    this.data[collection] = this.data[collection].filter(item => item && item.id !== id);
     
     if (this.data[collection].length < initialLength) {
       if (cleanupFn) {
-        cleanupFn(id);
+        try {
+          cleanupFn(id);
+        } catch (e) {
+          console.error(`DataStore: Error in cleanup function for '${collection}':`, e);
+        }
       }
       this.save();
       return true;
@@ -168,7 +250,10 @@ class DataStore {
    * @returns {Object|undefined} The found entity or undefined
    */
   findEntity(collection, id) {
-    return this.data[collection]?.find(item => item.id === id);
+    if (!this.data[collection] || !Array.isArray(this.data[collection])) {
+      return undefined;
+    }
+    return this.data[collection].find(item => item && item.id === id);
   }
 
   /**
@@ -178,8 +263,11 @@ class DataStore {
    * @param {string} idToRemove - ID to remove from the arrays
    */
   removeIdFromArrayField(collection, field, idToRemove) {
+    if (!this.data[collection] || !Array.isArray(this.data[collection])) {
+      return;
+    }
     this.data[collection].forEach(item => {
-      if (item[field]) {
+      if (item && item[field] && Array.isArray(item[field])) {
         item[field] = item[field].filter(id => id !== idToRemove);
       }
     });
@@ -192,8 +280,11 @@ class DataStore {
    * @param {string} keyToRemove - Key to remove from the objects
    */
   removeKeyFromObjectField(collection, field, keyToRemove) {
+    if (!this.data[collection] || !Array.isArray(this.data[collection])) {
+      return;
+    }
     this.data[collection].forEach(item => {
-      if (item[field]) {
+      if (item && item[field] && typeof item[field] === 'object') {
         delete item[field][keyToRemove];
       }
     });
@@ -515,6 +606,44 @@ class DataStore {
   }
 
   // ============================================
+  // Topic CRUD
+  // ============================================
+
+  createTopic(topic) {
+    return this.createEntity('topics', 'topic', {
+      headline: topic.headline,
+      bulletPoints: topic.bulletPoints || [],
+      documentIds: topic.documentIds || [],
+      startDate: topic.startDate || new Date().toISOString().split('T')[0],
+      endDate: topic.endDate || null,
+      volumeOverTime: topic.volumeOverTime || this.generateInitialTopicVolume()
+    });
+  }
+
+  updateTopic(id, updates) {
+    this.updateEntity('topics', id, updates);
+  }
+
+  deleteTopic(id) {
+    this.deleteEntity('topics', id);
+  }
+
+  generateInitialTopicVolume() {
+    const days = 7;
+    const data = [];
+    const now = new Date();
+    for (let i = days; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      data.push({
+        date: date.toISOString().split('T')[0],
+        volume: 0
+      });
+    }
+    return data;
+  }
+
+  // ============================================
   // Faction Overlaps
   // ============================================
 
@@ -641,6 +770,12 @@ class DataStore {
       persons: [],
       organizations: [],
       documents: [],
+      topics: [],
+      publishers: [],
+      publisherCategories: [],
+      monitors: [],
+      alerts: [],
+      users: [],
       sources: [],
       sourceCategories: []
     };

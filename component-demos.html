@@ -297,15 +297,6 @@
           </svg>
           <span>Workspaces</span>
         </a>
-        <a href="index.html#/ai-briefing" class="nav-link">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-            <circle cx="8" cy="8" r="6"/>
-            <path d="M8 5v3l2 1"/>
-            <circle cx="8" cy="8" r="1.5" fill="var(--text-secondary)"/>
-            <path d="M3 3l1.5 1.5M13 3l-1.5 1.5M3 13l1.5-1.5M13 13l-1.5-1.5"/>
-          </svg>
-          <span>AI Briefing</span>
-        </a>
         <a href="index.html#/search" class="nav-link">
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
             <circle cx="7" cy="7" r="4.5"/>
@@ -506,12 +497,11 @@
               <rect x="3" y="10" width="12" height="2.5" rx="0.5"/>
             </svg> Theme List
           </a></li>
-          <li><a href="#document-list" class="nav-link" data-target="document-list">
+          <li><a href="#document-table" class="nav-link" data-target="document-table">
             <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-              <rect x="2" y="1" width="10" height="14" rx="1"/>
-              <path d="M4 4h6M4 7h6M4 10h4"/>
-              <path d="M12 4l2 2v9a1 1 0 01-1 1H5"/>
-            </svg> Document List
+              <rect x="1" y="2" width="14" height="12" rx="1"/>
+              <path d="M1 5h14M1 8h14M1 11h14M5 5v9M10 5v9"/>
+            </svg> Document Table
           </a></li>
         </ul>
       </div>
@@ -682,7 +672,7 @@ timeline.update({
     <!-- Timeline Volume Composite -->
     <section id="timeline-volume-composite" class="component-section">
       <h2 class="section-title">Timeline + Volume Composite</h2>
-      <p class="section-description">Combined visualization showing volume over time with event markers. Correlate mention spikes with specific events. Toggle between faction and source views. Synchronized zoom and cross-highlighting between charts.</p>
+      <p class="section-description">Combined visualization showing volume over time with event markers. Correlate mention spikes with specific events. Toggle between faction and publisher views. Synchronized zoom and cross-highlighting between charts.</p>
       <div class="demo-container">
         <div id="timeline-volume-composite-chart" style="position: relative;"></div>
         <div class="code-block">
@@ -690,7 +680,7 @@ timeline.update({
   height: <span class="number">450</span>,
   volumeHeight: <span class="number">180</span>,
   timelineHeight: <span class="number">180</span>,
-  showViewToggle: <span class="number">true</span>,  <span class="comment">// Enable faction/source toggle</span>
+  showViewToggle: <span class="number">true</span>,  <span class="comment">// Enable faction/publisher toggle</span>
   onEventClick: (event) => console.log(event)
 });
 composite.update({
@@ -699,10 +689,10 @@ composite.update({
     series: [[<span class="number">100</span>, <span class="number">150</span>, ...], [<span class="number">80</span>, <span class="number">120</span>, ...]],
     factions: [{ id: <span class="string">'f1'</span>, name: <span class="string">'State Actors'</span>, color: <span class="string">'#ef4444'</span> }]
   },
-  sourceData: {  <span class="comment">// Volume by source (enables toggle)</span>
+  publisherData: {  <span class="comment">// Volume by publisher (enables toggle)</span>
     dates: [<span class="string">'2025-01-10'</span>, <span class="string">'2025-01-11'</span>, ...],
     series: [[<span class="number">80</span>, <span class="number">120</span>, ...], [<span class="number">60</span>, <span class="number">90</span>, ...]],
-    sources: [{ id: <span class="string">'s1'</span>, name: <span class="string">'Twitter'</span>, color: <span class="string">'#000'</span> }]
+    publishers: [{ id: <span class="string">'s1'</span>, name: <span class="string">'Twitter'</span>, color: <span class="string">'#000'</span> }]
   },
   events: [
     { id: <span class="string">'1'</span>, text: <span class="string">'Initial article'</span>, date: <span class="string">'2025-01-10T08:00:00Z'</span> },
@@ -818,32 +808,42 @@ list.update({
       </div>
     </section>
 
-    <!-- Document List -->
-    <section id="document-list" class="component-section">
-      <h2 class="section-title">Document List</h2>
-      <p class="section-description">List of source documents with publication info, source indicators, and external links. Documents link to original sources.</p>
+    <!-- Document Table -->
+    <section id="document-table" class="component-section">
+      <h2 class="section-title">Document Table</h2>
+      <p class="section-description">Flexible table view for documents with customizable columns. Supports publisher, title, excerpt, date, and related entities (narratives, themes, events, locations, people, organizations, factions, topics). Click column headers to sort.</p>
       <div class="demo-container">
-        <div id="document-list-demo"></div>
+        <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md);">
+          <span style="font-size: var(--text-xs); color: var(--text-muted);">Filter columns:</span>
+          <div id="document-table-column-filter"></div>
+        </div>
+        <div id="document-table-demo"></div>
         <div class="code-block">
-          <pre><span class="key">const</span> list = <span class="key">new</span> DocumentList(<span class="string">'container'</span>, {
-  maxItems: <span class="number">10</span>,
-  showExcerpt: <span class="number">true</span>,
-  showSource: <span class="number">true</span>,
-  showDate: <span class="number">true</span>,
+          <pre><span class="comment">// Document Table with customizable columns</span>
+<span class="key">const</span> table = <span class="key">new</span> DocumentTable(<span class="string">'container'</span>, {
+  columns: [<span class="string">'publisherName'</span>, <span class="string">'title'</span>, <span class="string">'publishedDate'</span>, <span class="string">'narratives'</span>],
+  maxItems: <span class="number">50</span>,
+  sortable: <span class="key">true</span>,
+  defaultSort: <span class="string">'publishedDate'</span>,
+  defaultSortDir: <span class="string">'desc'</span>,
   onDocumentClick: (doc) => console.log(doc)
 });
-list.update({
-  documents: [
-    { 
-      id: <span class="string">'1'</span>, 
-      title: <span class="string">'Breaking: Major policy announcement'</span>,
-      url: <span class="string">'https://example.com/article'</span>,
-      sourceId: <span class="string">'s1'</span>,
-      publishedDate: <span class="string">'2025-01-15T10:30:00Z'</span>,
-      excerpt: <span class="string">'Summary of the article content...'</span>
-    }
-  ]
-});</pre>
+table.update({ documents: [...] });
+
+<span class="comment">// Column Filter component for interactive column selection</span>
+<span class="key">const</span> columnFilter = <span class="key">new</span> ColumnFilter(<span class="string">'filter-container'</span>, {
+  availableColumns: {
+    publisherName: <span class="string">'Publisher'</span>,
+    title: <span class="string">'Title'</span>,
+    publishedDate: <span class="string">'Published'</span>,
+    narratives: <span class="string">'Narratives'</span>,
+    persons: <span class="string">'People'</span>
+  },
+  defaultColumns: [<span class="string">'publisherName'</span>, <span class="string">'title'</span>, <span class="string">'publishedDate'</span>],
+  requiredColumns: [<span class="string">'title'</span>],
+  onChange: (columns) => table.setColumns(columns)
+});
+columnFilter.render();</pre>
         </div>
       </div>
     </section>
@@ -916,8 +916,11 @@ filter.update({
     import { FactionCards } from './js/components/FactionCards.js';
     import { NarrativeList } from './js/components/NarrativeList.js';
     import { SubNarrativeList } from './js/components/SubNarrativeList.js';
-    import { DocumentList } from './js/components/DocumentList.js';
+    import { DocumentTable } from './js/components/DocumentTable.js';
+    import { ColumnFilter } from './js/components/ColumnFilter.js';
     import { TimeRangeFilter } from './js/components/TimeRangeFilter.js';
+    import { DataService } from './js/data/DataService.js';
+    import { dataStore } from './js/data/DataStore.js';
 
     // Demo Data
     const demoFactions = [
@@ -1068,13 +1071,25 @@ filter.update({
       });
     };
 
-    // Demo sources for the toggle
-    const demoSources = [
-      { id: 's1', name: 'X (Twitter)', color: '#000000' },
-      { id: 's2', name: 'Facebook', color: '#1877F2' },
-      { id: 's3', name: 'TikTok', color: '#00F2EA' },
-      { id: 's4', name: 'CNN', color: '#CC0000' }
+    // Demo publishers for the toggle
+    const demoPublishers = [
+      { id: 's1', name: 'X (Twitter)', type: 'social', color: '#000000' },
+      { id: 's2', name: 'Facebook', type: 'social', color: '#1877F2' },
+      { id: 's3', name: 'TikTok', type: 'social', color: '#00F2EA' },
+      { id: 's4', name: 'CNN', type: 'national_news', color: '#CC0000' },
+      { id: 's5', name: 'BBC', type: 'international_news', color: '#BB1919' }
     ];
+
+    // Demo narratives for table lookup
+    const demoNarratives = [
+      { id: 'n1', text: 'Voting machines are compromised and can be hacked', status: 'in_progress' },
+      { id: 'n2', text: 'Mail-in ballots enable widespread voter fraud', status: 'under_investigation' },
+      { id: 'n3', text: 'Foreign actors manipulated election results', status: 'new' }
+    ];
+
+    // Initialize demo data in the dataStore for DocumentTable lookups
+    dataStore.data.publishers = demoPublishers;
+    dataStore.data.narratives = demoNarratives;
 
     const timelineVolumeComposite = new TimelineVolumeComposite(
       document.getElementById('timeline-volume-composite-chart'), 
@@ -1100,7 +1115,7 @@ filter.update({
           { id: 'f3', name: 'Media Amplifiers', color: '#3b82f6' }
         ]
       },
-      sourceData: {
+      publisherData: {
         dates: compositeDates,
         series: [
           generateCompositeVolume(80, 2, 150),   // X - high volume, spike on article
@@ -1108,7 +1123,7 @@ filter.update({
           generateCompositeVolume(40, 4, 200),   // TikTok - big spike on amplification
           generateCompositeVolume(25, 7, 60),    // CNN - spike on mainstream coverage
         ],
-        sources: demoSources
+        publishers: demoPublishers
       },
       events: [
         { id: '1', text: 'Initial article published', date: '2025-01-10T08:00:00Z' },
@@ -1297,58 +1312,212 @@ filter.update({
       ]
     });
 
-    // Initialize Document List
-    const documentList = new DocumentList(document.getElementById('document-list-demo'), {
-      maxItems: 5,
-      showExcerpt: true,
-      showSource: true,
-      showDate: true,
-      onDocumentClick: (doc) => console.log('Clicked document:', doc)
+    // Demo persons, locations, events for document table
+    const demoPersons = [
+      { id: 'p1', name: 'John Smith' },
+      { id: 'p2', name: 'Jane Doe' },
+      { id: 'p3', name: 'Robert Johnson' }
+    ];
+    const demoLocations = [
+      { id: 'l1', name: 'Washington D.C.' },
+      { id: 'l2', name: 'Atlanta, GA' },
+      { id: 'l3', name: 'Phoenix, AZ' }
+    ];
+    const demoEvents = [
+      { id: 'e1', text: 'Press conference on election security' },
+      { id: 'e2', text: 'Viral video debunking event' }
+    ];
+
+    // Add to dataStore for lookups
+    dataStore.data.persons = demoPersons;
+    dataStore.data.locations = demoLocations;
+    dataStore.data.events = demoEvents;
+
+    // Initialize Document Table with column-based configuration
+    const documentTable = new DocumentTable(document.getElementById('document-table-demo'), {
+      columns: ['publisherName', 'publisherType', 'title', 'excerpt', 'publishedDate', 'narratives'],
+      maxItems: 10,
+      sortable: true,
+      defaultSort: 'publishedDate',
+      defaultSortDir: 'desc',
+      maxEntitiesPerCell: 2,
+      truncateLength: 40,
+      onDocumentClick: (doc) => console.log('Clicked document:', doc),
+      onEntityClick: (type, id) => console.log('Entity clicked:', type, id)
     });
-    documentList.update({
+    documentTable.update({
       documents: [
+        // Social Post - X (Twitter)
         {
           id: 'd1',
-          title: 'Analysis: Tracking the spread of election misinformation',
-          url: 'https://example.com/election-analysis',
-          sourceId: 's1',
+          documentType: 'social_post',
+          url: 'https://x.com/ElectionWatch2025/status/1234567890',
+          publisherId: 's1',
           publishedDate: '2025-01-15T10:30:00Z',
-          excerpt: 'A comprehensive analysis of how false claims about voting systems spread across social media platforms during the election cycle...'
+          author: {
+            username: '@ElectionWatch2025',
+            displayName: 'Election Watch',
+            avatarUrl: 'img/placeholders/avatar-default.svg'
+          },
+          content: 'THREAD: We tracked 47 voting machine claims over 72 hours. Here\'s what we found:\n\n1/ The original claim started on a small forum\n2/ Within 6 hours it hit major platforms\n3/ By hour 24, it had 2.3M impressions\n\nThe anatomy of election misinformation...',
+          engagement: {
+            likes: 4521,
+            reblogs: 1832,
+            replies: 247
+          },
+          narrativeIds: ['n1', 'n2'],
+          personIds: ['p1', 'p2'],
+          locationIds: ['l1'],
+          eventIds: ['e1']
         },
+        // News Article - CNN
         {
           id: 'd2',
+          documentType: 'news_article',
           title: 'State officials debunk viral voting machine claims',
           url: 'https://example.com/officials-debunk',
-          sourceId: 's4',
+          publisherId: 's4',
           publishedDate: '2025-01-14T14:15:00Z',
-          excerpt: 'Election officials from multiple states have issued statements refuting viral claims about vulnerabilities in voting machines...'
+          author: 'Sarah Mitchell',
+          narrativeIds: ['n1'],
+          personIds: ['p3'],
+          locationIds: ['l2', 'l3'],
+          eventIds: [],
+          excerpt: 'Election officials from multiple states have issued statements refuting viral claims about voting machine vulnerabilities...'
         },
+        // Social Post - Facebook
         {
           id: 'd3',
-          title: 'Social media platforms struggle with election content',
-          url: 'https://example.com/social-media-struggle',
-          sourceId: 's2',
+          documentType: 'social_post',
+          url: 'https://facebook.com/TruthInVoting/posts/9876543210',
+          publisherId: 's2',
           publishedDate: '2025-01-13T09:00:00Z',
-          excerpt: 'Major social media companies are facing renewed scrutiny over their handling of election-related misinformation...'
+          author: {
+            username: 'TruthInVoting',
+            displayName: 'Truth In Voting Coalition',
+            avatarUrl: 'img/placeholders/avatar-default.svg'
+          },
+          content: 'We\'ve been monitoring platforms for 3 weeks now. The same false claims keep circulating:\n\n❌ "Machines can flip votes" - FALSE\n❌ "No paper trail exists" - FALSE\n❌ "Foreign access confirmed" - FALSE\n\nShare accurate information. Our democracy depends on it.',
+          engagement: {
+            likes: 8934,
+            reblogs: 3201,
+            replies: 892
+          },
+          narrativeIds: ['n2'],
+          personIds: [],
+          locationIds: ['l1'],
+          eventIds: []
         },
+        // News Article - CNN
         {
           id: 'd4',
+          documentType: 'news_article',
           title: 'Fact-check: No evidence of widespread mail-in ballot fraud',
           url: 'https://example.com/fact-check-mail',
-          sourceId: 's4',
+          publisherId: 's4',
           publishedDate: '2025-01-12T16:45:00Z',
-          excerpt: 'Claims about fraudulent mail-in ballots continue to circulate despite lack of evidence supporting widespread fraud...'
+          author: 'James Rodriguez',
+          narrativeIds: ['n1', 'n2', 'n3'],
+          personIds: ['p1'],
+          locationIds: [],
+          eventIds: [],
+          excerpt: 'Claims about fraudulent mail-in ballots continue to circulate despite lack of supporting evidence from election officials...'
         },
+        // Social Post - X (Twitter)
         {
           id: 'd5',
-          title: 'How bot networks amplify election misinformation',
-          url: 'https://example.com/bot-networks',
-          sourceId: 's1',
+          documentType: 'social_post',
+          url: 'https://x.com/BotNetResearch/status/0987654321',
+          publisherId: 's1',
           publishedDate: '2025-01-11T11:20:00Z',
-          excerpt: 'Research reveals coordinated bot activity amplifying false claims about election integrity across multiple platforms...'
+          author: {
+            username: '@BotNetResearch',
+            displayName: 'Bot Network Research Lab',
+            avatarUrl: 'img/placeholders/avatar-default.svg'
+          },
+          content: 'Our latest analysis identified 12,000+ coordinated accounts pushing election misinfo. Key findings:\n\n• 73% created in last 90 days\n• Avg 847 posts/day per account\n• Peak activity 2-4am EST\n\nThis is not organic. Full report dropping tomorrow.',
+          engagement: {
+            likes: 15203,
+            reblogs: 8921,
+            replies: 1247
+          },
+          narrativeIds: [],
+          personIds: ['p2'],
+          locationIds: [],
+          eventIds: []
+        },
+        // TikTok Post
+        {
+          id: 'd6',
+          documentType: 'tiktok',
+          url: 'https://tiktok.com/@votingmyths/video/1234567890123',
+          publisherId: 's3',
+          publishedDate: '2025-01-10T08:00:00Z',
+          author: {
+            username: '@votingmyths',
+            displayName: 'Voting Myths Debunked',
+            avatarUrl: 'img/placeholders/avatar-default.svg'
+          },
+          content: 'POV: You\'re an election security expert watching people spread hacking claims 💀 Let me explain why voting machines can\'t be "hacked from the internet" #election #factcheck #votingmyths',
+          video: {
+            url: 'img/placeholders/video-thumbnail.svg',
+            thumbnailUrl: 'img/placeholders/video-thumbnail.svg',
+            duration: 58
+          },
+          engagement: {
+            likes: 245000,
+            reblogs: 52000,
+            replies: 8700
+          },
+          narrativeIds: ['n1'],
+          personIds: ['p1', 'p2', 'p3'],
+          locationIds: ['l1'],
+          eventIds: ['e1']
+        },
+        // News Article - BBC
+        {
+          id: 'd7',
+          documentType: 'news_article',
+          title: 'Video claiming fraud actually shows normal procedure',
+          url: 'https://example.com/video-debunk',
+          publisherId: 's5',
+          publishedDate: '2025-01-09T12:30:00Z',
+          author: 'Emma Thompson',
+          narrativeIds: ['n2'],
+          personIds: [],
+          locationIds: ['l2'],
+          eventIds: ['e2'],
+          excerpt: 'Viral video falsely portrayed as evidence of fraud actually shows standard election counting procedure...'
         }
       ]
     });
+
+    // Column Filter for Document Table demo
+    const documentTableColumnFilter = new ColumnFilter('document-table-column-filter', {
+      availableColumns: {
+        classification: 'Classification',
+        documentType: 'Doc Type',
+        publisherName: 'Publisher',
+        publisherType: 'Publisher Type',
+        title: 'Title',
+        excerpt: 'Excerpt',
+        publishedDate: 'Published',
+        narratives: 'Narratives',
+        themes: 'Themes',
+        events: 'Events',
+        locations: 'Locations',
+        persons: 'People',
+        organizations: 'Organizations',
+        factions: 'Factions',
+        topics: 'Topics'
+      },
+      defaultColumns: ['publisherName', 'publisherType', 'title', 'excerpt', 'publishedDate', 'narratives'],
+      requiredColumns: ['title'],
+      onChange: (columns) => {
+        documentTable.setColumns(columns);
+      }
+    });
+    documentTableColumnFilter.render();
 
     // Initialize Time Range Filter
     const timeRangeFilter = new TimeRangeFilter(document.getElementById('time-range-filter-demo'), {

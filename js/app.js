@@ -40,8 +40,6 @@ class App {
    * Initialize the application
    */
   async init() {
-    console.log('Initializing Primer...');
-
     // Initialize with the currently selected dataset
     this.initializeDataset();
 
@@ -75,8 +73,6 @@ class App {
         this.router.refreshTimeFilter();
       }
     });
-
-    console.log('Primer initialized');
   }
 
   /**
@@ -110,8 +106,6 @@ class App {
     this.dataStore.data = { ...dataset.data };
     this.dataStore.setCurrentDatasetName(dataset.name);
     this.dataStore.save();
-    
-    console.log(`Loaded dataset: ${dataset.name}`);
   }
 
   /**
@@ -150,8 +144,6 @@ class App {
     
     // Show success notification
     this.showToast(`Switched to ${dataset.name} dataset`, 'success');
-    
-    console.log(`Switched to dataset: ${dataset.name}`);
   }
 
   /**

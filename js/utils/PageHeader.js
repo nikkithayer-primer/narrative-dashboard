@@ -12,9 +12,13 @@ export const PageHeader = {
    * @param {string} [config.subtitle] - Subtitle text
    * @param {string} [config.icon] - Icon HTML or emoji
    * @param {string} [config.iconColor] - Background color for icon (for colored squares)
+   * @param {string} [config.imageUrl] - URL for entity image (takes precedence over icon)
+   * @param {string} [config.imageAlt] - Alt text for image
    * @param {string} [config.badge] - Badge HTML
    * @param {string} [config.description] - Description text
    * @param {string} [config.descriptionLink] - Link HTML to append to description
+   * @param {Array} [config.tabs] - Array of tab items [{id, label, href}]
+   * @param {string} [config.activeTab] - ID of the active tab
    * @returns {string} Page header HTML string
    */
   render(config) {
@@ -24,23 +28,29 @@ export const PageHeader = {
       subtitle,
       icon,
       iconColor,
+      imageUrl,
+      imageAlt,
       badge,
       description,
-      descriptionLink
+      descriptionLink,
+      tabs,
+      activeTab
     } = config;
 
     const breadcrumbHtml = this.renderBreadcrumbs(breadcrumbs);
-    const iconHtml = this.renderIcon(icon, iconColor);
+    const iconHtml = this.renderIcon(icon, iconColor, imageUrl, imageAlt);
     const titleRowHtml = this.renderTitleRow(title, iconHtml, badge);
     const subtitleHtml = subtitle ? `<p class="subtitle">${subtitle}</p>` : '';
     const descriptionHtml = this.renderDescription(description, descriptionLink);
+    const tabsHtml = this.renderTabs(tabs, activeTab);
 
     return `
-      <div class="page-header">
+      <div class="page-header${tabs && tabs.length > 0 ? ' page-header-with-tabs' : ''}">
         ${breadcrumbHtml}
         ${titleRowHtml}
         ${subtitleHtml}
         ${descriptionHtml}
+        ${tabsHtml}
       </div>
     `;
   },
@@ -72,11 +82,18 @@ export const PageHeader = {
 
   /**
    * Render icon HTML
-   * @param {string} icon - Icon content
+   * @param {string} icon - Icon content (SVG or emoji)
    * @param {string} iconColor - Background color for icon
+   * @param {string} imageUrl - URL for entity image
+   * @param {string} imageAlt - Alt text for image
    * @returns {string} Icon HTML
    */
-  renderIcon(icon, iconColor) {
+  renderIcon(icon, iconColor, imageUrl, imageAlt) {
+    // Image takes precedence
+    if (imageUrl) {
+      return `<img src="${imageUrl}" alt="${imageAlt || ''}" class="page-header-entity-image" onerror="this.style.display='none';">`;
+    }
+    
     if (!icon && !iconColor) return '';
     
     if (iconColor) {
@@ -134,6 +151,33 @@ export const PageHeader = {
           <a href="#/dashboard">Dashboard</a> <span>/</span> ${entityType} not found
         </div>
         <h1>${entityType} not found</h1>
+      </div>
+    `;
+  },
+
+  /**
+   * Render tab navigation
+   * @param {Array} tabs - Array of tab items [{id, label, href}]
+   * @param {string} activeTab - ID of the active tab
+   * @returns {string} Tabs HTML
+   */
+  renderTabs(tabs, activeTab) {
+    if (!tabs || tabs.length === 0) return '';
+
+    const tabItems = tabs.map(tab => {
+      const isActive = tab.id === activeTab;
+      return `
+        <a href="${tab.href}" 
+           class="page-header-tab${isActive ? ' active' : ''}" 
+           data-tab-id="${tab.id}">
+          ${tab.label}
+        </a>
+      `;
+    }).join('');
+
+    return `
+      <div class="page-header-tabs">
+        ${tabItems}
       </div>
     `;
   }

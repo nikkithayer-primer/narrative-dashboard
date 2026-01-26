@@ -147,7 +147,7 @@ export class ListView extends BaseView {
       if (searchInput) {
         searchInput.addEventListener('input', (e) => {
           this.searchQuery = e.target.value;
-          this.render();
+          this.updateFilteredList();
         });
       }
       return;
@@ -355,6 +355,56 @@ export class ListView extends BaseView {
     });
   }
 
+  /**
+   * Update only the filtered list content without re-rendering the whole page
+   * This prevents the search input from losing focus
+   */
+  updateFilteredList() {
+    const config = this.getConfig();
+    const items = this.getItems();
+    const filteredItems = this.filterItems(items);
+
+    // Update subtitle count
+    const subtitle = this.container.querySelector('.subtitle');
+    if (subtitle) {
+      subtitle.textContent = `${filteredItems.length} ${config.itemName}${filteredItems.length !== 1 ? 's' : ''}`;
+    }
+
+    // Update content based on entity type
+    if (this.entityType === 'narratives' && this.narrativeList) {
+      this.narrativeList.update({ narratives: filteredItems });
+    } else if (this.entityType === 'events' && this.eventsViewMode === 'timeline') {
+      this.initializeEventsTimeline(filteredItems);
+    } else {
+      // Update the entity list for events (list view) and other entity types
+      const entityList = document.getElementById('entity-list');
+      if (entityList) {
+        entityList.innerHTML = filteredItems.map(item => this.renderItem(item, config)).join('');
+        // Re-attach click listeners for the new items
+        this.attachItemClickListeners(config);
+      }
+    }
+  }
+
+  /**
+   * Attach click listeners to entity list items
+   */
+  attachItemClickListeners(config) {
+    const items = document.querySelectorAll('.entity-list-item');
+    items.forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.dataset.id;
+        const type = item.dataset.type;
+        
+        if (this.entityType === 'entities') {
+          window.location.hash = `#/${type}/${id}`;
+        } else {
+          window.location.hash = `#/${config.route}/${id}`;
+        }
+      });
+    });
+  }
+
   renderItem(item, config) {
     const title = item.text || item.name;
     const subtitle = config.getSubtitle ? config.getSubtitle(item) : '';
@@ -385,24 +435,12 @@ export class ListView extends BaseView {
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
         this.searchQuery = e.target.value;
-        this.render();
+        this.updateFilteredList();
       });
     }
 
     // Item clicks
-    const items = document.querySelectorAll('.entity-list-item');
-    items.forEach(item => {
-      item.addEventListener('click', () => {
-        const id = item.dataset.id;
-        const type = item.dataset.type;
-        
-        if (this.entityType === 'entities') {
-          window.location.hash = `#/${type}/${id}`;
-        } else {
-          window.location.hash = `#/${config.route}/${id}`;
-        }
-      });
-    });
+    this.attachItemClickListeners(config);
   }
 
   /**

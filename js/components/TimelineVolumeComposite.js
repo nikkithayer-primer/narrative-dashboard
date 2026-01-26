@@ -22,7 +22,7 @@ export class TimelineVolumeComposite extends BaseComponent {
       ...options
     });
     this.currentTransform = d3.zoomIdentity;
-    this.currentView = 'factions'; // 'factions' or 'sources'
+    this.currentView = 'factions'; // 'factions' or 'publishers'
   }
 
   render() {
@@ -74,15 +74,15 @@ export class TimelineVolumeComposite extends BaseComponent {
     controlsDiv.className = 'composite-controls';
     
     // Determine if we should show view toggle
-    const hasSourceData = this.data.sourceData && this.data.sourceData.dates && this.data.sourceData.dates.length > 0;
+    const hasPublisherData = this.data.publisherData && this.data.publisherData.dates && this.data.publisherData.dates.length > 0;
     const hasFactionData = volumeData && volumeData.dates && volumeData.dates.length > 0;
-    const showToggle = this.options.showViewToggle && hasSourceData && hasFactionData;
+    const showToggle = this.options.showViewToggle && hasPublisherData && hasFactionData;
     
     controlsDiv.innerHTML = `
       ${showToggle ? `
         <div class="view-toggle">
           <button class="view-toggle-btn ${this.currentView === 'factions' ? 'active' : ''}" data-view="factions">By Faction</button>
-          <button class="view-toggle-btn ${this.currentView === 'sources' ? 'active' : ''}" data-view="sources">By Source</button>
+          <button class="view-toggle-btn ${this.currentView === 'publishers' ? 'active' : ''}" data-view="publishers">By Publisher</button>
         </div>
       ` : ''}
       <div class="zoom-controls">
@@ -205,9 +205,9 @@ export class TimelineVolumeComposite extends BaseComponent {
 
   renderVolumeArea(volumeData) {
     // Determine which data to use based on current view
-    const { sourceData } = this.data || {};
-    const dataToUse = this.currentView === 'sources' && sourceData 
-      ? sourceData 
+    const { publisherData } = this.data || {};
+    const dataToUse = this.currentView === 'publishers' && publisherData 
+      ? publisherData 
       : volumeData;
 
     if (!dataToUse || !dataToUse.dates || !dataToUse.dates.length) {
@@ -223,10 +223,10 @@ export class TimelineVolumeComposite extends BaseComponent {
       return;
     }
 
-    // Extract the data arrays (factions or sources)
+    // Extract the data arrays (factions or publishers)
     const { dates, series } = dataToUse;
-    const items = this.currentView === 'sources' 
-      ? dataToUse.sources 
+    const items = this.currentView === 'publishers' 
+      ? dataToUse.publishers 
       : dataToUse.factions;
 
     if (!items || items.length === 0) {
@@ -655,7 +655,7 @@ export class TimelineVolumeComposite extends BaseComponent {
       .attr('opacity', 0)
       .attr('pointer-events', 'none');
 
-    // Hover dots for each faction/source
+    // Hover dots for each faction/publisher
     this.hoverDots = mainGroup.append('g')
       .attr('class', 'hover-dots')
       .attr('opacity', 0)
@@ -753,7 +753,7 @@ export class TimelineVolumeComposite extends BaseComponent {
 
   showVolumeTooltip(event, d, nearbyEvents = []) {
     const items = this.currentDataItems;
-    const viewType = this.currentView === 'sources' ? 'Source' : 'Faction';
+    const viewType = this.currentView === 'publishers' ? 'Publisher' : 'Faction';
     
     // Calculate total volume
     const total = items.reduce((sum, item) => sum + (d[item.id] || 0), 0);

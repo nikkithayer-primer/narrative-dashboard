@@ -432,15 +432,6 @@
           </svg>
           <span>Workspaces</span>
         </a>
-        <a href="index.html#/ai-briefing" class="nav-link">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
-            <circle cx="8" cy="8" r="6"/>
-            <path d="M8 5v3l2 1"/>
-            <circle cx="8" cy="8" r="1.5" fill="var(--text-secondary)"/>
-            <path d="M3 3l1.5 1.5M13 3l-1.5 1.5M3 13l1.5-1.5M13 13l-1.5-1.5"/>
-          </svg>
-          <span>AI Briefing</span>
-        </a>
         <a href="index.html#/search" class="nav-link">
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
             <circle cx="7" cy="7" r="4.5"/>
@@ -594,6 +585,18 @@
       <a href="#alert" class="nav-pill">
         <span class="dot" style="background: #f97316"></span>
         Alert
+      </a>
+      <a href="#document" class="nav-pill">
+        <span class="dot" style="background: #06b6d4"></span>
+        Document
+      </a>
+      <a href="#publisher" class="nav-pill">
+        <span class="dot" style="background: #b45309"></span>
+        Publisher
+      </a>
+      <a href="#classification" class="nav-pill">
+        <span class="dot" style="background: #ef4444"></span>
+        Classification
       </a>
     </nav>
 
@@ -2035,6 +2038,368 @@
             </ul>
           </div>
         </article>
+
+        <!-- Document -->
+        <article id="document" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(6, 182, 212, 0.2); color: #06b6d4;">▤</div>
+            <div class="entity-info">
+              <h3>Document</h3>
+              <p>Documents providing evidence for narratives. Supports multiple document types with type-specific fields.</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <h4 style="margin: 0 0 var(--space-md); color: var(--text-secondary); font-size: var(--text-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Base Fields (All Document Types)</h4>
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">documentType</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Type of document: <code>social_post</code>, <code>tiktok</code>, <code>news_article</code>, <code>internal</code></p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">classification</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Security classification: <code>U</code> (Unclassified), <code>CUI</code>, <code>C</code> (Confidential), <code>S</code> (Secret), <code>TS</code> (Top Secret)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">url</span>
+                <div class="field-meta">
+                  <span class="field-type">string (URL)</span>
+                  <p class="field-desc">Link to the original source. Null for internal documents.</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">publishedDate</span>
+                <div class="field-meta">
+                  <span class="field-type required">datetime</span>
+                  <p class="field-desc">When the document was published (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">publisherId</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Foreign key to the Publisher (e.g., CNN, Reuters, TikTok, Operations Division)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">excerpt</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Brief summary or snippet from the document</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">narrativeIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Narratives this document provides evidence for</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">subNarrativeIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Themes this document relates to</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">personIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">People mentioned in this document</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">organizationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Organizations mentioned in this document</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">locationIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Locations referenced in this document</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">eventIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Events this document reports on</p>
+                </div>
+              </li>
+            </ul>
+            
+            <h4 style="margin: var(--space-lg) 0 var(--space-md); color: var(--text-secondary); font-size: var(--text-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Social Post Fields (documentType: social_post)</h4>
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">author</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Author information: <code>{ username, displayName, avatarUrl }</code></p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">content</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Full text content of the post</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">media</span>
+                <div class="field-meta">
+                  <span class="field-type">array</span>
+                  <p class="field-desc">Attached media: <code>[{ type, url, altText }]</code></p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">engagement</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Engagement metrics: <code>{ replies, likes, reblogs }</code></p>
+                </div>
+              </li>
+            </ul>
+            
+            <h4 style="margin: var(--space-lg) 0 var(--space-md); color: var(--text-secondary); font-size: var(--text-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">TikTok Fields (documentType: tiktok)</h4>
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">author</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Creator information: <code>{ username, displayName, avatarUrl }</code></p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">content</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Video caption text</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">video</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Video details: <code>{ url, thumbnailUrl, duration }</code></p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">transcription</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Text transcription of video audio</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">engagement</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Engagement metrics: <code>{ replies, likes, reblogs }</code></p>
+                </div>
+              </li>
+            </ul>
+            
+            <h4 style="margin: var(--space-lg) 0 var(--space-md); color: var(--text-secondary); font-size: var(--text-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">News Article Fields (documentType: news_article)</h4>
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">title</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Article headline</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">author</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Author/byline name</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">headerImage</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Header image: <code>{ url, caption }</code></p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">contentBlocks</span>
+                <div class="field-meta">
+                  <span class="field-type">array</span>
+                  <p class="field-desc">Structured content: <code>[{ type, content, portionMark }]</code>. Types: paragraph, heading, image, quote, list</p>
+                </div>
+              </li>
+            </ul>
+            
+            <h4 style="margin: var(--space-lg) 0 var(--space-md); color: var(--text-secondary); font-size: var(--text-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Internal Document Fields (documentType: internal)</h4>
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">title</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Document title</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">author</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Author or division name</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">department</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Originating department</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">contentBlocks</span>
+                <div class="field-meta">
+                  <span class="field-type">array</span>
+                  <p class="field-desc">Structured content with portion marks: <code>[{ type, content, portionMark }]</code></p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+        
+        <!-- Classification System -->
+        <article id="classification" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">◉</div>
+            <div class="entity-info">
+              <h3>Classification System</h3>
+              <p>Security classification levels and portion marking for sensitive documents</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <h4 style="margin: 0 0 var(--space-md); color: var(--text-secondary); font-size: var(--text-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Classification Levels</h4>
+            <div class="classification-reference" style="display: grid; gap: var(--space-sm); margin-bottom: var(--space-lg);">
+              <div style="display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm); border-radius: var(--border-radius); background: rgba(34, 197, 94, 0.1);">
+                <span style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 3px; font-weight: 600; font-size: 11px;">U</span>
+                <span><strong>Unclassified</strong> — Public or uncontrolled information</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm); border-radius: var(--border-radius); background: rgba(124, 58, 237, 0.1);">
+                <span style="background: #7c3aed; color: white; padding: 2px 8px; border-radius: 3px; font-weight: 600; font-size: 11px;">CUI</span>
+                <span><strong>Controlled Unclassified Information</strong> — Requires safeguarding but not classified</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm); border-radius: var(--border-radius); background: rgba(59, 130, 246, 0.1);">
+                <span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 3px; font-weight: 600; font-size: 11px;">C</span>
+                <span><strong>Confidential</strong> — Unauthorized disclosure could cause damage</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm); border-radius: var(--border-radius); background: rgba(239, 68, 68, 0.1);">
+                <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 3px; font-weight: 600; font-size: 11px;">S</span>
+                <span><strong>Secret</strong> — Unauthorized disclosure could cause serious damage</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm); border-radius: var(--border-radius); background: rgba(249, 115, 22, 0.1);">
+                <span style="background: #f97316; color: white; padding: 2px 8px; border-radius: 3px; font-weight: 600; font-size: 11px;">TS</span>
+                <span><strong>Top Secret</strong> — Unauthorized disclosure could cause exceptionally grave damage</span>
+              </div>
+            </div>
+            
+            <h4 style="margin: var(--space-lg) 0 var(--space-md); color: var(--text-secondary); font-size: var(--text-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Portion Marks</h4>
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">portionMark</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Portion mark object: <code>{ classification, handling }</code></p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">classification</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Classification level for the portion (U, CUI, C, S, TS)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">handling</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Handling instructions (e.g., "NOFORN", "REL TO USA", "FOUO")</p>
+                </div>
+              </li>
+            </ul>
+            <p style="margin-top: var(--space-md); font-size: var(--text-sm); color: var(--text-muted);">
+              <strong>Example portion marks:</strong> <code>(U)</code>, <code>(U//FOUO)</code>, <code>(S//NOFORN)</code>, <code>(TS//SI)</code>
+            </p>
+          </div>
+        </article>
+
+        <!-- Publisher -->
+        <article id="publisher" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(180, 83, 9, 0.2); color: #b45309;">⊡</div>
+            <div class="entity-info">
+              <h3>Publisher</h3>
+              <p>Media outlets, social platforms, and news organizations</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">name</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Display name of the publisher (e.g., "CNN", "Reuters", "TikTok")</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">type</span>
+                <div class="field-meta">
+                  <span class="field-type required">enum</span>
+                  <p class="field-desc">Category of the publisher</p>
+                  <p class="field-enum">
+                    <code>social</code>
+                    <code>national_news</code>
+                    <code>international_news</code>
+                    <code>internal</code>
+                  </p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">color</span>
+                <div class="field-meta">
+                  <span class="field-type">string (hex)</span>
+                  <p class="field-desc">Brand color for visual identification (e.g., "#CC0000")</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">parent</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Parent category for hierarchical grouping</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -2732,6 +3097,125 @@
               </td>
               <td>N:M</td>
               <td>Alerts can reference sub-events that triggered them</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(6, 182, 212, 0.15);">
+                  <span class="dot" style="background: #06b6d4"></span>
+                  Document
+                </span>
+              </td>
+              <td class="relationship-type">evidences</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(239, 68, 68, 0.15);">
+                  <span class="dot" style="background: var(--color-narrative)"></span>
+                  Narrative
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Documents provide evidence for narratives</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(6, 182, 212, 0.15);">
+                  <span class="dot" style="background: #06b6d4"></span>
+                  Document
+                </span>
+              </td>
+              <td class="relationship-type">relates to</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(248, 113, 113, 0.15);">
+                  <span class="dot" style="background: #f87171"></span>
+                  Theme
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Documents can relate to multiple themes</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(6, 182, 212, 0.15);">
+                  <span class="dot" style="background: #06b6d4"></span>
+                  Document
+                </span>
+              </td>
+              <td class="relationship-type">mentions</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(236, 72, 153, 0.15);">
+                  <span class="dot" style="background: var(--color-entity)"></span>
+                  Person
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Documents mention people</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(6, 182, 212, 0.15);">
+                  <span class="dot" style="background: #06b6d4"></span>
+                  Document
+                </span>
+              </td>
+              <td class="relationship-type">mentions</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(168, 85, 247, 0.15);">
+                  <span class="dot" style="background: #a855f7"></span>
+                  Organization
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Documents mention organizations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(6, 182, 212, 0.15);">
+                  <span class="dot" style="background: #06b6d4"></span>
+                  Document
+                </span>
+              </td>
+              <td class="relationship-type">references</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(16, 185, 129, 0.15);">
+                  <span class="dot" style="background: var(--color-location)"></span>
+                  Location
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Documents reference geographic locations</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(6, 182, 212, 0.15);">
+                  <span class="dot" style="background: #06b6d4"></span>
+                  Document
+                </span>
+              </td>
+              <td class="relationship-type">reports on</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(59, 130, 246, 0.15);">
+                  <span class="dot" style="background: var(--color-event)"></span>
+                  Event
+                </span>
+              </td>
+              <td>N:M</td>
+              <td>Documents report on events</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="entity-badge" style="background: rgba(6, 182, 212, 0.15);">
+                  <span class="dot" style="background: #06b6d4"></span>
+                  Document
+                </span>
+              </td>
+              <td class="relationship-type">from</td>
+              <td>
+                <span class="entity-badge" style="background: rgba(180, 83, 9, 0.15);">
+                  <span class="dot" style="background: #b45309"></span>
+                  Publisher
+                </span>
+              </td>
+              <td>N:1</td>
+              <td>Each document originates from a single publisher</td>
             </tr>
           </tbody>
         </table>

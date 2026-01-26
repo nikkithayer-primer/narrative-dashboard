@@ -50,7 +50,12 @@ export class BaseComponent {
   update(data) {
     this.data = data;
     if (this.container) {
-      this.render();
+      try {
+        this.render();
+      } catch (e) {
+        console.error(`${this.constructor.name}: Error during render:`, e);
+        this.showErrorState('Failed to render component');
+      }
     }
     return this;
   }
@@ -70,9 +75,13 @@ export class BaseComponent {
    */
   resize() {
     if (this.container) {
-      this.options.width = this.container.clientWidth;
-      if (this.data) {
-        this.render();
+      try {
+        this.options.width = this.container.clientWidth || this.options.width;
+        if (this.data) {
+          this.render();
+        }
+      } catch (e) {
+        console.error(`${this.constructor.name}: Error during resize:`, e);
       }
     }
     return this;
@@ -105,6 +114,7 @@ export class BaseComponent {
    */
   destroy() {
     this.disableAutoResize();
+    this.removeTooltip();
     this.clear();
     this.data = null;
     this.svg = null;
@@ -119,11 +129,37 @@ export class BaseComponent {
       this.container.innerHTML = `
         <div class="empty-state">
           <span class="empty-icon">◇</span>
-          <p>${message}</p>
+          <p>${this.escapeHtml(message)}</p>
         </div>
       `;
     }
     return this;
+  }
+
+  /**
+   * Show error state message
+   */
+  showErrorState(message = 'An error occurred') {
+    this.clear();
+    if (this.container) {
+      this.container.innerHTML = `
+        <div class="empty-state error-state">
+          <span class="empty-icon">⚠</span>
+          <p>${this.escapeHtml(message)}</p>
+        </div>
+      `;
+    }
+    return this;
+  }
+
+  /**
+   * Escape HTML to prevent XSS
+   */
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   /**
@@ -149,22 +185,50 @@ export class BaseComponent {
     const { width, height } = this.options;
     this.clear();
 
-    this.svg = d3.select(this.container)
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .attr('viewBox', [0, 0, width, height]);
+    // Check if D3 is available
+    if (typeof d3 === 'undefined') {
+      console.error(`${this.constructor.name}: D3 library is not loaded`);
+      this.showErrorState('Visualization library not available');
+      return null;
+    }
 
-    return this.svg;
+    if (!this.container) {
+      console.error(`${this.constructor.name}: Container not available`);
+      return null;
+    }
+
+    try {
+      this.svg = d3.select(this.container)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('viewBox', [0, 0, width, height]);
+
+      return this.svg;
+    } catch (e) {
+      console.error(`${this.constructor.name}: Error creating SVG:`, e);
+      this.showErrorState('Failed to create visualization');
+      return null;
+    }
   }
 
   /**
    * Create inner group with margins applied
    */
   createInnerGroup() {
-    const { margin } = this.options;
-    return this.svg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+    if (!this.svg) {
+      console.error(`${this.constructor.name}: SVG not initialized`);
+      return null;
+    }
+    
+    try {
+      const { margin } = this.options;
+      return this.svg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+    } catch (e) {
+      console.error(`${this.constructor.name}: Error creating inner group:`, e);
+      return null;
+    }
   }
 
   /**
@@ -238,34 +302,53 @@ export class BaseComponent {
    * Add tooltip behavior to selection
    */
   addTooltip(selection, contentFn) {
-    const tooltip = d3.select('body').append('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0)
-      .style('position', 'absolute')
-      .style('pointer-events', 'none');
+    if (typeof d3 === 'undefined') {
+      console.warn(`${this.constructor.name}: D3 not available for tooltip`);
+      return selection;
+    }
+    
+    if (!selection || !contentFn) {
+      console.warn(`${this.constructor.name}: addTooltip requires selection and contentFn`);
+      return selection;
+    }
 
-    selection
-      .on('mouseover', function(event, d) {
-        tooltip.transition()
-          .duration(200)
-          .style('opacity', 1);
-        tooltip.html(contentFn(d))
-          .style('left', (event.pageX + 10) + 'px')
-          .style('top', (event.pageY - 10) + 'px');
-      })
-      .on('mousemove', function(event) {
-        tooltip
-          .style('left', (event.pageX + 10) + 'px')
-          .style('top', (event.pageY - 10) + 'px');
-      })
-      .on('mouseout', function() {
-        tooltip.transition()
-          .duration(500)
-          .style('opacity', 0);
-      });
+    try {
+      const tooltip = d3.select('body').append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0)
+        .style('position', 'absolute')
+        .style('pointer-events', 'none');
 
-    // Store tooltip reference for cleanup
-    this._tooltip = tooltip;
+      selection
+        .on('mouseover', function(event, d) {
+          try {
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', 1);
+            tooltip.html(contentFn(d))
+              .style('left', (event.pageX + 10) + 'px')
+              .style('top', (event.pageY - 10) + 'px');
+          } catch (e) {
+            console.error('Error in tooltip mouseover:', e);
+          }
+        })
+        .on('mousemove', function(event) {
+          tooltip
+            .style('left', (event.pageX + 10) + 'px')
+            .style('top', (event.pageY - 10) + 'px');
+        })
+        .on('mouseout', function() {
+          tooltip.transition()
+            .duration(500)
+            .style('opacity', 0);
+        });
+
+      // Store tooltip reference for cleanup
+      this._tooltip = tooltip;
+    } catch (e) {
+      console.error(`${this.constructor.name}: Error adding tooltip:`, e);
+    }
+    
     return selection;
   }
 
