@@ -2560,11 +2560,30 @@ export const mockData = {
     },
     {
       id: 'doc-019',
+      documentType: 'news_article',
+      classification: 'U',
       title: 'Scientists warn: New meat guidelines would require 100 million acres of farmland',
       url: 'https://guardian.com/environment/meat-guidelines-environmental-impact',
       publishedDate: '2026-01-19T12:00:00Z',
       publisherId: 'pub-int-guardian',
+      author: 'Oliver Milman',
       excerpt: 'World Resources Institute estimates the guidelines would add hundreds of millions of tons of emissions and require an area the size of California.',
+      headerImage: {
+        url: 'img/placeholders/image-placeholder.svg',
+        caption: 'Cattle grazing on farmland in Texas. The new dietary guidelines could significantly increase demand for beef. Photo: Guardian/Getty'
+      },
+      contentBlocks: [
+        { type: 'paragraph', content: 'The new federal dietary guidelines released this week would require an additional 100 million acres of farmland to meet increased meat demand—an area roughly the size of California—while adding hundreds of millions of tons of greenhouse gas emissions annually, according to an analysis by the World Resources Institute.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'The environmental research organization calculated that if Americans followed the new guidelines, beef production alone would need to increase by approximately 40%, requiring massive expansion of cattle ranching into forests, wetlands, and other natural areas.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'quote', content: '"These guidelines would be catastrophic for climate change efforts. We\'d be looking at an additional 300-400 million metric tons of CO2 equivalent emissions per year, just from the dietary changes." — Tim Searchinger, WRI Senior Fellow', portionMark: { classification: 'U', handling: '' } },
+        { type: 'heading', content: 'Water and Land Impacts', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Beyond emissions, the analysis found that the increased meat production would require approximately 15 trillion additional gallons of water annually and would accelerate deforestation in the Amazon and other critical ecosystems to create new grazing land.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: '"The environmental math simply doesn\'t work," said Dr. Sarah Lake, a food systems researcher at Stanford University. "The planet cannot sustain the level of meat consumption these guidelines encourage."', portionMark: { classification: 'U', handling: '' } },
+        { type: 'heading', content: 'Administration Dismisses Concerns', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'HHS Secretary Robert F. Kennedy Jr. dismissed the environmental analysis as "climate alarmism" and said American agricultural innovation would meet any increased demand without significant environmental impact.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: '"American farmers are the most efficient in the world," Kennedy said. "These doomsday predictions assume nothing will change. Technology will solve these problems, just as it always has."', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Environmental groups said they would challenge the guidelines in court, arguing they violate federal environmental review requirements.', portionMark: { classification: 'U', handling: '' } }
+      ],
       narrativeIds: ['narr-010'],
       subNarrativeIds: ['sub-026'],
       personIds: [],
@@ -2574,11 +2593,30 @@ export const mockData = {
     },
     {
       id: 'doc-020',
+      documentType: 'news_article',
+      classification: 'U',
       title: 'RFK Jr in 2004: Factory meat industry is "bigger threat than Osama bin Laden"',
       url: 'https://msnbc.com/opinion/rfk-jr-meat-industry-past-quotes',
       publishedDate: '2026-01-20T08:00:00Z',
       publisherId: 'pub-nat-msnbc',
+      author: 'Hayes Brown',
       excerpt: 'Critics highlight Kennedy\'s past environmental activism that sharply contradicts his new pro-meat dietary guidelines.',
+      headerImage: {
+        url: 'img/placeholders/image-placeholder.svg',
+        caption: 'Robert F. Kennedy Jr. speaking at an environmental rally in 2004. Photo: MSNBC/File'
+      },
+      contentBlocks: [
+        { type: 'paragraph', content: 'As HHS Secretary Robert F. Kennedy Jr. promotes new federal guidelines encouraging Americans to eat more meat, critics are circulating his past statements condemning the meat industry in the harshest possible terms.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'In a 2004 speech at the Sierra Club, Kennedy called factory farming "a bigger threat to America than Osama bin Laden" and said the meat industry was "destroying our waterways, poisoning our air, and making us sick."', portionMark: { classification: 'U', handling: '' } },
+        { type: 'quote', content: '"These factory farms are not farms at all—they are industrial polluters masquerading as agriculture. They are poisoning rural America and producing meat that is making our nation sicker and fatter." — RFK Jr., 2004', portionMark: { classification: 'U', handling: '' } },
+        { type: 'heading', content: 'Decades of Anti-Meat Advocacy', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Kennedy spent decades as an environmental lawyer suing meat producers on behalf of communities affected by pollution from hog farms and cattle operations. His organization, Waterkeeper Alliance, won several landmark cases forcing meat companies to pay millions in damages.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'As recently as 2019, Kennedy wrote that Americans should "dramatically reduce" their meat consumption to address climate change and public health concerns.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'heading', content: 'Kennedy Defends Shift', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Asked about the apparent contradiction, Kennedy said his views have "evolved" based on new research and that his previous criticisms were directed at "industrialized factory farming," not meat consumption itself.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: '"I still believe we need to reform how meat is produced," Kennedy said. "But the science is clear that animal protein is essential for human health. My job as HHS Secretary is to give Americans accurate nutrition information, not to advance an environmental agenda."', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Critics called the explanation unconvincing, noting that the new guidelines make no distinction between factory-farmed and sustainably-raised meat.', portionMark: { classification: 'U', handling: '' } }
+      ],
       narrativeIds: ['narr-010'],
       subNarrativeIds: ['sub-027'],
       personIds: ['person-026'],
@@ -2590,11 +2628,30 @@ export const mockData = {
     // Food preservatives documents (narr-003)
     {
       id: 'doc-021',
+      documentType: 'news_article',
+      classification: 'U',
       title: 'NutriNet-Santé study links sodium nitrite to 32% increased cancer risk',
       url: 'https://bbc.com/news/health-food-preservatives-cancer-study',
       publishedDate: '2026-01-08T10:00:00Z',
       publisherId: 'pub-int-bbc',
+      author: 'James Gallagher',
       excerpt: 'A major French study found sodium nitrite—common in deli meats—is associated with significantly higher prostate cancer risk.',
+      headerImage: {
+        url: 'img/placeholders/image-placeholder.svg',
+        caption: 'Processed meats containing sodium nitrite on display at a supermarket. Photo: BBC/Getty'
+      },
+      contentBlocks: [
+        { type: 'paragraph', content: 'A major French study has found that consuming sodium nitrite—a common preservative in processed meats—is associated with a 32% increased risk of prostate cancer, adding to growing evidence linking the additive to serious health problems.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'The NutriNet-Santé study, published in the International Journal of Epidemiology, followed more than 100,000 adults over a decade, tracking their consumption of foods containing sodium nitrite and subsequent cancer diagnoses.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Researchers found a clear dose-response relationship: participants who consumed the most sodium nitrite had significantly higher cancer rates than those who consumed the least.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'heading', content: 'Common in Everyday Foods', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Sodium nitrite is found in many common foods, including bacon, ham, hot dogs, deli meats, and some canned products. It serves both as a preservative and gives processed meats their characteristic pink color.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'quote', content: '"Our findings add to the body of evidence suggesting that sodium nitrite consumption should be minimized. The increased cancer risk was significant and consistent across our study population." — Dr. Mathilde Touvier, lead researcher', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'The World Health Organization has classified processed meat as a Group 1 carcinogen since 2015, though sodium nitrite\'s specific contribution to cancer risk has been debated.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'heading', content: 'Industry Response', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'The North American Meat Institute disputed the findings, calling the study "observational" and noting that it cannot prove causation. "Sodium nitrite has been used safely for over a century," a spokesperson said.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Some food companies have begun offering "nitrite-free" versions of popular products, though experts note that these often use celery powder, which naturally contains nitrites in similar concentrations.', portionMark: { classification: 'U', handling: '' } }
+      ],
       narrativeIds: ['narr-003'],
       subNarrativeIds: ['sub-007'],
       personIds: [],
@@ -2604,11 +2661,31 @@ export const mockData = {
     },
     {
       id: 'doc-022',
+      documentType: 'news_article',
+      classification: 'U',
       title: 'Harvard: Ultra-processed foods linked to 45% higher colorectal cancer risk',
       url: 'https://cnn.com/health/harvard-processed-food-cancer-study',
       publishedDate: '2026-01-10T14:00:00Z',
       publisherId: 'pub-nat-cnn',
+      author: 'Sandee LaMotte',
       excerpt: 'Researchers found high consumption of ultra-processed foods correlates with significantly increased risk of precancerous colorectal adenomas.',
+      headerImage: {
+        url: 'img/placeholders/image-placeholder.svg',
+        caption: 'Ultra-processed foods including packaged snacks and ready meals. Photo: CNN/Getty'
+      },
+      contentBlocks: [
+        { type: 'paragraph', content: 'A new Harvard study has found that people who regularly consume ultra-processed foods have a 45% higher risk of developing precancerous colorectal adenomas compared to those who eat primarily whole foods.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'The research, published in the journal Gastroenterology, analyzed dietary data from more than 45,000 participants in the Health Professionals Follow-Up Study and correlated it with colonoscopy results over a 20-year period.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: '"This is one of the largest and longest studies to examine the relationship between ultra-processed food consumption and colorectal cancer precursors," said lead author Dr. Lu Wang of the Harvard T.H. Chan School of Public Health.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'heading', content: 'What Are Ultra-Processed Foods?', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Ultra-processed foods are defined as industrial formulations made mostly from substances derived from foods, with little or no intact food. Examples include soft drinks, packaged snacks, instant noodles, chicken nuggets, and ready-to-heat meals.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'These products typically contain additives such as emulsifiers, artificial sweeteners, and preservatives that have been linked to inflammation and changes in gut microbiome composition.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'quote', content: '"The risk was particularly elevated for certain types of ultra-processed foods, including processed meats and sugar-sweetened beverages. But we saw increased risk across the category." — Dr. Lu Wang', portionMark: { classification: 'U', handling: '' } },
+        { type: 'heading', content: 'Implications for Public Health', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'The findings are particularly concerning given that ultra-processed foods now make up nearly 60% of calories consumed by American adults, according to previous research.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'Colorectal cancer is the third most common cancer in the United States and the second leading cause of cancer death. Rates have been increasing among younger adults, a trend some researchers attribute to dietary changes.', portionMark: { classification: 'U', handling: '' } },
+        { type: 'paragraph', content: 'The American Cancer Society recommends limiting consumption of processed and ultra-processed foods as part of a cancer prevention strategy.', portionMark: { classification: 'U', handling: '' } }
+      ],
       narrativeIds: ['narr-003'],
       subNarrativeIds: [],
       personIds: [],
