@@ -8,12 +8,14 @@ import { DataService } from '../data/DataService.js';
 import { NarrativeList } from '../components/NarrativeList.js';
 import { CardBuilder } from '../utils/CardBuilder.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
+import { getMonitorEditor } from '../components/MonitorEditorModal.js';
 
 export class MonitorsView extends BaseView {
   constructor(container, options = {}) {
     super(container, options);
     this.narrativeListComponents = [];
     this.descriptionToggles = new Map(); // Map of containerId -> NarrativeList
+    this.monitorEditor = null;
   }
 
   /**
@@ -119,6 +121,7 @@ export class MonitorsView extends BaseView {
       const matchedNarratives = DataService.getNarrativesForMonitor(monitor.id);
       const alerts = DataService.getAlertsForMonitor(monitor.id);
       const containerId = `monitor-narratives-${monitor.id}`;
+      const scopeLogic = monitor.scope?.logic || 'OR';
       
       return {
         ...monitor,
@@ -129,6 +132,7 @@ export class MonitorsView extends BaseView {
         matchedNarratives,
         alerts,
         containerId,
+        scopeLogic,
         lastTriggeredFormatted: this.formatRelativeTime(monitor.lastTriggered)
       };
     });
@@ -151,9 +155,21 @@ export class MonitorsView extends BaseView {
         ? `Triggered ${monitor.lastTriggeredFormatted}`
         : !monitor.enabled ? 'Paused' : '';
       
-      // Build actions HTML with description toggle
+      // Add logic badge and match count to subtitle
+      const logicBadge = `<span class="logic-badge logic-${monitor.scopeLogic.toLowerCase()}">${monitor.scopeLogic}</span>`;
+      const matchCount = `<span class="match-count">${monitor.matchedNarratives.length} match${monitor.matchedNarratives.length !== 1 ? 'es' : ''}</span>`;
+      subtitle = `${logicBadge}${matchCount}${subtitle ? ' • ' + subtitle : ''}`;
+      
+      // Build actions HTML with edit button and description toggle
       const descToggleId = `desc-toggle-${monitor.id}`;
-      const actionsHtml = CardBuilder.descriptionToggle(descToggleId);
+      const editBtnHtml = `
+        <button class="monitor-edit-btn" data-monitor-id="${monitor.id}" title="Edit monitor">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M11.5 2.5l2 2M2 11l-.5 3.5L5 14l9-9-2-2-10 10z"/>
+          </svg>
+        </button>
+      `;
+      const actionsHtml = editBtnHtml + CardBuilder.descriptionToggle(descToggleId);
       
       // Content for the card body
       const cardBodyContent = `
@@ -345,6 +361,9 @@ export class MonitorsView extends BaseView {
     // Setup popover toggle handlers
     this.setupHeaderPopovers();
     
+    // Setup create/edit monitor handlers
+    this.setupMonitorEditorHandlers(enrichedMonitors);
+    
     // Initialize card width toggles for all monitor cards
     const monitorsGrid = this.container.querySelector('.monitors-grid');
     initAllCardToggles(monitorsGrid, 'monitors');
@@ -428,6 +447,41 @@ export class MonitorsView extends BaseView {
       }
     };
     document.addEventListener('click', this.documentClickHandler);
+  }
+
+  /**
+   * Setup handlers for creating and editing monitors
+   */
+  setupMonitorEditorHandlers(enrichedMonitors) {
+    // Get the monitor editor instance
+    this.monitorEditor = getMonitorEditor();
+    
+    // Handle "New Monitor" button click
+    const newMonitorBtn = this.container.querySelector('.btn-primary');
+    if (newMonitorBtn) {
+      newMonitorBtn.addEventListener('click', () => {
+        this.monitorEditor.openCreate(() => {
+          // Re-render the view after save
+          this.render();
+        });
+      });
+    }
+    
+    // Handle edit button clicks
+    const editBtns = this.container.querySelectorAll('.monitor-edit-btn');
+    editBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const monitorId = btn.dataset.monitorId;
+        const monitor = enrichedMonitors.find(m => m.id === monitorId);
+        if (monitor) {
+          this.monitorEditor.openEdit(monitor, () => {
+            // Re-render the view after save
+            this.render();
+          });
+        }
+      });
+    });
   }
 
   destroy() {

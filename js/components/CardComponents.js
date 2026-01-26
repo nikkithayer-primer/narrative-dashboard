@@ -10,11 +10,33 @@ import { DataService } from '../data/DataService.js';
 import { NetworkGraph } from './NetworkGraph.js';
 import { NarrativeList } from './NarrativeList.js';
 import { DocumentTable } from './DocumentTable.js';
+import { ColumnFilter } from './ColumnFilter.js';
 import { MapView } from './MapView.js';
 import { Timeline } from './Timeline.js';
 import { SentimentChart } from './SentimentChart.js';
 import { FactionCards } from './FactionCards.js';
 import { VennDiagram } from './VennDiagram.js';
+
+// Standard column configuration for document tables
+const DOCUMENT_AVAILABLE_COLUMNS = {
+  classification: 'Classification',
+  documentType: 'Doc Type',
+  publisherName: 'Publisher',
+  publisherType: 'Publisher Type',
+  title: 'Title',
+  excerpt: 'Excerpt',
+  publishedDate: 'Published',
+  narratives: 'Narratives',
+  themes: 'Themes',
+  events: 'Events',
+  locations: 'Locations',
+  persons: 'People',
+  organizations: 'Organizations',
+  factions: 'Factions',
+  topics: 'Topics'
+};
+
+const DOCUMENT_DEFAULT_COLUMNS = ['publisherName', 'publisherType', 'title', 'publishedDate'];
 
 /**
  * Base class for card components
@@ -319,6 +341,11 @@ export class DocumentTableCard extends BaseCardComponent {
     this.halfWidth = options.halfWidth || false;
     this.fullWidth = options.fullWidth || false;
     this.enableViewerMode = options.enableViewerMode || false;
+    this.showColumnFilter = options.showColumnFilter !== false; // Show filter by default
+    this.columns = options.columns || [...DOCUMENT_DEFAULT_COLUMNS];
+    this.availableColumns = options.availableColumns || DOCUMENT_AVAILABLE_COLUMNS;
+    this.columnFilterId = `${containerId}-column-filter`;
+    this.columnFilter = null;
   }
 
   hasData() {
@@ -327,19 +354,47 @@ export class DocumentTableCard extends BaseCardComponent {
 
   getCardHtml() {
     if (!this.hasData()) return '';
+    
+    // Build actions HTML with column filter placeholder
+    const actionsHtml = this.showColumnFilter 
+      ? `<div class="filter-control" id="${this.columnFilterId}"></div>`
+      : '';
+    
     return CardBuilder.create(this.title, this.containerId, {
       count: this.showCount ? this.documents.length : undefined,
       noPadding: true,
       halfWidth: this.halfWidth,
-      fullWidth: this.fullWidth
+      fullWidth: this.fullWidth,
+      actions: actionsHtml
     });
   }
 
   initialize() {
     if (!this.hasData()) return null;
 
+    // Initialize column filter if enabled
+    if (this.showColumnFilter) {
+      const filterContainer = document.getElementById(this.columnFilterId);
+      if (filterContainer) {
+        this.columnFilter = new ColumnFilter(this.columnFilterId, {
+          availableColumns: this.availableColumns,
+          defaultColumns: this.columns,
+          requiredColumns: ['title'],
+          onChange: (columns) => {
+            this.columns = columns;
+            if (this.component) {
+              this.component.setColumns(columns);
+            }
+          }
+        });
+        this.columnFilter.setSelectedColumns(this.columns);
+        this.columnFilter.render();
+      }
+    }
+
+    // Initialize document table
     this.component = new DocumentTable(this.containerId, {
-      columns: ['publisherName', 'publisherType', 'title', 'publishedDate'],
+      columns: this.columns,
       maxItems: this.maxItems,
       enableViewerMode: this.enableViewerMode,
       onDocumentClick: (doc) => {
@@ -349,6 +404,14 @@ export class DocumentTableCard extends BaseCardComponent {
     this.component.update({ documents: this.documents });
 
     return this.component;
+  }
+
+  destroy() {
+    if (this.columnFilter) {
+      this.columnFilter.destroy();
+      this.columnFilter = null;
+    }
+    super.destroy();
   }
 }
 

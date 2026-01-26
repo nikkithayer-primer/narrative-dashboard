@@ -1551,35 +1551,80 @@ export const DataService = {
 
   /**
    * Get narratives that match a monitor's scope criteria.
-   * A narrative matches if it references any entity in the monitor's scope.
+   * Supports AND/OR logic for matching:
+   * - OR mode (default): A narrative matches if it references ANY entity in the monitor's scope
+   * - AND mode: A narrative matches if it references ALL entities in the monitor's scope
    */
   getNarrativesForMonitor: (monitorId) => {
     const monitor = findById('monitors', monitorId);
     if (!monitor) return [];
     
     const scope = monitor.scope || {};
+    const logic = scope.logic || 'OR';
     const narratives = dataStore.data.narratives || [];
     
+    // Helper to check if narrative matches a specific entity type
+    const matchesPersons = (narrative, personIds) => {
+      if (!personIds || personIds.length === 0) return null; // No criteria
+      return personIds.some(pId => (narrative.personIds || []).includes(pId));
+    };
+    
+    const matchesOrganizations = (narrative, orgIds) => {
+      if (!orgIds || orgIds.length === 0) return null;
+      return orgIds.some(oId => (narrative.organizationIds || []).includes(oId));
+    };
+    
+    const matchesFactions = (narrative, factionIds) => {
+      if (!factionIds || factionIds.length === 0) return null;
+      return factionIds.some(fId => narrative.factionMentions && narrative.factionMentions[fId]);
+    };
+    
+    const matchesLocations = (narrative, locationIds) => {
+      if (!locationIds || locationIds.length === 0) return null;
+      return locationIds.some(lId => (narrative.locationIds || []).includes(lId));
+    };
+    
+    const matchesEvents = (narrative, eventIds) => {
+      if (!eventIds || eventIds.length === 0) return null;
+      return eventIds.some(eId => (narrative.eventIds || []).includes(eId));
+    };
+    
+    const matchesNarrativeIds = (narrative, narrativeIds) => {
+      if (!narrativeIds || narrativeIds.length === 0) return null;
+      return narrativeIds.includes(narrative.id);
+    };
+    
+    const matchesThemes = (narrative, themeIds) => {
+      if (!themeIds || themeIds.length === 0) return null;
+      // Check if any of the narrative's sub-narratives are in the theme scope
+      return themeIds.some(tId => (narrative.subNarrativeIds || []).includes(tId));
+    };
+    
     return narratives.filter(narrative => {
-      // Check if narrative directly in scope
-      if (scope.narrativeIds?.includes(narrative.id)) return true;
+      // Get match results for each criteria (null means no criteria set)
+      const matches = [
+        matchesNarrativeIds(narrative, scope.narrativeIds),
+        matchesPersons(narrative, scope.personIds),
+        matchesOrganizations(narrative, scope.organizationIds),
+        matchesFactions(narrative, scope.factionIds),
+        matchesLocations(narrative, scope.locationIds),
+        matchesEvents(narrative, scope.eventIds),
+        matchesThemes(narrative, scope.themeIds)
+      ];
       
-      // Check person overlap
-      if (scope.personIds?.some(pId => (narrative.personIds || []).includes(pId))) return true;
+      // Filter out null values (criteria not set)
+      const activeMatches = matches.filter(m => m !== null);
       
-      // Check organization overlap
-      if (scope.organizationIds?.some(oId => (narrative.organizationIds || []).includes(oId))) return true;
+      // If no criteria set, return no matches
+      if (activeMatches.length === 0) return false;
       
-      // Check faction overlap (factionMentions is an object with faction IDs as keys)
-      if (scope.factionIds?.some(fId => narrative.factionMentions && narrative.factionMentions[fId])) return true;
-      
-      // Check location overlap
-      if (scope.locationIds?.some(lId => (narrative.locationIds || []).includes(lId))) return true;
-      
-      // Check event overlap
-      if (scope.eventIds?.some(eId => (narrative.eventIds || []).includes(eId))) return true;
-      
-      return false;
+      if (logic === 'AND') {
+        // AND mode: narrative must match ALL active criteria
+        return activeMatches.every(m => m === true);
+      } else {
+        // OR mode (default): narrative must match ANY active criteria
+        return activeMatches.some(m => m === true);
+      }
     });
   },
 
@@ -1602,32 +1647,68 @@ export const DataService = {
 
   /**
    * Get events that match a monitor's scope criteria.
-   * Events match if they are in scope or related to scoped entities.
+   * Supports AND/OR logic for matching:
+   * - OR mode (default): An event matches if it references ANY entity in the monitor's scope
+   * - AND mode: An event matches if it references ALL non-empty scope criteria
    */
   getEventsForMonitor: (monitorId) => {
     const monitor = findById('monitors', monitorId);
     if (!monitor) return [];
     
     const scope = monitor.scope || {};
+    const logic = scope.logic || 'OR';
     const events = dataStore.data.events || [];
     const includeRelated = monitor.options?.includeRelatedEvents !== false;
     
+    // Helper to check if event matches a specific entity type
+    const matchesEventIds = (event, eventIds) => {
+      if (!eventIds || eventIds.length === 0) return null;
+      return eventIds.includes(event.id);
+    };
+    
+    const matchesPersons = (event, personIds) => {
+      if (!personIds || personIds.length === 0) return null;
+      return personIds.some(pId => (event.personIds || []).includes(pId));
+    };
+    
+    const matchesOrganizations = (event, orgIds) => {
+      if (!orgIds || orgIds.length === 0) return null;
+      return orgIds.some(oId => (event.organizationIds || []).includes(oId));
+    };
+    
+    const matchesLocations = (event, locationIds) => {
+      if (!locationIds || locationIds.length === 0) return null;
+      return locationIds.includes(event.locationId);
+    };
+    
     return events.filter(event => {
-      // Check if event directly in scope
-      if (scope.eventIds?.includes(event.id)) return true;
+      // Direct event ID match always applies
+      const directMatch = matchesEventIds(event, scope.eventIds);
+      if (directMatch === true) return true;
       
-      if (includeRelated) {
-        // Check person overlap
-        if (scope.personIds?.some(pId => (event.personIds || []).includes(pId))) return true;
-        
-        // Check organization overlap
-        if (scope.organizationIds?.some(oId => (event.organizationIds || []).includes(oId))) return true;
-        
-        // Check location overlap
-        if (scope.locationIds?.includes(event.locationId)) return true;
+      // If not including related events, only match direct event IDs
+      if (!includeRelated) return false;
+      
+      // Get match results for related criteria
+      const matches = [
+        matchesPersons(event, scope.personIds),
+        matchesOrganizations(event, scope.organizationIds),
+        matchesLocations(event, scope.locationIds)
+      ];
+      
+      // Filter out null values (criteria not set)
+      const activeMatches = matches.filter(m => m !== null);
+      
+      // If no related criteria set, no match
+      if (activeMatches.length === 0) return false;
+      
+      if (logic === 'AND') {
+        // AND mode: event must match ALL active criteria
+        return activeMatches.every(m => m === true);
+      } else {
+        // OR mode (default): event must match ANY active criteria
+        return activeMatches.some(m => m === true);
       }
-      
-      return false;
     });
   },
 

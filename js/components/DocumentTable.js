@@ -30,8 +30,8 @@ import {
 const COLUMN_CONFIG = {
   classification: {
     label: 'Class',
-    width: '60px',
-    minWidth: '50px',
+    width: '45px',
+    minWidth: '40px',
     sortable: true,
     getValue: (doc) => {
       const level = CLASSIFICATION_LEVELS[doc.classification || 'U'];
@@ -68,8 +68,8 @@ const COLUMN_CONFIG = {
   },
   excerpt: {
     label: 'Excerpt',
-    width: '300px',
-    minWidth: '200px',
+    width: '400px',
+    minWidth: '280px',
     sortable: false,
     getValue: () => ''
   },
@@ -1067,6 +1067,33 @@ export class DocumentTable extends BaseComponent {
   }
 
   /**
+   * Render a linked list of entities for the details view
+   * @param {Array} entities - Array of entity objects
+   * @param {string} route - Route prefix (e.g., 'person', 'organization')
+   * @param {string} displayField - Field to display (e.g., 'name')
+   * @returns {string} HTML string for the list
+   */
+  renderEntityListHtml(entities, route, displayField) {
+    if (!entities || entities.length === 0) return '';
+    
+    const items = entities.map(entity => {
+      const displayText = entity[displayField] || entity.name || entity.id;
+      return `
+        <li class="details-entity-item">
+          <a href="#/${route}/${entity.id}" class="details-entity-link">
+            ${displayText}
+            <svg class="details-entity-arrow" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 4l4 4-4 4"/>
+            </svg>
+          </a>
+        </li>
+      `;
+    }).join('');
+    
+    return `<ul class="details-entity-list">${items}</ul>`;
+  }
+
+  /**
    * Render the details view showing related entities
    * @param {Object} doc - The document
    * @returns {string} HTML string
@@ -1078,7 +1105,6 @@ export class DocumentTable extends BaseComponent {
     const organizations = DataService.getOrganizationsForDocument(doc.id);
     const locations = DataService.getLocationsForDocument(doc.id);
     const events = DataService.getEventsForDocument(doc.id);
-    const hasNetwork = persons.length > 0 || organizations.length > 0;
 
     // Build cards using CardBuilder with standard layout (half/full width)
     const cards = CardBuilder.createMultiple([
@@ -1105,10 +1131,18 @@ export class DocumentTable extends BaseComponent {
         }
       },
       {
-        condition: hasNetwork,
-        title: 'Mentioned People & Organizations',
-        id: 'doc-details-network',
-        options: { count: persons.length + organizations.length, halfWidth: true }
+        condition: persons.length > 0,
+        title: 'Mentioned People',
+        id: 'doc-details-persons',
+        content: this.renderEntityListHtml(persons, 'person', 'name'),
+        options: { count: persons.length, halfWidth: true, noPadding: true }
+      },
+      {
+        condition: organizations.length > 0,
+        title: 'Mentioned Organizations',
+        id: 'doc-details-organizations',
+        content: this.renderEntityListHtml(organizations, 'organization', 'name'),
+        options: { count: organizations.length, halfWidth: true, noPadding: true }
       },
       {
         condition: locations.length > 0,
@@ -1176,22 +1210,6 @@ export class DocumentTable extends BaseComponent {
         }
       });
       this.detailsThemeList.update({ subNarratives });
-    }
-
-    // Initialize Network Graph
-    if ((persons.length > 0 || organizations.length > 0) && document.getElementById('doc-details-network')) {
-      const personIds = persons.map(p => p.id);
-      const orgIds = organizations.map(o => o.id);
-      const networkData = DataService.buildNetworkGraph(personIds, orgIds);
-
-      this.detailsNetwork = new NetworkGraph('doc-details-network', {
-        height: 300,
-        onNodeClick: (node) => {
-          const route = node.type === 'person' ? 'person' : 'organization';
-          window.location.hash = `#/${route}/${node.id}`;
-        }
-      });
-      this.detailsNetwork.update(networkData);
     }
 
     // Initialize Map

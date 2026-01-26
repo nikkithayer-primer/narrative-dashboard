@@ -14,9 +14,31 @@ import { MapView } from '../components/MapView.js';
 import { TimelineVolumeComposite } from '../components/TimelineVolumeComposite.js';
 import { NetworkGraph } from '../components/NetworkGraph.js';
 import { DocumentTable } from '../components/DocumentTable.js';
+import { ColumnFilter } from '../components/ColumnFilter.js';
 import { getSourceViewer } from '../components/SourceViewerModal.js';
 import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 import { renderEntityList } from '../utils/entityRenderer.js';
+
+// Column configuration for document tables
+const DOCUMENT_AVAILABLE_COLUMNS = {
+  classification: 'Classification',
+  documentType: 'Doc Type',
+  publisherName: 'Publisher',
+  publisherType: 'Publisher Type',
+  title: 'Title',
+  excerpt: 'Excerpt',
+  publishedDate: 'Published',
+  narratives: 'Narratives',
+  themes: 'Themes',
+  events: 'Events',
+  locations: 'Locations',
+  persons: 'People',
+  organizations: 'Organizations',
+  factions: 'Factions',
+  topics: 'Topics'
+};
+
+const DOCUMENT_DEFAULT_COLUMNS = ['publisherName', 'publisherType', 'title', 'publishedDate'];
 
 export class NarrativeView extends BaseView {
   constructor(container, narrativeId, options = {}) {
@@ -216,10 +238,14 @@ export class NarrativeView extends BaseView {
       return '<div class="empty-state"><p class="empty-state-text">No documents found</p></div>';
     }
 
+    // Column filter in card header
+    const actionsHtml = `<div class="filter-control" id="narrative-docs-column-filter"></div>`;
+
     return CardBuilder.create('Source Documents', 'narrative-documents', {
       count: data.documents.length,
       fullWidth: true,
-      noPadding: true
+      noPadding: true,
+      actions: actionsHtml
     });
   }
 
@@ -230,11 +256,33 @@ export class NarrativeView extends BaseView {
       mapLocations, personIds, orgIds, documents
     } = this._prefetchedData;
 
-    // Documents Tab: Only initialize document table
+    // Documents Tab: Only initialize document table with column filter
     if (this.isDocumentsTab()) {
       if (documents.length > 0) {
+        // Initialize selected columns (start with defaults)
+        this._selectedDocColumns = [...DOCUMENT_DEFAULT_COLUMNS];
+        
+        // Initialize column filter
+        const filterContainer = document.getElementById('narrative-docs-column-filter');
+        if (filterContainer) {
+          this.components.columnFilter = new ColumnFilter('narrative-docs-column-filter', {
+            availableColumns: DOCUMENT_AVAILABLE_COLUMNS,
+            defaultColumns: DOCUMENT_DEFAULT_COLUMNS,
+            requiredColumns: ['title'],
+            onChange: (columns) => {
+              this._selectedDocColumns = columns;
+              if (this.components.documentTable) {
+                this.components.documentTable.setColumns(columns);
+              }
+            }
+          });
+          this.components.columnFilter.setSelectedColumns(this._selectedDocColumns);
+          this.components.columnFilter.render();
+        }
+        
+        // Initialize document table
         this.components.documentTable = new DocumentTable('narrative-documents', {
-          columns: ['publisherName', 'publisherType', 'title', 'publishedDate'],
+          columns: this._selectedDocColumns,
           maxItems: 50, // Larger limit for dedicated documents view
           enableViewerMode: true,
           onDocumentClick: (doc) => {

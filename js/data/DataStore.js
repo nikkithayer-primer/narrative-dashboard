@@ -628,6 +628,54 @@ class DataStore {
     this.deleteEntity('topics', id);
   }
 
+  // ============================================
+  // Monitor CRUD
+  // ============================================
+
+  createMonitor(monitor) {
+    return this.createEntity('monitors', 'monitor', {
+      name: monitor.name,
+      description: monitor.description || '',
+      scope: {
+        personIds: monitor.scope?.personIds || [],
+        organizationIds: monitor.scope?.organizationIds || [],
+        factionIds: monitor.scope?.factionIds || [],
+        locationIds: monitor.scope?.locationIds || [],
+        eventIds: monitor.scope?.eventIds || [],
+        narrativeIds: monitor.scope?.narrativeIds || [],
+        themeIds: monitor.scope?.themeIds || [],
+        logic: monitor.scope?.logic || 'OR'
+      },
+      options: {
+        includeSubEvents: monitor.options?.includeSubEvents ?? true,
+        includeSubNarratives: monitor.options?.includeSubNarratives ?? true,
+        includeRelatedEvents: monitor.options?.includeRelatedEvents ?? true
+      },
+      triggers: monitor.triggers || {
+        newNarrative: true,
+        newEvent: true,
+        volumeSpike: { threshold: 500, timeWindow: '24h' },
+        sentimentShift: { threshold: 0.15, direction: 'any' },
+        factionEngagement: null
+      },
+      enabled: monitor.enabled ?? true,
+      lastTriggered: null
+    });
+  }
+
+  updateMonitor(id, updates) {
+    return this.updateEntity('monitors', id, updates);
+  }
+
+  deleteMonitor(id) {
+    return this.deleteEntity('monitors', id, () => {
+      // Clean up related alerts when monitor is deleted
+      if (this.data.alerts) {
+        this.data.alerts = this.data.alerts.filter(a => a.monitorId !== id);
+      }
+    });
+  }
+
   generateInitialTopicVolume() {
     const days = 7;
     const data = [];

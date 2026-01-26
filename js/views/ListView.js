@@ -1,6 +1,7 @@
 /**
  * ListView.js
  * Generic list view for browsing all entities of a type
+ * Supports entity type filtering for people/organizations
  */
 
 import { BaseView } from './BaseView.js';
@@ -8,6 +9,13 @@ import { DataService } from '../data/DataService.js';
 import { NarrativeList } from '../components/NarrativeList.js';
 import { Timeline } from '../components/Timeline.js';
 import { STATUS_LABELS } from '../utils/formatters.js';
+
+// Entity types with labels (used for people/orgs filter - mirrors DocumentsView pattern)
+const ENTITY_TYPES = {
+  all: 'All Entities',
+  person: 'People Only',
+  organization: 'Organizations Only'
+};
 
 export class ListView extends BaseView {
   constructor(container, entityType, options = {}) {
@@ -17,6 +25,9 @@ export class ListView extends BaseView {
     this.narrativeList = null;
     this.timeline = null;
     this.eventsViewMode = 'list'; // 'list' or 'timeline'
+    
+    // Filter state for entities view (matches DocumentsView pattern)
+    this.entityTypeFilter = 'all';
   }
 
   /**
@@ -217,6 +228,19 @@ export class ListView extends BaseView {
       return;
     }
 
+    // Build entity type filter options (mirrors DocumentsView publisherTypeFilter pattern)
+    const entityTypeFilterHtml = this.entityType === 'entities' 
+      ? `<div class="filter-control">
+          <label class="filter-label">Type</label>
+          <select id="entity-type-filter" class="filter-select">
+            ${Object.entries(ENTITY_TYPES).map(([key, label]) => {
+              const selected = this.entityTypeFilter === key ? 'selected' : '';
+              return `<option value="${key}" ${selected}>${label}</option>`;
+            }).join('')}
+          </select>
+        </div>`
+      : '';
+
     // Default rendering for other entity types
     this.container.innerHTML = `
       <div class="page-header">
@@ -224,7 +248,7 @@ export class ListView extends BaseView {
           ${breadcrumbHtml}
         </div>
         <h1>${config.title}</h1>
-        <p class="subtitle">${filteredItems.length} ${config.itemName}${filteredItems.length !== 1 ? 's' : ''}</p>
+        <p class="subtitle">${filteredItems.length} ${filteredItems.length !== 1 ? (config.itemNamePlural || config.itemName + 's') : config.itemName}</p>
       </div>
 
       <div class="content-area">
@@ -240,6 +264,7 @@ export class ListView extends BaseView {
                 value="${this.searchQuery}"
               />
             </div>
+            ${entityTypeFilterHtml ? `<div class="card-header-actions">${entityTypeFilterHtml}</div>` : ''}
           </div>
           <div class="card-body no-padding">
             <ul class="entity-list" id="entity-list">
@@ -302,9 +327,22 @@ export class ListView extends BaseView {
         }
       },
       entities: {
-        title: 'People & Organizations',
-        itemName: 'entit',
-        itemNamePlural: 'entities',
+        // Dynamic title/names based on entity type filter
+        title: this.entityTypeFilter === 'person' 
+          ? 'People' 
+          : this.entityTypeFilter === 'organization' 
+            ? 'Organizations' 
+            : 'People & Organizations',
+        itemName: this.entityTypeFilter === 'person' 
+          ? 'person' 
+          : this.entityTypeFilter === 'organization' 
+            ? 'organization' 
+            : 'entit',
+        itemNamePlural: this.entityTypeFilter === 'person' 
+          ? 'people' 
+          : this.entityTypeFilter === 'organization' 
+            ? 'organizations' 
+            : 'entities',
         iconType: 'entities',
         route: null, // Special handling
         getSubtitle: (item) => item.type || (item._entityType === 'person' ? 'Person' : 'Organization')
@@ -337,6 +375,13 @@ export class ListView extends BaseView {
         }
         return events;
       case 'entities':
+        // Apply entity type filter (mirrors DocumentsView publisherTypeFilter pattern)
+        if (this.entityTypeFilter === 'person') {
+          return DataService.getPersons().map(p => ({ ...p, _entityType: 'person' }));
+        } else if (this.entityTypeFilter === 'organization') {
+          return DataService.getOrganizations().map(o => ({ ...o, _entityType: 'organization' }));
+        }
+        // Default: return all entities
         return [
           ...DataService.getPersons().map(p => ({ ...p, _entityType: 'person' })),
           ...DataService.getOrganizations().map(o => ({ ...o, _entityType: 'organization' }))
@@ -364,10 +409,10 @@ export class ListView extends BaseView {
     const items = this.getItems();
     const filteredItems = this.filterItems(items);
 
-    // Update subtitle count
+    // Update subtitle count (use itemNamePlural for correct pluralization)
     const subtitle = this.container.querySelector('.subtitle');
     if (subtitle) {
-      subtitle.textContent = `${filteredItems.length} ${config.itemName}${filteredItems.length !== 1 ? 's' : ''}`;
+      subtitle.textContent = `${filteredItems.length} ${filteredItems.length !== 1 ? (config.itemNamePlural || config.itemName + 's') : config.itemName}`;
     }
 
     // Update content based on entity type
@@ -436,6 +481,15 @@ export class ListView extends BaseView {
       searchInput.addEventListener('input', (e) => {
         this.searchQuery = e.target.value;
         this.updateFilteredList();
+      });
+    }
+
+    // Entity type filter (mirrors DocumentsView publisherTypeFilter pattern)
+    const entityTypeSelect = document.getElementById('entity-type-filter');
+    if (entityTypeSelect) {
+      entityTypeSelect.addEventListener('change', (e) => {
+        this.entityTypeFilter = e.target.value;
+        this.render();
       });
     }
 

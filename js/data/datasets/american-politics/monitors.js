@@ -9,8 +9,9 @@ export const monitors = [
     description: 'Track narratives and events related to DOJ, ICE, and DHS immigration enforcement activities',
     scope: {
       organizationIds: ['org-010', 'org-011', 'org-017'], // DOJ, ICE, DHS
-      personIds: ['org-018'], // Kristi Noem
-      locationIds: ['loc-002', 'loc-008'] // Minneapolis, St. Paul
+      personIds: ['person-018'], // Kristi Noem
+      locationIds: ['loc-002', 'loc-008'], // Minneapolis, St. Paul
+      logic: 'OR' // Match narratives containing ANY of the above entities
     },
     options: {
       includeSubEvents: true,
@@ -34,7 +35,8 @@ export const monitors = [
     description: 'Monitor narratives mentioning President Trump and key administration officials',
     scope: {
       personIds: ['person-003', 'person-012', 'person-013', 'person-018', 'person-026'], // Trump, Dhillon, Bondi, Noem, RFK Jr
-      factionIds: ['faction-001'] // American Right Wing
+      factionIds: ['faction-001'], // American Right Wing
+      logic: 'OR' // Match narratives containing ANY of the above entities
     },
     options: {
       includeSubEvents: true,
@@ -59,7 +61,8 @@ export const monitors = [
     scope: {
       organizationIds: ['org-003', 'org-022', 'org-023'], // FDA, HHS, World Resources Institute
       personIds: ['person-026'], // RFK Jr
-      narrativeIds: ['narr-003', 'narr-010'] // Food preservatives, dietary guidelines
+      narrativeIds: ['narr-003', 'narr-010'], // Food preservatives, dietary guidelines
+      logic: 'OR' // Match narratives containing ANY of the above entities
     },
     options: {
       includeSubEvents: true,
@@ -84,7 +87,8 @@ export const monitors = [
     scope: {
       organizationIds: ['org-013', 'org-014', 'org-015'], // Tippecanoe Superior Court, Indiana Supreme Court, Lafayette PD
       personIds: ['person-009', 'person-011'], // Judge Meyer, Chief Justice Rush
-      locationIds: ['loc-007'] // Lafayette, Indiana
+      locationIds: ['loc-007'], // Lafayette, Indiana
+      logic: 'AND' // Match narratives containing ALL: (any org) AND (any person) AND (location)
     },
     options: {
       includeSubEvents: true,
@@ -109,7 +113,8 @@ export const monitors = [
     scope: {
       personIds: ['person-004', 'person-005', 'person-006'], // Macron, von der Leyen, Greenland PM
       organizationIds: ['org-008', 'org-009'], // European Commission, World Economic Forum
-      locationIds: ['loc-005', 'loc-006'] // Davos, Greenland
+      locationIds: ['loc-005', 'loc-006'], // Davos, Greenland
+      logic: 'OR' // Match narratives containing ANY of the above entities
     },
     options: {
       includeSubEvents: true,

@@ -10,7 +10,8 @@ export const monitors = [
     scope: {
       organizationIds: ['org-001'], // SMIC
       personIds: ['person-001', 'person-002', 'person-003'], // SMIC leadership
-      narrativeIds: ['narr-001'] // SMIC 5nm breakthrough
+      narrativeIds: ['narr-001'], // SMIC 5nm breakthrough
+      logic: 'OR' // Match narratives containing ANY of the above entities
     },
     options: {
       includeSubEvents: true,

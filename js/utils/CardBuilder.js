@@ -17,6 +17,7 @@ export const CardBuilder = {
    * @param {string} [options.bodyClass] - Additional classes for card body
    * @param {boolean} [options.draggable] - Enable drag handle (default: true)
    * @param {string} [options.subtitle] - Optional subtitle text (e.g., "Triggered 6 days ago")
+   * @param {string} [options.content] - Optional HTML content to insert into card body
    * @returns {string} Card HTML string
    */
   create(title, containerId, options = {}) {
@@ -37,6 +38,7 @@ export const CardBuilder = {
     
     const dragHandle = showDragHandle ? this.dragHandle() : '';
     const subtitleHtml = options.subtitle ? `<span class="card-subtitle">${options.subtitle}</span>` : '';
+    const bodyContent = options.content || '';
     
     return `
       <div class="${cardClasses}" data-card-id="${containerId}">
@@ -46,7 +48,7 @@ export const CardBuilder = {
           ${subtitleHtml}
           <div class="card-header-actions">${options.actions || ''}</div>
         </div>
-        <div class="${bodyClasses}" id="${containerId}"></div>
+        <div class="${bodyClasses}" id="${containerId}">${bodyContent}</div>
       </div>
     `;
   },
@@ -93,7 +95,13 @@ export const CardBuilder = {
   createMultiple(configs) {
     return configs
       .filter(config => config.condition !== false)
-      .map(config => this.create(config.title, config.id, config.options))
+      .map(config => {
+        const options = { ...config.options };
+        if (config.content) {
+          options.content = config.content;
+        }
+        return this.create(config.title, config.id, options);
+      })
       .join('');
   }
 };
