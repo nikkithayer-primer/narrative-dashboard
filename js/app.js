@@ -5,9 +5,9 @@
 
 import { dataStore } from './data/DataStore.js';
 import { DataService } from './data/DataService.js';
-import { mockData as americanPoliticsData, datasetId as americanPoliticsId, datasetName as americanPoliticsName } from './data/mockData.js';
-import { mockData as chinaSemiconductorData, datasetId as chinaSemiconductorId, datasetName as chinaSemiconductorName } from './data/mockDataChinaSemiconductor.js';
-import { mockData as walmartBrandData, datasetId as walmartBrandId, datasetName as walmartBrandName } from './data/mockDataWalmartBrand.js';
+import { mockData as americanPoliticsData, datasetId as americanPoliticsId, datasetName as americanPoliticsName } from './data/datasets/american-politics/index.js';
+import { mockData as chinaSemiconductorData, datasetId as chinaSemiconductorId, datasetName as chinaSemiconductorName } from './data/datasets/china-semiconductor/index.js';
+import { mockData as walmartBrandData, datasetId as walmartBrandId, datasetName as walmartBrandName } from './data/datasets/walmart-brand/index.js';
 import { Router } from './router.js';
 
 // Dataset registry

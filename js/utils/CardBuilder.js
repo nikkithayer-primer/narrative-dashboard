@@ -16,6 +16,7 @@ export const CardBuilder = {
    * @param {string} [options.actions] - HTML for card header actions
    * @param {string} [options.bodyClass] - Additional classes for card body
    * @param {boolean} [options.draggable] - Enable drag handle (default: true)
+   * @param {string} [options.subtitle] - Optional subtitle text (e.g., "Triggered 6 days ago")
    * @returns {string} Card HTML string
    */
   create(title, containerId, options = {}) {
@@ -35,12 +36,14 @@ export const CardBuilder = {
     ].filter(Boolean).join(' ');
     
     const dragHandle = showDragHandle ? this.dragHandle() : '';
+    const subtitleHtml = options.subtitle ? `<span class="card-subtitle">${options.subtitle}</span>` : '';
     
     return `
       <div class="${cardClasses}" data-card-id="${containerId}">
         <div class="card-header">
           ${dragHandle}
           <h2 class="card-title">${title}${countLabel}</h2>
+          ${subtitleHtml}
           <div class="card-header-actions">${options.actions || ''}</div>
         </div>
         <div class="${bodyClasses}" id="${containerId}"></div>

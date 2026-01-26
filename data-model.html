@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="doc-page">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,398 +19,11 @@
   <link rel="stylesheet" href="css/forms.css">
   <link rel="stylesheet" href="css/components.css">
 
+  <!-- Documentation Pages -->
+  <link rel="stylesheet" href="css/documentation.css">
+
   <!-- Utilities (last for override capability) -->
   <link rel="stylesheet" href="css/utilities.css">
-  
-  <style>
-    /* Override body overflow from reset.css to allow scrolling */
-    body {
-      overflow-y: auto;
-      height: auto;
-      min-height: 100vh;
-    }
-
-    /* Main Content */
-    .data-model-main {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 32px;
-    }
-
-    .page-intro {
-      margin-bottom: 40px;
-    }
-
-    .page-intro .page-title {
-      font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-
-    .page-intro .page-description {
-      color: var(--text-secondary);
-      font-size: 15px;
-      max-width: 800px;
-    }
-
-    /* Navigation */
-    .model-nav {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 32px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .nav-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 13px;
-      transition: all 0.15s ease;
-    }
-
-    .nav-pill:hover {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      border-color: var(--border-color);
-    }
-
-    .nav-pill .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
-    /* Entity Relationship Diagram */
-    .erd-section {
-      margin-bottom: 48px;
-    }
-
-    .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .section-title::before {
-      content: '';
-      width: 4px;
-      height: 20px;
-      background: var(--accent-primary);
-      border-radius: 2px;
-    }
-
-    .erd-container {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 32px;
-      overflow-x: auto;
-    }
-
-    .erd-diagram {
-      min-width: 1100px;
-      height: 650px;
-    }
-
-    /* Entity Cards */
-    .entities-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 24px;
-    }
-
-    .entity-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .entity-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .entity-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .entity-info h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .entity-info p {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .entity-body {
-      padding: 16px 20px;
-    }
-
-    .field-list {
-      list-style: none;
-    }
-
-    .field-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .field-item:last-child {
-      border-bottom: none;
-    }
-
-    .field-name {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--accent-primary);
-      min-width: 140px;
-      flex-shrink: 0;
-    }
-
-    .field-meta {
-      flex: 1;
-    }
-
-    .field-type {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 2px 6px;
-      background: var(--bg-tertiary);
-      border-radius: 3px;
-      color: var(--text-secondary);
-      margin-bottom: 4px;
-    }
-
-    .field-type.required::after {
-      content: '*';
-      color: var(--color-narrative);
-      margin-left: 4px;
-    }
-
-    .field-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .field-enum {
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .field-enum code {
-      font-family: var(--font-mono);
-      background: var(--bg-tertiary);
-      padding: 1px 4px;
-      border-radius: 2px;
-      margin-right: 4px;
-    }
-
-    /* Relationships Section */
-    .relationships-section {
-      margin-top: 48px;
-    }
-
-    .relationship-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    .relationship-table th,
-    .relationship-table td {
-      padding: 12px 16px;
-      text-align: left;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .relationship-table th {
-      background: var(--bg-tertiary);
-      font-weight: 500;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-    }
-
-    .relationship-table td {
-      background: var(--bg-secondary);
-    }
-
-    .relationship-table tr:hover td {
-      background: var(--bg-hover);
-    }
-
-    .entity-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .entity-badge .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-    }
-
-    .relationship-type {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-secondary);
-    }
-
-    /* JSON Schema Section */
-    .schema-section {
-      margin-top: 48px;
-    }
-
-    .schema-tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .schema-tab {
-      padding: 10px 16px;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 13px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: color 0.15s;
-    }
-
-    .schema-tab:hover {
-      color: var(--text-primary);
-    }
-
-    .schema-tab.active {
-      color: var(--accent-primary);
-      border-bottom-color: var(--accent-primary);
-    }
-
-    .schema-content {
-      display: none;
-    }
-
-    .schema-content.active {
-      display: block;
-    }
-
-    .code-block {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 20px;
-      overflow-x: auto;
-    }
-
-    .code-block pre {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      line-height: 1.6;
-      color: var(--text-primary);
-      margin: 0;
-    }
-
-    .code-block .key {
-      color: var(--accent-primary);
-    }
-
-    .code-block .string {
-      color: #a5d6a7;
-    }
-
-    .code-block .number {
-      color: #ffcc80;
-    }
-
-    .code-block .boolean {
-      color: #ce93d8;
-    }
-
-    .code-block .comment {
-      color: var(--text-muted);
-    }
-
-    /* Footer */
-    .footer {
-      margin-top: 64px;
-      padding: 24px 32px;
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border-color);
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg-secondary);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--text-muted);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .data-model-main {
-        padding: 20px;
-      }
-
-      .entities-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body>
   <nav class="top-navbar">
@@ -544,17 +157,36 @@
     </div>
   </nav>
 
-  <main class="data-model-main">
+  <main class="doc-main">
     <section class="page-intro">
       <h1 class="page-title">Data Model Documentation</h1>
       <p class="page-description">
-        This reference documents the complete data model for the Primer Intelligence Dashboard. 
-        The model supports tracking of disinformation narratives and themes, factions, events, 
-        locations, people, and organizations across intelligence missions.
+        This reference documents the complete data model for the Primer Intelligence Dashboard.
+        The model is organized into three interconnected domains: the Core Intelligence Model for tracking 
+        narratives and entities, the Document & Collaboration Model for source materials and team annotations, 
+        and the Monitor & Alert System for automated tracking.
       </p>
     </section>
 
+    <!-- Section Navigation -->
+    <nav class="model-nav" style="margin-bottom: 16px;">
+      <a href="#core-intelligence" class="nav-pill" style="background: var(--bg-tertiary); border-color: var(--accent-primary);">
+        <span class="dot" style="background: var(--accent-primary)"></span>
+        Core Intelligence Model
+      </a>
+      <a href="#document-collaboration" class="nav-pill" style="background: var(--bg-tertiary); border-color: #06b6d4;">
+        <span class="dot" style="background: #06b6d4"></span>
+        Document & Collaboration
+      </a>
+      <a href="#monitor-alert" class="nav-pill" style="background: var(--bg-tertiary); border-color: #14b8a6;">
+        <span class="dot" style="background: #14b8a6"></span>
+        Monitor & Alert System
+      </a>
+    </nav>
+
+    <!-- Entity Quick Nav -->
     <nav class="model-nav">
+      <span style="color: var(--text-muted); font-size: 12px; margin-right: 8px;">Core:</span>
       <a href="#mission" class="nav-pill">
         <span class="dot" style="background: var(--color-mission)"></span>
         Mission
@@ -566,6 +198,10 @@
       <a href="#subnarrative" class="nav-pill">
         <span class="dot" style="background: #f87171"></span>
         Theme
+      </a>
+      <a href="#topic" class="nav-pill">
+        <span class="dot" style="background: #8b5cf6"></span>
+        Topic
       </a>
       <a href="#faction" class="nav-pill">
         <span class="dot" style="background: var(--color-faction)"></span>
@@ -591,14 +227,9 @@
         <span class="dot" style="background: #60a5fa"></span>
         SubEvent
       </a>
-      <a href="#monitor" class="nav-pill">
-        <span class="dot" style="background: #14b8a6"></span>
-        Monitor
-      </a>
-      <a href="#alert" class="nav-pill">
-        <span class="dot" style="background: #f97316"></span>
-        Alert
-      </a>
+    </nav>
+    <nav class="model-nav">
+      <span style="color: var(--text-muted); font-size: 12px; margin-right: 8px;">Docs:</span>
       <a href="#document" class="nav-pill">
         <span class="dot" style="background: #06b6d4"></span>
         Document
@@ -607,15 +238,42 @@
         <span class="dot" style="background: #b45309"></span>
         Publisher
       </a>
+      <a href="#user" class="nav-pill">
+        <span class="dot" style="background: #10b981"></span>
+        User
+      </a>
+      <a href="#highlight" class="nav-pill">
+        <span class="dot" style="background: #fbbf24"></span>
+        Highlight
+      </a>
+      <a href="#comment" class="nav-pill">
+        <span class="dot" style="background: #f472b6"></span>
+        Comment
+      </a>
       <a href="#classification" class="nav-pill">
         <span class="dot" style="background: #ef4444"></span>
         Classification
       </a>
+      <span style="color: var(--text-muted); font-size: 12px; margin-left: 16px; margin-right: 8px;">Monitors:</span>
+      <a href="#monitor" class="nav-pill">
+        <span class="dot" style="background: #14b8a6"></span>
+        Monitor
+      </a>
+      <a href="#alert" class="nav-pill">
+        <span class="dot" style="background: #f97316"></span>
+        Alert
+      </a>
     </nav>
 
-    <!-- Entity Relationship Diagram -->
-    <section class="erd-section">
-      <h2 class="section-title">Entity Relationship Diagram</h2>
+    <!-- ============================================ -->
+    <!-- SECTION 1: CORE INTELLIGENCE MODEL -->
+    <!-- ============================================ -->
+    <section id="core-intelligence" class="erd-section" style="margin-top: 32px;">
+      <h2 class="section-title">Core Intelligence Model</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">
+        The analytical domain model for tracking narratives, themes, and their relationships to real-world entities. 
+        This is the foundation for intelligence analysis and narrative tracking.
+      </p>
       <div class="erd-container">
         <svg class="erd-diagram" viewBox="0 0 1100 650">
           <!-- Definitions -->
@@ -729,11 +387,25 @@
             <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Theme</text>
           </g>
 
+          <!-- Topic -->
+          <g transform="translate(720, 135)">
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/>
+            <circle cx="20" cy="25" r="8" fill="#8b5cf6"/>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Topic</text>
+          </g>
+
           <!-- Faction -->
           <g transform="translate(420, 135)">
             <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
             <circle cx="20" cy="25" r="8" fill="#f59e0b"/>
             <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Faction</text>
+          </g>
+
+          <!-- FactionOverlap (smaller, between factions) -->
+          <g transform="translate(420, 60)">
+            <rect width="120" height="35" rx="4" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <circle cx="16" cy="17" r="6" fill="#f59e0b" fill-opacity="0.5"/>
+            <text x="30" y="22" fill="#333333" font-size="11" font-weight="500">FactionOverlap</text>
           </g>
 
           <!-- Person -->
@@ -771,33 +443,28 @@
             <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">SubEvent</text>
           </g>
 
-          <!-- Monitor -->
-          <g transform="translate(720, 380)">
-            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/>
-            <circle cx="20" cy="25" r="8" fill="#14b8a6"/>
-            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Monitor</text>
+          <!-- Document (reference to next section) -->
+          <g transform="translate(720, 235)">
+            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#06b6d4" stroke-width="2" stroke-dasharray="6,3"/>
+            <circle cx="20" cy="25" r="8" fill="#06b6d4"/>
+            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Document</text>
           </g>
 
-          <!-- Alert -->
-          <g transform="translate(720, 485)">
-            <rect width="160" height="50" rx="6" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
-            <circle cx="20" cy="25" r="8" fill="#f97316"/>
-            <text x="40" y="30" fill="#333333" font-size="14" font-weight="600">Alert</text>
-          </g>
-
-          <!-- Monitor connections -->
-          <!-- Monitor to Alert (1:N) -->
-          <path d="M 800 430 L 800 485" stroke="#606070" stroke-width="1.5" fill="none"/>
-          <text x="810" y="460" fill="#9090a0" font-size="9">generates</text>
+          <!-- Topic connections -->
+          <!-- Topic aggregates Documents -->
+          <path d="M 800 185 L 800 235" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="810" y="215" fill="#9090a0" font-size="9">aggregates</text>
           
-          <!-- Monitor watches entities (dashed) -->
-          <path d="M 720 400 L 580 310" stroke="#14b8a6" stroke-width="1" fill="none" stroke-dasharray="4,4"/>
-          <path d="M 720 410 L 620 400" stroke="#14b8a6" stroke-width="1" fill="none" stroke-dasharray="4,4"/>
-          <path d="M 750 380 L 580 160" stroke="#14b8a6" stroke-width="1" fill="none" stroke-dasharray="4,4"/>
-          <text x="660" y="270" fill="#14b8a6" font-size="8">watches</text>
+          <!-- Document evidences Narrative -->
+          <path d="M 720 260 L 280 160" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="500" y="195" fill="#9090a0" font-size="9">evidences</text>
+          
+          <!-- FactionOverlap to Faction -->
+          <path d="M 480 95 L 480 135" stroke="#606070" stroke-width="1" fill="none"/>
+          <text x="488" y="118" fill="#9090a0" font-size="8">joins</text>
 
           <!-- Legend -->
-          <g transform="translate(880, 50)">
+          <g transform="translate(880, 380)">
             <text x="0" y="0" fill="#9090a0" font-size="11" font-weight="500">LEGEND</text>
             <line x1="0" y1="25" x2="40" y2="25" stroke="#606070" stroke-width="1.5"/>
             <text x="50" y="29" fill="#606070" font-size="10">One-to-Many</text>
@@ -805,18 +472,21 @@
             <text x="50" y="54" fill="#606070" font-size="10">Many-to-Many</text>
             <line x1="0" y1="75" x2="40" y2="75" stroke="#505058" stroke-width="1" stroke-dasharray="3,3"/>
             <text x="50" y="79" fill="#606070" font-size="10">Theme links</text>
-            <line x1="0" y1="100" x2="40" y2="100" stroke="#14b8a6" stroke-width="1" stroke-dasharray="4,4"/>
-            <text x="50" y="104" fill="#14b8a6" font-size="10">Monitor watches</text>
+            <line x1="0" y1="100" x2="40" y2="100" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="6,3"/>
+            <text x="50" y="104" fill="#06b6d4" font-size="10">Cross-section ref</text>
           </g>
         </svg>
       </div>
     </section>
 
-    <!-- Monitor-Alert ERD -->
-    <section class="erd-section">
-      <h2 class="section-title">Monitor-Alert System</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 13px;">
-        Monitors define scoped watchlists with configurable triggers. When conditions are met, alerts are generated referencing the relevant narratives, themes, events, and sub-events that match the criteria.
+    <!-- ============================================ -->
+    <!-- SECTION 3: MONITOR & ALERT SYSTEM -->
+    <!-- ============================================ -->
+    <section id="monitor-alert" class="erd-section" style="margin-top: 48px;">
+      <h2 class="section-title">Monitor & Alert System</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">
+        Automated tracking and notification system. Monitors define scoped watchlists with configurable triggers. 
+        When conditions are met, alerts are generated referencing the relevant narratives, themes, events, and sub-events that match the criteria.
       </p>
       <div class="erd-container">
         <svg class="erd-diagram" viewBox="0 0 1100 450">
@@ -1734,6 +1404,230 @@
           </div>
         </article>
 
+        <!-- Topic -->
+        <article id="topic" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">◈</div>
+            <div class="entity-info">
+              <h3>Topic</h3>
+              <p>Aggregated story clusters from documents with time-based volume tracking</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">headline</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Main headline summarizing the topic</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">bulletPoints</span>
+                <div class="field-meta">
+                  <span class="field-type">string[]</span>
+                  <p class="field-desc">Key summary points for the topic</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">documentIds</span>
+                <div class="field-meta">
+                  <span class="field-type">string[] (UUID)</span>
+                  <p class="field-desc">Documents that comprise this topic cluster</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">startDate</span>
+                <div class="field-meta">
+                  <span class="field-type">date</span>
+                  <p class="field-desc">When this topic first emerged (ISO 8601 date)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">endDate</span>
+                <div class="field-meta">
+                  <span class="field-type">date</span>
+                  <p class="field-desc">When this topic ended (null if ongoing)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">volumeOverTime</span>
+                <div class="field-meta">
+                  <span class="field-type">array</span>
+                  <p class="field-desc">Daily volume data: <code>[{ date, volume }]</code></p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">createdAt</span>
+                <div class="field-meta">
+                  <span class="field-type">datetime</span>
+                  <p class="field-desc">Record creation timestamp</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- FactionOverlap -->
+        <article id="factionoverlap" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--color-faction);">◇</div>
+            <div class="entity-info">
+              <h3>FactionOverlap</h3>
+              <p>Represents overlapping membership or shared sentiment between factions</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">factionIds</span>
+                <div class="field-meta">
+                  <span class="field-type required">string[] (UUID)</span>
+                  <p class="field-desc">The factions that overlap (typically two)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">overlapSize</span>
+                <div class="field-meta">
+                  <span class="field-type">number</span>
+                  <p class="field-desc">Estimated count of shared members</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">sharedSentiment</span>
+                <div class="field-meta">
+                  <span class="field-type">object</span>
+                  <p class="field-desc">Shared sentiment by narrative: <code>{ narrativeId: sentimentScore }</code></p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 2: DOCUMENT & COLLABORATION MODEL -->
+    <!-- ============================================ -->
+    <section id="document-collaboration" class="erd-section" style="margin-top: 48px;">
+      <h2 class="section-title">Document & Collaboration Model</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">
+        How we handle source materials, provenance, and team collaboration. Documents flow from Publishers, 
+        and Users can annotate them with Highlights and Comments to facilitate collaborative analysis.
+      </p>
+      <div class="erd-container">
+        <svg class="erd-diagram" viewBox="0 0 900 400">
+          <!-- Definitions -->
+          <defs>
+            <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#606070"/>
+            </marker>
+          </defs>
+
+          <!-- Connection Lines -->
+          <!-- Publisher to Document -->
+          <path d="M 200 120 L 350 120" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="255" y="112" fill="#9090a0" font-size="10">publishes</text>
+          
+          <!-- PublisherCategory to Publisher -->
+          <path d="M 120 60 L 120 95" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="130" y="82" fill="#9090a0" font-size="9">groups</text>
+          
+          <!-- Document to Highlight -->
+          <path d="M 500 145 L 620 200" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="545" y="165" fill="#9090a0" font-size="9">has</text>
+          
+          <!-- Document to Comment -->
+          <path d="M 500 145 L 620 280" stroke="#606070" stroke-width="1.5" fill="none"/>
+          
+          <!-- User to Highlight -->
+          <path d="M 780 120 L 700 200" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          <text x="735" y="155" fill="#9090a0" font-size="9">creates</text>
+          
+          <!-- User to Comment -->
+          <path d="M 780 120 L 700 280" stroke="#606070" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+          
+          <!-- Comment to Reply (self) -->
+          <path d="M 700 305 C 730 330, 730 350, 700 340" stroke="#606070" stroke-width="1" fill="none"/>
+          <text x="735" y="340" fill="#9090a0" font-size="8">replies</text>
+          
+          <!-- Document to Classification -->
+          <path d="M 430 145 L 430 200" stroke="#606070" stroke-width="1.5" fill="none"/>
+          <text x="440" y="175" fill="#9090a0" font-size="9">classified</text>
+
+          <!-- Entity Boxes -->
+          <!-- PublisherCategory -->
+          <g transform="translate(50, 35)">
+            <rect width="140" height="40" rx="5" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>
+            <circle cx="16" cy="20" r="6" fill="#b45309"/>
+            <text x="30" y="25" fill="#333333" font-size="12" font-weight="500">PublisherCategory</text>
+          </g>
+
+          <!-- Publisher -->
+          <g transform="translate(50, 95)">
+            <rect width="150" height="50" rx="6" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+            <circle cx="18" cy="25" r="8" fill="#b45309"/>
+            <text x="36" y="30" fill="#333333" font-size="14" font-weight="600">Publisher</text>
+          </g>
+
+          <!-- Document -->
+          <g transform="translate(350, 95)">
+            <rect width="150" height="50" rx="6" fill="#ffffff" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="18" cy="25" r="8" fill="#06b6d4"/>
+            <text x="36" y="30" fill="#333333" font-size="14" font-weight="600">Document</text>
+          </g>
+
+          <!-- Classification -->
+          <g transform="translate(370, 200)">
+            <rect width="120" height="40" rx="5" fill="#ffffff" stroke="#ef4444" stroke-width="1.5"/>
+            <circle cx="16" cy="20" r="6" fill="#ef4444"/>
+            <text x="30" y="25" fill="#333333" font-size="12" font-weight="500">Classification</text>
+          </g>
+
+          <!-- User -->
+          <g transform="translate(710, 95)">
+            <rect width="140" height="50" rx="6" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+            <circle cx="18" cy="25" r="8" fill="#10b981"/>
+            <text x="36" y="30" fill="#333333" font-size="14" font-weight="600">User</text>
+          </g>
+
+          <!-- Highlight -->
+          <g transform="translate(600, 200)">
+            <rect width="140" height="50" rx="6" fill="#ffffff" stroke="#fbbf24" stroke-width="2"/>
+            <circle cx="18" cy="25" r="8" fill="#fbbf24"/>
+            <text x="36" y="30" fill="#333333" font-size="14" font-weight="600">Highlight</text>
+          </g>
+
+          <!-- Comment -->
+          <g transform="translate(600, 280)">
+            <rect width="140" height="50" rx="6" fill="#ffffff" stroke="#f472b6" stroke-width="2"/>
+            <circle cx="18" cy="25" r="8" fill="#f472b6"/>
+            <text x="36" y="30" fill="#333333" font-size="14" font-weight="600">Comment</text>
+          </g>
+
+          <!-- Legend -->
+          <g transform="translate(50, 280)">
+            <text x="0" y="0" fill="#9090a0" font-size="11" font-weight="500">LEGEND</text>
+            <line x1="0" y1="22" x2="35" y2="22" stroke="#606070" stroke-width="1.5"/>
+            <text x="45" y="26" fill="#606070" font-size="10">One-to-Many</text>
+            <line x1="0" y1="44" x2="35" y2="44" stroke="#606070" stroke-width="1.5" stroke-dasharray="4,4"/>
+            <text x="45" y="48" fill="#606070" font-size="10">Created-by</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Document & Collaboration Entities -->
+    <section class="entities-section">
+      <div class="entities-grid">
+
         <!-- Monitor -->
         <article id="monitor" class="entity-card">
           <header class="entity-header">
@@ -2293,6 +2187,218 @@
             </ul>
           </div>
         </article>
+
+        <!-- User -->
+        <article id="user" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">◐</div>
+            <div class="entity-info">
+              <h3>User</h3>
+              <p>System users who can annotate documents with highlights and comments</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">username</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Login username (e.g., "nthayer")</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">displayName</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Full display name (e.g., "Nicole Thayer")</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">role</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Job role (e.g., "Senior Analyst", "Team Lead")</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">department</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">Department name (e.g., "Intelligence Analysis")</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">avatarUrl</span>
+                <div class="field-meta">
+                  <span class="field-type">string (URL)</span>
+                  <p class="field-desc">Path to user's avatar image</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">isCurrentUser</span>
+                <div class="field-meta">
+                  <span class="field-type">boolean</span>
+                  <p class="field-desc">Whether this is the currently logged-in user</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Highlight -->
+        <article id="highlight" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24;">▮</div>
+            <div class="entity-info">
+              <h3>Highlight</h3>
+              <p>Text selections marked by users within document content blocks</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">userId</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Foreign key to User who created the highlight</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">blockIndex</span>
+                <div class="field-meta">
+                  <span class="field-type required">number</span>
+                  <p class="field-desc">Index of the content block containing the highlight</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">startOffset</span>
+                <div class="field-meta">
+                  <span class="field-type required">number</span>
+                  <p class="field-desc">Character offset where highlight begins</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">endOffset</span>
+                <div class="field-meta">
+                  <span class="field-type required">number</span>
+                  <p class="field-desc">Character offset where highlight ends</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">highlightedText</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">The actual text that was highlighted (for display/reference)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">createdAt</span>
+                <div class="field-meta">
+                  <span class="field-type">datetime</span>
+                  <p class="field-desc">When the highlight was created (ISO 8601)</p>
+                </div>
+              </li>
+            </ul>
+            <p style="margin-top: var(--space-md); font-size: var(--text-sm); color: var(--text-muted);">
+              <strong>Note:</strong> Highlights are stored as embedded arrays within Document objects under the <code>highlights</code> field.
+            </p>
+          </div>
+        </article>
+
+        <!-- Comment -->
+        <article id="comment" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(244, 114, 182, 0.2); color: #f472b6;">💬</div>
+            <div class="entity-info">
+              <h3>Comment</h3>
+              <p>User annotations anchored to specific text within document content blocks</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Unique identifier</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">userId</span>
+                <div class="field-meta">
+                  <span class="field-type required">string (UUID)</span>
+                  <p class="field-desc">Foreign key to User who created the comment</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">blockIndex</span>
+                <div class="field-meta">
+                  <span class="field-type required">number</span>
+                  <p class="field-desc">Index of the content block the comment is anchored to</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">anchorStartOffset</span>
+                <div class="field-meta">
+                  <span class="field-type required">number</span>
+                  <p class="field-desc">Character offset where anchor text begins</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">anchorEndOffset</span>
+                <div class="field-meta">
+                  <span class="field-type required">number</span>
+                  <p class="field-desc">Character offset where anchor text ends</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">anchorText</span>
+                <div class="field-meta">
+                  <span class="field-type">string</span>
+                  <p class="field-desc">The text the comment is anchored to (for display/reference)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">content</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">The comment text content</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">createdAt</span>
+                <div class="field-meta">
+                  <span class="field-type">datetime</span>
+                  <p class="field-desc">When the comment was created (ISO 8601)</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">replies</span>
+                <div class="field-meta">
+                  <span class="field-type">array</span>
+                  <p class="field-desc">Nested reply objects: <code>[{ id, userId, content, createdAt }]</code></p>
+                </div>
+              </li>
+            </ul>
+            <p style="margin-top: var(--space-md); font-size: var(--text-sm); color: var(--text-muted);">
+              <strong>Note:</strong> Comments are stored as embedded arrays within Document objects under the <code>comments</code> field.
+            </p>
+          </div>
+        </article>
         
         <!-- Classification System -->
         <article id="classification" class="entity-card">
@@ -2408,6 +2514,42 @@
                 <div class="field-meta">
                   <span class="field-type">string</span>
                   <p class="field-desc">Parent category for hierarchical grouping</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- PublisherCategory -->
+        <article id="publishercategory" class="entity-card">
+          <header class="entity-header">
+            <div class="entity-icon" style="background: rgba(180, 83, 9, 0.2); color: #b45309;">⊞</div>
+            <div class="entity-info">
+              <h3>PublisherCategory</h3>
+              <p>Groupings for publishers by type (social, national news, etc.)</p>
+            </div>
+          </header>
+          <div class="entity-body">
+            <ul class="field-list">
+              <li class="field-item">
+                <span class="field-name">id</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Category identifier (e.g., "social", "national_news")</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">name</span>
+                <div class="field-meta">
+                  <span class="field-type required">string</span>
+                  <p class="field-desc">Display name (e.g., "Social Media", "National News")</p>
+                </div>
+              </li>
+              <li class="field-item">
+                <span class="field-name">color</span>
+                <div class="field-meta">
+                  <span class="field-type">string (hex)</span>
+                  <p class="field-desc">Category color for visualizations</p>
                 </div>
               </li>
             </ul>
@@ -3435,6 +3577,8 @@
 {
   <span class="key">"version"</span>: <span class="string">"1.0"</span>,
   <span class="key">"exportedAt"</span>: <span class="string">"2026-01-16T10:00:00Z"</span>,
+  
+  <span class="comment">// Core Intelligence Model</span>
   <span class="key">"missions"</span>: [
     { <span class="comment">/* Mission objects */</span> }
   ],
@@ -3444,8 +3588,14 @@
   <span class="key">"subNarratives"</span>: [
     { <span class="comment">/* Theme objects */</span> }
   ],
+  <span class="key">"topics"</span>: [
+    { <span class="comment">/* Topic objects */</span> }
+  ],
   <span class="key">"factions"</span>: [
     { <span class="comment">/* Faction objects */</span> }
+  ],
+  <span class="key">"factionOverlaps"</span>: [
+    { <span class="comment">/* FactionOverlap objects */</span> }
   ],
   <span class="key">"persons"</span>: [
     { <span class="comment">/* Person objects */</span> }
@@ -3459,9 +3609,22 @@
   <span class="key">"events"</span>: [
     { <span class="comment">/* Event objects */</span> }
   ],
-  <span class="key">"subEvents"</span>: [
-    { <span class="comment">/* SubEvent objects */</span> }
+  
+  <span class="comment">// Document & Collaboration Model</span>
+  <span class="key">"documents"</span>: [
+    { <span class="comment">/* Document objects (includes highlights, comments) */</span> }
   ],
+  <span class="key">"publishers"</span>: [
+    { <span class="comment">/* Publisher objects */</span> }
+  ],
+  <span class="key">"publisherCategories"</span>: [
+    { <span class="comment">/* PublisherCategory objects */</span> }
+  ],
+  <span class="key">"users"</span>: [
+    { <span class="comment">/* User objects */</span> }
+  ],
+  
+  <span class="comment">// Monitor & Alert System</span>
   <span class="key">"monitors"</span>: [
     { <span class="comment">/* Monitor objects */</span> }
   ],
@@ -3474,8 +3637,8 @@
     </section>
   </main>
 
-  <footer class="footer">
-    <p>Primer Data Model Reference v1.0 • Generated January 2026</p>
+  <footer class="doc-footer">
+    <p>Primer Data Model Reference v2.0 • Updated January 2026</p>
   </footer>
 
   <script>

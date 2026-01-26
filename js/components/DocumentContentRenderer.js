@@ -21,6 +21,7 @@ export class DocumentContentRenderer extends BaseComponent {
       ...options
     });
     this.activeCommentThread = null;
+    this._documentClickHandler = null;
   }
 
   formatNumber(num) {
@@ -143,14 +144,32 @@ export class DocumentContentRenderer extends BaseComponent {
       marker.addEventListener('click', (e) => this.toggleCommentThread(e, marker));
     });
 
+    // Remove any existing document click handler before adding a new one
+    if (this._documentClickHandler) {
+      document.removeEventListener('click', this._documentClickHandler);
+    }
+
     // Close comment thread when clicking outside
-    document.addEventListener('click', (e) => {
+    this._documentClickHandler = (e) => {
       if (this.activeCommentThread && 
           !e.target.closest('.comment-thread-popover') && 
           !e.target.closest('.comment-marker')) {
         this.closeCommentThread();
       }
-    });
+    };
+    document.addEventListener('click', this._documentClickHandler);
+  }
+
+  /**
+   * Clean up event listeners
+   */
+  destroy() {
+    if (this._documentClickHandler) {
+      document.removeEventListener('click', this._documentClickHandler);
+      this._documentClickHandler = null;
+    }
+    this.activeCommentThread = null;
+    super.destroy();
   }
 
   showHighlightTooltip(event) {

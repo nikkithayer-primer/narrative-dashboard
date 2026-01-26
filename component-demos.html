@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="doc-page">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,256 +29,11 @@
   <!-- View-specific -->
   <link rel="stylesheet" href="css/editor.css">
 
+  <!-- Documentation Pages -->
+  <link rel="stylesheet" href="css/documentation.css">
+
   <!-- Utilities (last for override capability) -->
   <link rel="stylesheet" href="css/utilities.css">
-  
-  <!-- Demo Page Specific Styles -->
-  <style>
-    /* Override body styles from reset.css to allow scrolling on standalone page */
-    html, body {
-      height: auto !important;
-      min-height: 100vh;
-      overflow: visible !important;
-    }
-    
-    body {
-      overflow-y: auto !important;
-      display: block !important;
-    }
-
-    /* Ensure logo is constrained (in case CSS doesn't load) */
-    .logo-img {
-      height: 24px !important;
-      width: auto !important;
-      max-width: 150px;
-    }
-
-    /* Fallback navbar styles */
-    .top-navbar {
-      height: 48px;
-      height: var(--navbar-height, 48px);
-    }
-
-    /* Layout with sidebar below navbar */
-    .demo-content-wrapper {
-      display: flex;
-      min-height: calc(100vh - 48px); /* Fallback if --navbar-height not available */
-      min-height: calc(100vh - var(--navbar-height, 48px));
-    }
-
-    /* Demo Sidebar */
-    .demo-sidebar {
-      width: 220px;
-      background: var(--bg-secondary, #ffffff);
-      border-right: 1px solid var(--border-color, #d8dde3);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      height: calc(100vh - 48px);
-      height: calc(100vh - var(--navbar-height, 48px));
-      position: sticky;
-      top: 48px;
-      top: var(--navbar-height, 48px);
-      overflow-y: auto;
-      padding-top: var(--space-lg, 12px);
-    }
-
-    .demo-sidebar .nav-section {
-      padding: 0 var(--space-md);
-    }
-
-    .demo-sidebar .nav-section-title {
-      font-size: var(--text-xs);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      padding: var(--space-sm) var(--space-md);
-      margin-top: var(--space-md);
-    }
-
-    .demo-sidebar .nav-links {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .demo-sidebar .nav-links li {
-      margin: 0;
-    }
-
-    .demo-sidebar .nav-links .nav-link {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-      padding: var(--space-sm) var(--space-md);
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: var(--text-sm);
-      border-radius: var(--border-radius);
-      transition: background 0.15s, color 0.15s;
-    }
-
-    .demo-sidebar .nav-links .nav-link:hover {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-    }
-
-    .demo-sidebar .nav-links .nav-link.active {
-      background: var(--bg-tertiary);
-      color: var(--accent-primary);
-    }
-
-    .demo-sidebar .nav-links .nav-link .nav-icon {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-
-    /* Main Content */
-    .demo-main {
-      flex: 1;
-      padding: var(--space-2xl);
-      overflow-y: auto;
-      max-width: 1200px;
-    }
-
-    .demo-main .page-intro {
-      margin-bottom: var(--space-2xl);
-    }
-
-    .demo-main .page-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: var(--space-sm);
-    }
-
-    .demo-main .page-description {
-      color: var(--text-secondary);
-      font-size: var(--text-sm);
-      max-width: 700px;
-    }
-
-    /* Component Section */
-    .component-section {
-      margin-bottom: var(--space-2xl);
-    }
-
-    .section-title {
-      font-size: var(--text-lg);
-      font-weight: 600;
-      margin-bottom: var(--space-sm);
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-    }
-
-    .section-title::before {
-      content: '';
-      width: 3px;
-      height: 18px;
-      background: var(--accent-primary);
-      border-radius: 2px;
-    }
-
-    .section-description {
-      color: var(--text-secondary);
-      font-size: var(--text-sm);
-      margin-bottom: var(--space-lg);
-    }
-
-    .demo-container {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: var(--space-lg);
-      overflow: hidden;
-    }
-
-    .demo-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: var(--space-lg);
-    }
-
-    /* Sparkline Demo */
-    .sparkline-demo {
-      display: flex;
-      align-items: center;
-      gap: var(--space-lg);
-      flex-wrap: wrap;
-    }
-
-    .sparkline-item {
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-    }
-
-    .sparkline-label {
-      font-size: var(--text-sm);
-      color: var(--text-secondary);
-    }
-
-    /* Code Block */
-    .code-block {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: var(--space-lg);
-      overflow-x: auto;
-      margin-top: var(--space-lg);
-    }
-
-    .code-block pre {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      line-height: 1.5;
-      color: var(--text-secondary);
-      margin: 0;
-    }
-
-    .code-block .key {
-      color: var(--accent-primary);
-    }
-
-    .code-block .string {
-      color: #a5d6a7;
-    }
-
-    .code-block .number {
-      color: #ffcc80;
-    }
-
-    .code-block .comment {
-      color: #6a737d;
-      font-style: italic;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .demo-content-wrapper {
-        flex-direction: column;
-      }
-
-      .demo-sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        top: 0;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .demo-main {
-        padding: var(--space-lg);
-      }
-
-      .demo-row {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body>
   <nav class="top-navbar">
@@ -534,6 +289,46 @@
               <rect x="13" y="8" width="2" height="6"/>
               <path d="M1 2h14" stroke-dasharray="2 1"/>
             </svg> Time Range Filter
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <span class="nav-section-title">Documents</span>
+        <ul class="nav-links">
+          <li><a href="#document-content-renderer" class="nav-link" data-target="document-content-renderer">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <path d="M3 1h7l3 3v11H3V1z"/>
+              <path d="M10 1v3h3"/>
+              <path d="M5 7h6M5 9h6M5 11h4"/>
+            </svg> Document Content
+          </a></li>
+          <li><a href="#document-list" class="nav-link" data-target="document-list">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <rect x="1" y="2" width="14" height="3" rx="0.5"/>
+              <rect x="1" y="6.5" width="14" height="3" rx="0.5"/>
+              <rect x="1" y="11" width="14" height="3" rx="0.5"/>
+            </svg> Document List
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <span class="nav-section-title">UI Elements</span>
+        <ul class="nav-links">
+          <li><a href="#classification-banner" class="nav-link" data-target="classification-banner">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <rect x="1" y="4" width="14" height="8" rx="1"/>
+              <path d="M1 7h14"/>
+            </svg> Classification Banner
+          </a></li>
+          <li><a href="#topic-list" class="nav-link" data-target="topic-list">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="var(--text-secondary)" stroke-width="1">
+              <circle cx="3" cy="4" r="1.5"/>
+              <circle cx="3" cy="8" r="1.5"/>
+              <circle cx="3" cy="12" r="1.5"/>
+              <path d="M6 4h8M6 8h8M6 12h8"/>
+            </svg> Topic List
           </a></li>
         </ul>
       </div>
@@ -893,6 +688,144 @@ filter.update({
         </div>
       </div>
     </section>
+
+    <!-- Document Content Renderer -->
+    <section id="document-content-renderer" class="component-section">
+      <h2 class="section-title">Document Content Renderer</h2>
+      <p class="section-description">Renders document content based on document type. Supports social posts, TikTok videos, news articles, and internal documents with highlights and comment annotations.</p>
+      <div class="demo-container">
+        <div style="display: flex; gap: var(--space-md); margin-bottom: var(--space-md);">
+          <button class="btn btn-small doc-type-btn active" data-doc-type="social_post">Social Post</button>
+          <button class="btn btn-small doc-type-btn" data-doc-type="news_article">News Article</button>
+          <button class="btn btn-small doc-type-btn" data-doc-type="tiktok">TikTok</button>
+          <button class="btn btn-small doc-type-btn" data-doc-type="internal">Internal</button>
+        </div>
+        <div id="document-content-renderer-demo" style="max-width: 600px; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: var(--space-lg); background: var(--bg-primary);"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> renderer = <span class="key">new</span> DocumentContentRenderer(<span class="string">'container'</span>, {
+  showPortionMarks: <span class="number">true</span>,
+  showAnnotations: <span class="number">true</span>
+});
+renderer.update({
+  document: {
+    documentType: <span class="string">'social_post'</span>,  <span class="comment">// or 'news_article', 'tiktok', 'internal'</span>
+    author: { displayName: <span class="string">'User'</span>, username: <span class="string">'@user'</span> },
+    content: <span class="string">'Post content here...'</span>,
+    publishedDate: <span class="string">'2025-01-15T10:30:00Z'</span>
+  },
+  highlights: [...],  <span class="comment">// Optional user highlights</span>
+  comments: [...]     <span class="comment">// Optional comments</span>
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Document List -->
+    <section id="document-list" class="component-section">
+      <h2 class="section-title">Document List</h2>
+      <p class="section-description">Simplified list view of documents with publication info and external links. Supports multiple document types and classification badges.</p>
+      <div class="demo-container">
+        <div id="document-list-demo"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> list = <span class="key">new</span> DocumentList(<span class="string">'container'</span>, {
+  maxItems: <span class="number">10</span>,
+  showExcerpt: <span class="number">true</span>,
+  showPublisher: <span class="number">true</span>,
+  showDate: <span class="number">true</span>,
+  showType: <span class="number">false</span>,
+  showClassification: <span class="number">true</span>,
+  onDocumentClick: (doc) => console.log(doc)
+});
+list.update({
+  documents: [
+    { 
+      id: <span class="string">'1'</span>,
+      title: <span class="string">'Document Title'</span>,
+      url: <span class="string">'https://example.com'</span>,
+      publisherId: <span class="string">'pub1'</span>,
+      publishedDate: <span class="string">'2025-01-15'</span>,
+      excerpt: <span class="string">'Document excerpt...'</span>,
+      classification: <span class="string">'U'</span>
+    }
+  ]
+});</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Classification Banner -->
+    <section id="classification-banner" class="component-section">
+      <h2 class="section-title">Classification Banner</h2>
+      <p class="section-description">Displays classification banners and badges for documents with security markings. Supports multiple classification levels.</p>
+      <div class="demo-container">
+        <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+          <div>
+            <span style="font-size: var(--text-xs); color: var(--text-muted); display: block; margin-bottom: var(--space-xs);">Full Banners:</span>
+            <div id="classification-banner-demo" style="display: flex; flex-direction: column; gap: var(--space-sm);"></div>
+          </div>
+          <div>
+            <span style="font-size: var(--text-xs); color: var(--text-muted); display: block; margin-bottom: var(--space-xs);">Inline Badges:</span>
+            <div id="classification-badges-demo" style="display: flex; gap: var(--space-md); flex-wrap: wrap;"></div>
+          </div>
+          <div>
+            <span style="font-size: var(--text-xs); color: var(--text-muted); display: block; margin-bottom: var(--space-xs);">Portion Marks:</span>
+            <div id="portion-marks-demo" style="display: flex; gap: var(--space-md); flex-wrap: wrap;"></div>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><span class="comment">// Full banner component</span>
+<span class="key">const</span> banner = <span class="key">new</span> ClassificationBanner(<span class="string">'container'</span>, {
+  showFullName: <span class="number">true</span>
+});
+banner.update({ classification: <span class="string">'S'</span> });
+
+<span class="comment">// Inline badge (helper function)</span>
+<span class="key">import</span> { renderClassificationBadge } <span class="key">from</span> <span class="string">'./ClassificationBanner.js'</span>;
+element.innerHTML = renderClassificationBadge(<span class="string">'TS'</span>);
+
+<span class="comment">// Portion mark (helper function)</span>
+<span class="key">import</span> { renderPortionMark } <span class="key">from</span> <span class="string">'./ClassificationBanner.js'</span>;
+element.innerHTML = renderPortionMark({ classification: <span class="string">'S'</span>, handling: <span class="string">'NF'</span> });</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Topic List -->
+    <section id="topic-list" class="component-section">
+      <h2 class="section-title">Topic List</h2>
+      <p class="section-description">List of topics with status indicators, sparklines, and expandable bullet point summaries. Shows topic duration and activity over time.</p>
+      <div class="demo-container">
+        <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md);">
+          <label style="font-size: var(--text-sm); display: flex; align-items: center; gap: var(--space-xs);">
+            <input type="checkbox" id="topic-list-bullets-toggle"> Show bullet points
+          </label>
+        </div>
+        <div id="topic-list-demo"></div>
+        <div class="code-block">
+          <pre><span class="key">const</span> list = <span class="key">new</span> TopicList(<span class="string">'container'</span>, {
+  maxItems: <span class="number">10</span>,
+  showSparkline: <span class="number">true</span>,
+  showVolume: <span class="number">true</span>,
+  showDuration: <span class="number">true</span>,
+  showBulletPoints: <span class="number">false</span>,
+  maxBulletPoints: <span class="number">3</span>,
+  onTopicClick: (topic) => console.log(topic)
+});
+list.update({
+  topics: [
+    {
+      id: <span class="string">'1'</span>,
+      headline: <span class="string">'Topic headline'</span>,
+      startDate: <span class="string">'2025-01-01'</span>,
+      endDate: <span class="number">null</span>,  <span class="comment">// null = active</span>
+      bulletPoints: [<span class="string">'Point 1'</span>, <span class="string">'Point 2'</span>],
+      volumeOverTime: [{ date: <span class="string">'2025-01-01'</span>, volume: <span class="number">100</span> }, ...]
+    }
+  ]
+});</pre>
+        </div>
+      </div>
+    </section>
   </main>
   </div>
 
@@ -935,6 +868,10 @@ filter.update({
     import { DocumentTable } from './js/components/DocumentTable.js';
     import { ColumnFilter } from './js/components/ColumnFilter.js';
     import { TimeRangeFilter } from './js/components/TimeRangeFilter.js';
+    import { DocumentContentRenderer } from './js/components/DocumentContentRenderer.js';
+    import { DocumentList } from './js/components/DocumentList.js';
+    import { ClassificationBanner, renderClassificationBadge, renderPortionMark } from './js/components/ClassificationBanner.js';
+    import { TopicList } from './js/components/TopicList.js';
     import { DataService } from './js/data/DataService.js';
     import { dataStore } from './js/data/DataStore.js';
 
@@ -1563,6 +1500,278 @@ filter.update({
     // Clear button handler
     document.getElementById('clear-time-filter-demo').addEventListener('click', () => {
       timeRangeFilter.clearSelection();
+    });
+
+    // ========================================
+    // Document Content Renderer Demo
+    // ========================================
+    
+    const demoDocuments = {
+      social_post: {
+        documentType: 'social_post',
+        author: {
+          displayName: 'Election Watch',
+          username: '@ElectionWatch2025',
+          avatarUrl: 'img/placeholders/avatar-default.svg'
+        },
+        content: 'THREAD: We tracked 47 voting machine claims over 72 hours. Here\'s what we found:\n\n1/ The original claim started on a small forum\n2/ Within 6 hours it hit major platforms\n3/ By hour 24, it had 2.3M impressions\n\nThe anatomy of election misinformation...',
+        publishedDate: '2025-01-15T10:30:00Z',
+        engagement: {
+          likes: 4521,
+          reblogs: 1832,
+          replies: 247
+        }
+      },
+      news_article: {
+        documentType: 'news_article',
+        title: 'State officials debunk viral voting machine claims',
+        author: 'Sarah Mitchell',
+        publishedDate: '2025-01-14T14:15:00Z',
+        headerImage: {
+          url: 'img/placeholders/image-placeholder.svg',
+          caption: 'Election officials address misinformation at press conference'
+        },
+        contentBlocks: [
+          { type: 'paragraph', content: 'Election officials from multiple states have issued statements refuting viral claims about voting machine vulnerabilities that spread across social media platforms this week.' },
+          { type: 'paragraph', content: 'The claims, which originated from an anonymous post on a small forum, alleged that voting machines could be remotely accessed and vote totals manipulated. Security experts have repeatedly debunked these assertions.' },
+          { type: 'quote', content: '"Our voting systems are tested rigorously before every election. These claims misrepresent how election security actually works," said the state election director.' },
+          { type: 'paragraph', content: 'The viral spread of the false claims demonstrates how quickly misinformation can reach millions of people on modern social platforms.' }
+        ]
+      },
+      tiktok: {
+        documentType: 'tiktok',
+        author: {
+          displayName: 'Voting Myths Debunked',
+          username: '@votingmyths',
+          avatarUrl: 'img/placeholders/avatar-default.svg'
+        },
+        content: 'POV: You\'re an election security expert watching people spread hacking claims 💀 Let me explain why voting machines can\'t be "hacked from the internet" #election #factcheck #votingmyths',
+        video: {
+          thumbnailUrl: 'img/placeholders/video-thumbnail.svg',
+          duration: 58
+        },
+        transcription: 'So everyone is sharing this video claiming voting machines can be hacked remotely. Let me break down why that\'s not how any of this works...',
+        publishedDate: '2025-01-10T08:00:00Z',
+        engagement: {
+          likes: 245000,
+          reblogs: 52000,
+          replies: 8700
+        }
+      },
+      internal: {
+        documentType: 'internal',
+        title: 'Weekly Threat Assessment - Election Security',
+        department: 'Threat Intelligence',
+        author: 'Analysis Team',
+        publishedDate: '2025-01-16T09:00:00Z',
+        contentBlocks: [
+          { type: 'heading', content: 'Executive Summary', portionMark: { classification: 'S', handling: 'NF' } },
+          { type: 'paragraph', content: 'This week saw a significant increase in coordinated inauthentic behavior targeting election infrastructure claims.', portionMark: { classification: 'S' } },
+          { type: 'paragraph', content: 'Analysis indicates the campaign originated from previously identified threat actors.', portionMark: { classification: 'S', handling: 'NF' } },
+          { type: 'heading', content: 'Key Findings', portionMark: { classification: 'C' } },
+          { type: 'list', content: ['47 unique claims tracked across 12 platforms', 'Estimated reach: 15M accounts', 'Peak activity: January 12-14'], portionMark: { classification: 'C' } }
+        ]
+      }
+    };
+
+    const documentContentRenderer = new DocumentContentRenderer(
+      document.getElementById('document-content-renderer-demo'),
+      { showPortionMarks: true, showAnnotations: true }
+    );
+    
+    // Initial render
+    documentContentRenderer.update({ document: demoDocuments.social_post });
+
+    // Document type switcher
+    document.querySelectorAll('.doc-type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.doc-type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const docType = btn.dataset.docType;
+        documentContentRenderer.update({ document: demoDocuments[docType] });
+      });
+    });
+
+    // ========================================
+    // Document List Demo
+    // ========================================
+    
+    const documentList = new DocumentList(document.getElementById('document-list-demo'), {
+      maxItems: 5,
+      showExcerpt: true,
+      showPublisher: true,
+      showDate: true,
+      showType: true,
+      showClassification: true,
+      onDocumentClick: (doc) => console.log('Clicked document:', doc)
+    });
+    
+    documentList.update({
+      documents: [
+        {
+          id: 'd1',
+          documentType: 'news_article',
+          title: 'State officials debunk viral voting machine claims',
+          url: 'https://example.com/officials-debunk',
+          publisherId: 's4',
+          publishedDate: '2025-01-14T14:15:00Z',
+          excerpt: 'Election officials from multiple states have issued statements refuting viral claims about voting machine vulnerabilities...',
+          classification: 'U'
+        },
+        {
+          id: 'd2',
+          documentType: 'social_post',
+          title: null,
+          url: 'https://x.com/ElectionWatch2025/status/1234567890',
+          publisherId: 's1',
+          publishedDate: '2025-01-15T10:30:00Z',
+          author: { username: '@ElectionWatch2025', displayName: 'Election Watch' },
+          content: 'THREAD: We tracked 47 voting machine claims over 72 hours...',
+          classification: 'U'
+        },
+        {
+          id: 'd3',
+          documentType: 'internal',
+          title: 'Weekly Threat Assessment - Election Security',
+          url: null,
+          publisherId: null,
+          publishedDate: '2025-01-16T09:00:00Z',
+          excerpt: 'This week saw a significant increase in coordinated inauthentic behavior targeting election infrastructure claims.',
+          classification: 'S'
+        },
+        {
+          id: 'd4',
+          documentType: 'news_article',
+          title: 'Fact-check: No evidence of widespread mail-in ballot fraud',
+          url: 'https://example.com/fact-check-mail',
+          publisherId: 's4',
+          publishedDate: '2025-01-12T16:45:00Z',
+          excerpt: 'Claims about fraudulent mail-in ballots continue to circulate despite lack of supporting evidence...',
+          classification: 'CUI'
+        }
+      ]
+    });
+
+    // ========================================
+    // Classification Banner Demo
+    // ========================================
+    
+    const classificationLevels = ['U', 'CUI', 'C', 'S', 'TS'];
+    const bannerContainer = document.getElementById('classification-banner-demo');
+    const badgesContainer = document.getElementById('classification-badges-demo');
+    const portionMarksContainer = document.getElementById('portion-marks-demo');
+    
+    // Create banners for each level
+    classificationLevels.forEach(level => {
+      const bannerWrapper = document.createElement('div');
+      bannerWrapper.id = `banner-${level.toLowerCase()}`;
+      bannerContainer.appendChild(bannerWrapper);
+      
+      const banner = new ClassificationBanner(bannerWrapper, { showFullName: true });
+      banner.update({ classification: level });
+    });
+    
+    // Create badges
+    badgesContainer.innerHTML = classificationLevels.map(level => 
+      renderClassificationBadge(level)
+    ).join(' ');
+    
+    // Create portion marks
+    const portionMarkExamples = [
+      { classification: 'U' },
+      { classification: 'CUI', handling: 'NOFORN' },
+      { classification: 'S', handling: 'NF' },
+      { classification: 'TS', handling: 'SI/TK' }
+    ];
+    portionMarksContainer.innerHTML = portionMarkExamples.map(pm => 
+      renderPortionMark(pm)
+    ).join(' ');
+
+    // ========================================
+    // Topic List Demo
+    // ========================================
+    
+    const topicList = new TopicList(document.getElementById('topic-list-demo'), {
+      maxItems: 5,
+      showSparkline: true,
+      showVolume: true,
+      showDuration: true,
+      showBulletPoints: false,
+      maxBulletPoints: 3,
+      onTopicClick: (topic) => console.log('Clicked topic:', topic)
+    });
+    
+    // Generate topic volume data
+    const generateTopicVolume = (days, baseVolume, trend = 'stable') => {
+      const data = [];
+      const startDate = new Date('2025-01-01');
+      for (let i = 0; i < days; i++) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + i);
+        let volume = baseVolume + Math.random() * baseVolume * 0.3;
+        if (trend === 'rising') volume *= (1 + i * 0.05);
+        if (trend === 'falling') volume *= (1 - i * 0.03);
+        data.push({ date: date.toISOString().split('T')[0], volume: Math.floor(volume) });
+      }
+      return data;
+    };
+
+    topicList.update({
+      topics: [
+        {
+          id: 't1',
+          headline: 'Election security concerns in swing states',
+          startDate: '2025-01-05',
+          endDate: null,
+          bulletPoints: [
+            'Multiple claims about voting machine vulnerabilities went viral',
+            'State officials issued coordinated response statements',
+            'Social media platforms implemented fact-check labels',
+            'Bot network activity detected amplifying claims'
+          ],
+          volumeOverTime: generateTopicVolume(20, 500, 'rising')
+        },
+        {
+          id: 't2',
+          headline: 'Mail-in ballot fraud allegations',
+          startDate: '2025-01-02',
+          endDate: null,
+          bulletPoints: [
+            'Claims focus on signature verification processes',
+            'No evidence of systematic fraud found',
+            'Narrative amplified by known disinformation accounts'
+          ],
+          volumeOverTime: generateTopicVolume(25, 350, 'stable')
+        },
+        {
+          id: 't3',
+          headline: 'Foreign interference in election campaigns',
+          startDate: '2024-12-15',
+          endDate: '2025-01-10',
+          bulletPoints: [
+            'Investigation concluded with no actionable findings',
+            'Monitoring continues for related activity'
+          ],
+          volumeOverTime: generateTopicVolume(30, 200, 'falling')
+        },
+        {
+          id: 't4',
+          headline: 'Voter registration database concerns',
+          startDate: '2025-01-10',
+          endDate: null,
+          bulletPoints: [
+            'Claims about database tampering debunked',
+            'Security audits confirmed system integrity',
+            'Misinformation traced to misunderstood routine maintenance'
+          ],
+          volumeOverTime: generateTopicVolume(15, 280, 'rising')
+        }
+      ]
+    });
+
+    // Toggle bullet points
+    document.getElementById('topic-list-bullets-toggle').addEventListener('change', (e) => {
+      topicList.setShowBulletPoints(e.target.checked);
     });
 
     // Smooth scroll and active state for sidebar navigation

@@ -6,11 +6,14 @@
 import { BaseView } from './BaseView.js';
 import { DataService } from '../data/DataService.js';
 import { NarrativeList } from '../components/NarrativeList.js';
+import { CardBuilder } from '../utils/CardBuilder.js';
+import { initAllCardToggles } from '../utils/cardWidthToggle.js';
 
 export class MonitorsView extends BaseView {
   constructor(container, options = {}) {
     super(container, options);
     this.narrativeListComponents = [];
+    this.descriptionToggles = new Map(); // Map of containerId -> NarrativeList
   }
 
   /**
@@ -130,11 +133,8 @@ export class MonitorsView extends BaseView {
       };
     });
     
-    // Build monitor cards HTML
+    // Build monitor cards HTML using CardBuilder
     const monitorCardsHtml = enrichedMonitors.map(monitor => {
-      const statusClass = monitor.enabled ? '' : 'monitor-paused';
-      const indicatorClass = monitor.enabled ? 'active' : 'paused';
-      
       // Build alerts HTML
       const alertsHtml = monitor.alerts && monitor.alerts.length > 0 
         ? monitor.alerts.slice(0, 3).map(alert => `
@@ -146,57 +146,43 @@ export class MonitorsView extends BaseView {
           `).join('')
         : '<div class="monitor-no-alerts">No recent alerts</div>';
       
-      return `
-        <div class="card ${statusClass}">
-          <div class="card-header">
-            <div class="monitor-title-row">
-              <div class="monitor-status-indicator ${indicatorClass}"></div>
-              <div class="monitor-title-wrapper">
-                <h2 class="card-title">${monitor.name}</h2>
-                <svg class="info-icon" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                  <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                </svg>
-                <div class="monitor-scope-popover">
-                  <div class="popover-section">
-                    <div class="popover-label">Scope</div>
-                    <div class="popover-scope-entity">
-                      ${monitor.scopeIcon}
-                      <span>${monitor.scopeLabel}</span>
-                    </div>
-                  </div>
-                  <div class="popover-section">
-                    <div class="popover-label">Triggers</div>
-                    <div class="popover-triggers">
-                      ${monitor.triggerLabels.map(t => `<span class="trigger-tag">${t}</span>`).join('')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="card-header-actions">
-              ${!monitor.enabled ? '<span class="badge badge-status-paused">Paused</span>' : ''}
-              <span class="monitor-meta-text">${
-                monitor.enabled && monitor.lastTriggeredFormatted
-                  ? `Triggered ${monitor.lastTriggeredFormatted}` 
-                  : ''
-              }</span>
-            </div>
+      // Build subtitle with trigger info and paused status
+      let subtitle = monitor.enabled && monitor.lastTriggeredFormatted
+        ? `Triggered ${monitor.lastTriggeredFormatted}`
+        : !monitor.enabled ? 'Paused' : '';
+      
+      // Build actions HTML with description toggle
+      const descToggleId = `desc-toggle-${monitor.id}`;
+      const actionsHtml = CardBuilder.descriptionToggle(descToggleId);
+      
+      // Content for the card body
+      const cardBodyContent = `
+        <div class="monitor-alerts-section">
+          <div class="monitor-section-header">
+            <span class="monitor-section-title">Recent Alerts</span>
+            ${monitor.alerts && monitor.alerts.length > 0 ? `<span class="alert-count">${monitor.alerts.length}</span>` : ''}
           </div>
-          <div class="card-body no-padding">
-            <div class="monitor-alerts-section">
-              <div class="monitor-section-header">
-                <span class="monitor-section-title">Recent Alerts</span>
-                ${monitor.alerts && monitor.alerts.length > 0 ? `<span class="alert-count">${monitor.alerts.length}</span>` : ''}
-              </div>
-              <div class="monitor-alerts-list">
-                ${alertsHtml}
-              </div>
-            </div>
-            <div class="monitor-narratives-container" id="${monitor.containerId}"></div>
+          <div class="monitor-alerts-list">
+            ${alertsHtml}
           </div>
         </div>
+        <div class="monitor-narratives-container" id="${monitor.containerId}"></div>
       `;
+      
+      // Use CardBuilder to create the card
+      const cardHtml = CardBuilder.create(monitor.name, `monitor-body-${monitor.id}`, {
+        noPadding: true,
+        halfWidth: true,
+        subtitle: subtitle,
+        actions: actionsHtml
+      });
+      
+      // Insert the card body content into the generated card
+      // We need to replace the empty body with our content
+      return cardHtml.replace(
+        `id="monitor-body-${monitor.id}"></div>`,
+        `id="monitor-body-${monitor.id}">${cardBodyContent}</div>`
+      );
     }).join('');
     
     // Calculate today's alerts count
@@ -349,7 +335,7 @@ export class MonitorsView extends BaseView {
           <h2 class="section-title">Active Monitors</h2>
           <button class="btn btn-small btn-primary">+ New Monitor</button>
         </div>
-        <div class="monitors-grid">
+        <div class="content-grid monitors-grid">
           ${monitorCardsHtml}
         </div>
       </div>
@@ -358,6 +344,10 @@ export class MonitorsView extends BaseView {
     
     // Setup popover toggle handlers
     this.setupHeaderPopovers();
+    
+    // Initialize card width toggles for all monitor cards
+    const monitorsGrid = this.container.querySelector('.monitors-grid');
+    initAllCardToggles(monitorsGrid, 'monitors');
     
     // Initialize NarrativeList components for each monitor
     enrichedMonitors.forEach(monitor => {
@@ -377,6 +367,18 @@ export class MonitorsView extends BaseView {
         });
         narrativeList.update({ narratives: monitor.matchedNarratives });
         this.narrativeListComponents.push(narrativeList);
+        
+        // Store reference for description toggle
+        this.descriptionToggles.set(monitor.id, narrativeList);
+        
+        // Set up description toggle handler
+        const descToggle = document.getElementById(`desc-toggle-${monitor.id}`);
+        if (descToggle) {
+          descToggle.addEventListener('click', () => {
+            const isShowing = narrativeList.toggleDescription();
+            descToggle.classList.toggle('active', isShowing);
+          });
+        }
       } else {
         // Show empty state for monitors with no matching narratives
         const container = document.getElementById(monitor.containerId);
@@ -432,6 +434,9 @@ export class MonitorsView extends BaseView {
     // Clean up narrative list components
     this.narrativeListComponents.forEach(c => c.destroy && c.destroy());
     this.narrativeListComponents = [];
+    
+    // Clear description toggles map
+    this.descriptionToggles.clear();
     
     // Remove document click handler
     if (this.documentClickHandler) {
